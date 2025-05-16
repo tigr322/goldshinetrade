@@ -1,1 +1,7 @@
 *.sqlite*
+/docker/db/backup.sql
+/docker/nginx/default.conf
+/docker/php/Dockerfile
+docker-compose.yml
+backup.sql
+/public/css/app
