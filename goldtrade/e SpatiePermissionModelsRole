@@ -1,0 +1,16 @@
+[90m= [39m[34;4mApp\Models\User[39;24m {#6352
+    [34mid[39m: [35m1[39m,
+    [34mname[39m: "[32mTigran Adamyan[39m",
+    [34memail[39m: "[32mtigran05012002@mail.ru[39m",
+    [34memail_verified_at[39m: [36mnull[39m,
+    [34madress[39m: [36mnull[39m,
+    #[33mpassword[39m: "[32m$2y$12$TMzwXaOuLF0eHLV9eOGOpuamZPe6ye9sc9wQWwb7EdWLSCUEz1fGy[39m",
+    [34mphone[39m: [36mnull[39m,
+    [34mis_verified[39m: [35m0[39m,
+    [34mbalance_real[39m: "[32m0.00[39m",
+    [34mrating[39m: [33m0.0[39m,
+    #[33mremember_token[39m: [36mnull[39m,
+    [34mcreated_at[39m: "[32m2025-05-15 17:48:45[39m",
+    [34mupdated_at[39m: "[32m2025-05-15 17:48:45[39m",
+  }
+
