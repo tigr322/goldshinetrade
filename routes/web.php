@@ -26,7 +26,7 @@ Route::get('/exchange', function () {
     return Inertia::render('Exchange');
 })->name('exchange');
 
-// Мои карты
+// Мои картывыв
 Route::get('/cards', function () {
     return Inertia::render('Cards');
 })->name('cards');
