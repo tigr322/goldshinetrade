@@ -2,25 +2,30 @@
     "private": true,
     "type": "module",
     "scripts": {
-      "dev": "vite",
-      "build": "vite build"
+        "dev": "vite",
+        "build": "vite build"
     },
     "devDependencies": {
-      "@inertiajs/vue3": "^2.0.0",
-      "@tailwindcss/forms": "^0.5.3",
-      "@tailwindcss/vite": "^4.0.0",
-      "@vitejs/plugin-vue": "^5.0.0",
-      "autoprefixer": "^10.4.12",
-      "axios": "^1.8.2",
-      "concurrently": "^9.0.1",
-      "laravel-vite-plugin": "^1.2.0",
-      "postcss": "^8.4.31",
-      "tailwindcss": "^3.2.1",
-      "vite": "^6.2.4",
-      "vue": "^3.4.0"
+        "@inertiajs/vue3": "^1.3.0",
+        "@tailwindcss/forms": "^0.5.3",
+        "@tailwindcss/vite": "^4.0.0",
+        "@vitejs/plugin-vue": "^5.0.0",
+        "autoprefixer": "^10.4.12",
+        "axios": "^1.8.2",
+        "concurrently": "^9.0.1",
+        "laravel-vite-plugin": "^1.2.0",
+        "postcss": "^8.4.31",
+        "tailwindcss": "^3.2.1",
+        "vite": "^6.2.4",
+        "vue": "^3.5.14"
     },
     "dependencies": {
-      "@headlessui/vue": "^1.7.23",
-      "@heroicons/vue": "^2.2.0"
+        "@headlessui/vue": "^1.7.23",
+        "@heroicons/vue": "^2.2.0",
+        "@inertiajs/inertia": "^0.11.1",
+        "@inertiajs/inertia-vue3": "^0.6.0",
+        "@inertiajs/progress": "^0.2.7",
+        "ziggy": "^2.4.0",
+        "ziggy-js": "^1.8.2"
     }
-  }
+}

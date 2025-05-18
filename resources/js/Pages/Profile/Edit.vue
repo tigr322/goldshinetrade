@@ -4,6 +4,7 @@ import DeleteUserForm from './Partials/DeleteUserForm.vue';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm.vue';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm.vue';
 import { Head } from '@inertiajs/vue3';
+defineOptions({ layout: (h, page) => h(AppLayout, null, () => page) })
 
 defineProps({
     mustVerifyEmail: {
@@ -54,3 +55,6 @@ defineProps({
         </div>
     </AuthenticatedLayout>
 </template>
+<script>
+import AppLayout from '@/Layouts/AppLayout.vue'
+</script>

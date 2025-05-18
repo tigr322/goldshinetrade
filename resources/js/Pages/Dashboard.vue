@@ -59,39 +59,20 @@ import {
   ChevronRightIcon,
   MagnifyingGlassIcon,
 } from '@heroicons/vue/20/solid'
+
 const props = defineProps({
-  user: Object
+  title: String,
+  user: Object,
+  balance: String,
+  offers_count: Number,
+  deals_count: Number,
+  messages_count: Number,
+  reviews_received_count: Number,
+  reviews_given_count: Number,
+  withdrawals: Array,
 })
-const navigation = [
-  { name: 'Дом', href: '#', icon: HomeIcon, current: true },
-  { name: 'Обмен', href: '#', icon: ClockIcon, current: false },
-  { name: 'Баланс', href: '#', icon: ScaleIcon, current: false },
-  { name: 'Мои карты', href: '#', icon: CreditCardIcon, current: false },
-  { name: 'Мои счета', href: '#', icon: UserGroupIcon, current: false },
-  { name: 'Жалобы', href: '#', icon: DocumentChartBarIcon, current: false },
-]
-const secondaryNavigation = [
-  { name: 'Настройки', href: '#', icon: CogIcon },
-  { name: 'Помощь', href: '#', icon: QuestionMarkCircleIcon },
-  { name: 'Безопасность', href: '#', icon: ShieldCheckIcon },
-]
-const cards = [
-  { name: 'Баланс аккаунта', href: '#', icon: ScaleIcon, amount: '₽30,659.45' },
-  // More items...
-]
-const transactions = [
-  {
-    id: 1,
-    name: 'Обмен 10,000 golds WOW Warmane на 20,000',
-    href: '#',
-    amount: '20,000',
-    currency: 'руб',
-    status: 'success',
-    date: 'Мая 11, 2025',
-    datetime: '2025-05-11',
-  },
-  // More transactions...
-]
+defineOptions({ layout: (h, page) => h(AppLayout, null, () => page) })
+
 const statusStyles = {
   success: 'bg-green-100 text-green-800',
   processing: 'bg-yellow-100 text-yellow-800',
@@ -110,85 +91,14 @@ const sidebarOpen = ref(false)
       ```
     -->
     <div class="min-h-full">
-      <TransitionRoot as="template" :show="sidebarOpen">
-        <Dialog as="div" class="relative z-40 lg:hidden" @close="sidebarOpen = false">
-          <TransitionChild as="template" enter="transition-opacity ease-linear duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="transition-opacity ease-linear duration-300" leave-from="opacity-100" leave-to="opacity-0">
-            <div class="fixed inset-0 bg-gray-600 bg-opacity-75" />
-          </TransitionChild>
-  
-          <div class="fixed inset-0 z-40 flex">
-            <TransitionChild as="template" enter="transition ease-in-out duration-300 transform" enter-from="-translate-x-full" enter-to="translate-x-0" leave="transition ease-in-out duration-300 transform" leave-from="translate-x-0" leave-to="-translate-x-full">
-              <DialogPanel class="relative flex w-full max-w-xs flex-1 flex-col bg-cyan-700 pt-5 pb-4">
-                <TransitionChild as="template" enter="ease-in-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in-out duration-300" leave-from="opacity-100" leave-to="opacity-0">
-                  <div class="absolute top-0 right-0 -mr-12 pt-2">
-                    <button type="button" class="ml-1 flex h-10 w-10 items-center justify-center rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" @click="sidebarOpen = false">
-                      <span class="sr-only">Close sidebar</span>
-                      <XMarkIcon class="h-6 w-6 text-white" aria-hidden="true" />
-                    </button>
-                  </div>
-                </TransitionChild>
-               
-                
-                <div className="flex flex-shrink-0 items-center px-4">
-                <img className="h-8 w-auto" src="/storage/icon.png" alt="Logo" />
-                </div>
-                <nav class="mt-5 h-full flex-shrink-0 divide-y divide-cyan-800 overflow-y-auto" aria-label="Sidebar">
-                  <div class="space-y-1 px-2">
-                    <a v-for="item in navigation" :key="item.name" :href="item.href" :class="[item.current ? 'bg-cyan-800 text-white' : 'text-cyan-100 hover:text-white hover:bg-cyan-600', 'group flex items-center px-2 py-2 text-base font-medium rounded-md']" :aria-current="item.current ? 'page' : undefined">
-                      <component :is="item.icon" class="mr-4 h-6 w-6 flex-shrink-0 text-cyan-200" aria-hidden="true" />
-                      {{ item.name }}
-                    </a>
-                  </div>
-                  <div class="mt-6 pt-6">
-                    <div class="space-y-1 px-2">
-                      <a v-for="item in secondaryNavigation" :key="item.name" :href="item.href" class="group flex items-center rounded-md px-2 py-2 text-base font-medium text-cyan-100 hover:bg-cyan-600 hover:text-white">
-                        <component :is="item.icon" class="mr-4 h-6 w-6 text-cyan-200" aria-hidden="true" />
-                        {{ item.name }}
-                      </a>
-                    </div>
-                  </div>
-                </nav>
-              </DialogPanel>
-            </TransitionChild>
-            <div class="w-14 flex-shrink-0" aria-hidden="true">
-              <!-- Dummy element to force sidebar to shrink to fit close icon -->
-            </div>
-          </div>
-        </Dialog>
-      </TransitionRoot>
+     
   
       <!-- Static sidebar for desktop -->
-      <div class="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-48 lg:flex-col">
-        <!-- Sidebar component, swap this element with another sidebar if you like -->
-        <div class="flex flex-grow flex-col overflow-y-auto bg-cyan-700">
-          <div class="flex flex-shrink-0 items-center">
-            <img class="h-23 w-23 flex-shrink-0" src="/storage/icon.png" alt="" />
-          </div>
-          <nav class="mt-5 flex flex-1 flex-col divide-y divide-cyan-800 overflow-y-auto" aria-label="Sidebar">
-            <div class="space-y-1 px-2">
-              <a v-for="item in navigation" :key="item.name" :href="item.href" :class="[item.current ? 'bg-cyan-800 text-white' : 'text-cyan-100 hover:text-white hover:bg-cyan-600', 'group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md']" :aria-current="item.current ? 'page' : undefined">
-                <component :is="item.icon" class="mr-4 h-6 w-6 flex-shrink-0 text-cyan-200" aria-hidden="true" />
-                {{ item.name }}
-              </a>
-            </div>
-            <div class="mt-6 pt-6">
-              <div class="space-y-1 px-2">
-                <a v-for="item in secondaryNavigation" :key="item.name" :href="item.href" class="group flex items-center rounded-md px-2 py-2 text-sm font-medium leading-6 text-cyan-100 hover:bg-cyan-600 hover:text-white">
-                  <component :is="item.icon" class="mr-4 h-6 w-6 text-cyan-200" aria-hidden="true" />
-                  {{ item.name }}
-                </a>
-              </div>
-            </div>
-          </nav>
-        </div>
-      </div>
+      
   
-      <div class="flex flex-1 flex-col lg:pl-64">
+      <div class="flex flex-1 flex-col">
         <div class="flex h-16 flex-shrink-0 border-b border-gray-200 bg-white lg:border-none">
-          <button type="button" class="border-r border-gray-200 px-4 text-gray-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-cyan-500 lg:hidden" @click="sidebarOpen = true">
-            <span class="sr-only">Open sidebar</span>
-            <Bars3CenterLeftIcon class="h-6 w-6" aria-hidden="true" />
-          </button>
+          
           <!-- Search bar -->
           <div class="flex flex-1 justify-between px-4 sm:px-6 lg:mx-auto lg:max-w-6xl lg:px-8">
             <div class="flex flex-1">
@@ -320,24 +230,25 @@ const sidebarOpen = ref(false)
             <!-- Activity list (smallest breakpoint only) -->
             <div class="shadow sm:hidden">
               <ul role="list" class="mt-2 divide-y divide-gray-200 overflow-hidden shadow sm:hidden">
-                <li v-for="transaction in transactions" :key="transaction.id">
-                  <a :href="transaction.href" class="block bg-white px-4 py-4 hover:bg-gray-50">
-                    <span class="flex items-center space-x-4">
-                      <span class="flex flex-1 space-x-2 truncate">
-                        <BanknotesIcon class="h-5 w-5 flex-shrink-0 text-gray-400" aria-hidden="true" />
-                        <span class="flex flex-col truncate text-sm text-gray-500">
-                          <span class="truncate">{{ transaction.name }}</span>
-                          <span
-                            ><span class="font-medium text-gray-900">{{ transaction.amount }}</span> {{ transaction.currency }}</span
-                          >
-                          <time :datetime="transaction.datetime">{{ transaction.date }}</time>
+              <li v-for="item in withdrawals" :key="item.id">
+                <a :href="item.href" class="block bg-white px-4 py-4 hover:bg-gray-50">
+                  <span class="flex items-center space-x-4">
+                    <span class="flex flex-1 space-x-2 truncate">
+                      <BanknotesIcon class="h-5 w-5 flex-shrink-0 text-gray-400" aria-hidden="true" />
+                      <span class="flex flex-col truncate text-sm text-gray-500">
+                        <span class="truncate">{{ item.name }}</span>
+                        <span>
+                          <span class="font-medium text-gray-900">{{ item.amount }}</span> {{ item.currency }}
                         </span>
+                        <time :datetime="item.datetime">{{ item.date }}</time>
                       </span>
-                      <ChevronRightIcon class="h-5 w-5 flex-shrink-0 text-gray-400" aria-hidden="true" />
                     </span>
-                  </a>
-                </li>
-              </ul>
+                    <ChevronRightIcon class="h-5 w-5 flex-shrink-0 text-gray-400" aria-hidden="true" />
+                  </span>
+                </a>
+              </li>
+            </ul>
+
   
               <nav class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3" aria-label="Pagination">
                 <div class="flex flex-1 justify-between">
@@ -418,3 +329,6 @@ const sidebarOpen = ref(false)
     </div>
   </template>
   
+<script>
+import AppLayout from '@/Layouts/AppLayout.vue'
+</script>

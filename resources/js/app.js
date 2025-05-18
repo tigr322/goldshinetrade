@@ -10,13 +10,17 @@ const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
-    resolve: (name) =>
-        resolvePageComponent(
-            `./Pages/${name}.vue`,
-            import.meta.glob('./Pages/**/*.vue'),
-        ),
+    resolve: name => {
+        const pages = import.meta.glob('./Pages/**/*.vue', { eager: true })
+        const page = pages[`./Pages/${name}.vue`]
+    
+        // по умолчанию оборачивать в AppLayout, если страница сама не указала layout
+        page.default.layout ??= undefined // можно поставить AppLayout, если хочешь дефолт
+    
+        return page
+      },
     setup({ el, App, props, plugin }) {
-        return createApp({ render: () => h(App, props) })
+        createApp({ render: () => h(App, props) })
             .use(plugin)
             .use(ZiggyVue)
             .mount(el);

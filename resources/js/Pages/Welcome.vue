@@ -1,6 +1,7 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
 
+
 defineProps({
     canLogin: {
         type: Boolean,
@@ -57,14 +58,7 @@ function handleImageError() {
           <div class="hidden lg:flex lg:gap-x-12">
             <a v-for="item in navigation" :key="item.name" :href="item.href" class="text-sm font-semibold leading-6 text-gray-900">{{ item.name }}</a>
           </div>
-          <div class="hidden lg:flex lg:flex-1 lg:justify-end">
-            <Link
-                        :href="route('login')"
-                              class="text-sm font-semibold leading-6 text-gray-900"
-                            >
-                                Log in
-                </Link>
-          </div>
+          
         </nav>
         <Dialog as="div" @close="mobileMenuOpen = false" :open="mobileMenuOpen">
           <DialogPanel focus="true" class="fixed inset-0 z-10 overflow-y-auto bg-white px-6 py-6 lg:hidden">
@@ -114,7 +108,14 @@ function handleImageError() {
               <p class="mt-6 text-lg leading-8 text-gray-600">Продавайте и получайте реальные денежные средства в течение всего дня, без необходимости выхода из дома!</p>
              
               <div class="mt-10 flex items-center justify-center gap-x-6">
-                
+               
+            <Link
+                        :href="route('login')"
+                              class="text-sm font-semibold leading-6 text-gray-900"
+                            >
+                                Log in
+                </Link>
+        
                 <Link
                                 v-if="canRegister"
                                 :href="route('register')"
