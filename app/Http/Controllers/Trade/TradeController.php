@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 
 use App\Models\Offer;
 use App\Models\Deal;
+use App\Models\Category;
 use App\Models\Currency;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -17,7 +18,7 @@ class TradeController extends Controller
         $offers = Offer::with(['currency', 'user'])
             ->where('is_active', true)
             ->latest()
-            ->take(10)
+            ->take(100)
             ->get()
             ->map(function ($offer) {
                 return [
@@ -38,10 +39,11 @@ class TradeController extends Controller
             });
 
         $currencies = Currency::select('id', 'name')->get();
-
+        $categories = Category::select('id', 'name')->get();
         return Inertia::render('Trades/Index', [
             'offers' => $offers,
             'currencies' => $currencies,
+            'categories' => $categories,
         ]);
     }
 

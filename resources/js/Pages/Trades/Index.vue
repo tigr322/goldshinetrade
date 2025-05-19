@@ -2,13 +2,17 @@
 import { ref } from 'vue'
 import { useForm } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
+import { computed } from 'vue'
 
 defineOptions({ layout: (h, page) => h(AppLayout, null, () => page) })
 
 const props = defineProps({
   offers: Array,
-  currencies: Array
+  currencies: Array,
+  categories: Array  
 })
+const selectedCategory = ref('')
+
 
 const selectedOffer = ref(null)
 
@@ -17,7 +21,11 @@ const form = useForm({
   offer_id: '',
   quantity: 1,
 })
+const filteredOffers = computed(() => {
+  if (!selectedCategory.value) return props.offers
 
+  return props.offers.filter(offer => offer.category_id === selectedCategory.value)
+})
 const buy = (offer) => {
   selectedOffer.value = offer
   form.offer_id = offer.id
@@ -51,6 +59,16 @@ const createForm = useForm({
    <!-- Список офферов в стиле списка с иконками -->
 <!-- Таблица офферов для десктопа -->
 <div class="hidden sm:block mt-6">
+    <div class="mb-4">
+  <label for="categoryFilter" class="block font-semibold mb-1">Фильтр по категории</label>
+  <select id="categoryFilter" v-model="selectedCategory" class="border p-2 rounded">
+    <option value="">Все категории</option>
+    <option v-for="category in categories" :key="category.id" :value="category.id">
+      {{ category.name }}
+    </option>
+  </select>
+</div>
+
   <div class="mx-auto max-w-4xl">
     <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
       <table class="min-w-full divide-y divide-gray-300">
@@ -64,18 +82,18 @@ const createForm = useForm({
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200 bg-white">
-          <tr v-for="offer in offers" :key="offer.id">
-            <td class="px-6 py-4 text-sm text-gray-900">{{ offer.title }}</td>
-            <td class="px-6 py-4 text-sm text-gray-500">{{ offer.price_per_unit }} </td>
-            <td class="px-6 py-4 text-sm text-gray-500">{{ offer.quantity }} {{ offer.currency.name }}</td>
-            <td class="px-6 py-4 text-sm text-gray-500">{{ offer.user.name }}</td>
-            <td class="px-6 py-4 text-sm">
-              <button @click="buy(offer)" class="bg-cyan-600 text-white px-3 py-1 rounded text-sm hover:bg-cyan-700">
-                Купить
-              </button>
-            </td>
-          </tr>
-        </tbody>
+  <tr v-for="offer in filteredOffers" :key="offer.id">
+    <td class="px-6 py-4 text-sm text-gray-900">{{ offer.title }}</td>
+    <td class="px-6 py-4 text-sm text-gray-500">{{ offer.price_per_unit }}</td>
+    <td class="px-6 py-4 text-sm text-gray-500">{{ offer.quantity }} {{ offer.currency.name }}</td>
+    <td class="px-6 py-4 text-sm text-gray-500">{{ offer.user.name }}</td>
+    <td class="px-6 py-4 text-sm">
+      <button @click="buy(offer)" class="bg-cyan-600 text-white px-3 py-1 rounded text-sm hover:bg-cyan-700">
+        Купить
+      </button>
+    </td>
+  </tr>
+</tbody>
       </table>
     </div>
   </div>
