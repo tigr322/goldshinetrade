@@ -85,7 +85,7 @@ if (user && user.roles?.includes('Admin')) {
               </div>
 
               <div class="flex items-center px-4">
-                <img class="h-8 w-auto" src="/storage/icon.png" alt="Logo" />
+                <img class="h-20 w-auto" src="/storage/icon.png" alt="Logo" />
               </div>
 
               <nav class="mt-5 divide-y divide-cyan-800 overflow-y-auto px-2" aria-label="Sidebar">
