@@ -36,7 +36,7 @@ Route::get('/accounts', function () {
     return Inertia::render('Accounts');
 })->name('accounts');
 
-// Жалобывыв
+// Жалобывыввы
 Route::get('/complaints', function () {
     return Inertia::render('Complaints');
 })->name('complaints');
