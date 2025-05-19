@@ -226,28 +226,62 @@ const sidebarOpen = ref(false)
             </div>
   
             <h2 class="mx-auto mt-8 max-w-6xl px-4 text-lg font-medium leading-6 text-gray-900 sm:px-6 lg:px-8">Активности</h2>
-  
-            <!-- Activity list (smallest breakpoint only) -->
-            <div class="shadow sm:hidden">
-              <ul role="list" class="mt-2 divide-y divide-gray-200 overflow-hidden shadow sm:hidden">
-              <li v-for="item in withdrawals" :key="item.id">
-                <a :href="item.href" class="block bg-white px-4 py-4 hover:bg-gray-50">
-                  <span class="flex items-center space-x-4">
-                    <span class="flex flex-1 space-x-2 truncate">
-                      <BanknotesIcon class="h-5 w-5 flex-shrink-0 text-gray-400" aria-hidden="true" />
-                      <span class="flex flex-col truncate text-sm text-gray-500">
-                        <span class="truncate">{{ item.name }}</span>
-                        <span>
-                          <span class="font-medium text-gray-900">{{ item.amount }}</span> {{ item.currency }}
-                        </span>
-                        <time :datetime="item.datetime">{{ item.date }}</time>
-                      </span>
-                    </span>
-                    <ChevronRightIcon class="h-5 w-5 flex-shrink-0 text-gray-400" aria-hidden="true" />
-                  </span>
-                </a>
-              </li>
-            </ul>
+
+<!-- Таблица для больших экранов -->
+<div class="hidden sm:block">
+  <div class="mt-2 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+    <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+      <table class="min-w-full divide-y divide-gray-300">
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Название</th>
+            <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Сумма</th>
+            <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Статус</th>
+            <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Дата</th>
+            <th scope="col" class="relative px-6 py-3"><span class="sr-only">Подробнее</span></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 bg-white">
+          <tr v-for="item in withdrawals" :key="item.id">
+            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900">{{ item.name }}</td>
+            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{{ item.amount }} {{ item.currency }}</td>
+            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{{ item.status }}</td>
+            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+              <time :datetime="item.datetime">{{ item.date }}</time>
+            </td>
+            <td class="relative whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+              <a :href="item.href" class="text-indigo-600 hover:text-indigo-900">Подробнее</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Список для мобильных -->
+<div class="shadow sm:hidden">
+  <ul role="list" class="mt-2 divide-y divide-gray-200 overflow-hidden shadow sm:hidden">
+    <li v-for="item in withdrawals" :key="item.id">
+      <a :href="item.href" class="block bg-white px-4 py-4 hover:bg-gray-50">
+        <span class="flex items-center space-x-4">
+          <span class="flex flex-1 space-x-2 truncate">
+            <BanknotesIcon class="h-5 w-5 flex-shrink-0 text-gray-400" aria-hidden="true" />
+            <span class="flex flex-col truncate text-sm text-gray-500">
+              <span class="truncate">{{ item.name }}</span>
+              <span>
+                <span class="font-medium text-gray-900">{{ item.amount }}</span> {{ item.currency }}
+              </span>
+              <time :datetime="item.datetime">{{ item.date }}</time>
+            </span>
+          </span>
+          <ChevronRightIcon class="h-5 w-5 flex-shrink-0 text-gray-400" aria-hidden="true" />
+        </span>
+      </a>
+    </li>
+  </ul>
+
+
 
   
               <nav class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3" aria-label="Pagination">

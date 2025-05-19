@@ -49,32 +49,38 @@ const createForm = useForm({
 
     <!-- Таблица офферов -->
    <!-- Список офферов в стиле списка с иконками -->
-<div class="shadow sm:hidden">
-  <ul role="list" class="mt-2 divide-y divide-gray-200 overflow-hidden shadow sm:hidden">
-    <li v-for="offer in offers" :key="offer.id">
-      <div class="block bg-white px-4 py-4 hover:bg-gray-50">
-        <div class="flex items-center space-x-4">
-          <div class="flex flex-1 space-x-2 truncate">
-            <BanknotesIcon class="h-5 w-5 flex-shrink-0 text-gray-400" aria-hidden="true" />
-            <div class="flex flex-col truncate text-sm text-gray-500">
-              <span class="truncate font-medium text-gray-900">{{ offer.title }}</span>
-              <span>
-                Цена: <span class="font-medium text-gray-900">{{ offer.price_per_unit }}</span> {{ offer.currency.name }}
-              </span>
-              <span>
-                Кол-во: {{ offer.quantity }}
-              </span>
-              <span>
-                Продавец: {{ offer.user.name }}
-              </span>
-            </div>
-          </div>
-          <button @click="buy(offer)" class=" bg-cyan-600 text-white px-3 py-1 rounded text-sm">Купить</button>
-        </div>
-      </div>
-    </li>
-  </ul>
+<!-- Таблица офферов для десктопа -->
+<div class="hidden sm:block mt-6">
+  <div class="mx-auto max-w-4xl">
+    <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+      <table class="min-w-full divide-y divide-gray-300">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Название</th>
+            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Цена за штуку</th>
+            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Всего доступно</th>
+            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Продавец</th>
+            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Действие</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 bg-white">
+          <tr v-for="offer in offers" :key="offer.id">
+            <td class="px-6 py-4 text-sm text-gray-900">{{ offer.title }}</td>
+            <td class="px-6 py-4 text-sm text-gray-500">{{ offer.price_per_unit }} </td>
+            <td class="px-6 py-4 text-sm text-gray-500">{{ offer.quantity }} {{ offer.currency.name }}</td>
+            <td class="px-6 py-4 text-sm text-gray-500">{{ offer.user.name }}</td>
+            <td class="px-6 py-4 text-sm">
+              <button @click="buy(offer)" class="bg-cyan-600 text-white px-3 py-1 rounded text-sm hover:bg-cyan-700">
+                Купить
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
+
 
 
     <!-- Форма покупки -->
