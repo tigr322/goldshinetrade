@@ -31,7 +31,7 @@ Route::get('/cards', function () {
     return Inertia::render('Cards');
 })->name('cards');
 
-// Мои счета
+// Мои счетаfdfd
 Route::get('/accounts', function () {
     return Inertia::render('Accounts');
 })->name('accounts');
