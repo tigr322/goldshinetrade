@@ -13,11 +13,19 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 class TradeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $offers = Offer::with(['currency', 'user'])
-            ->where('is_active', true)
-            ->latest()
+        $query = Offer::with(['user'])
+        ->where('is_active', 1);
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+    
+        // фильтр по названию
+        if ($request->filled('search')) {
+            $query->where('title', 'like', '%' . $request->search . '%');
+        }
+        $offers = $query->latest()
             ->take(100)
             ->get()
             ->map(function ($offer) {
@@ -25,11 +33,11 @@ class TradeController extends Controller
                     'id' => $offer->id,
                     'title' => $offer->title,
                     'description' => $offer->description,
-                    'price_per_unit' => number_format($offer->price_per_unit, 2, '.', ' '),
+                    'price_per_unit' => number_format($offer->price, 2, '.', ' '),
                     'quantity' => $offer->quantity,
                     'currency' => [
-                        'id' => $offer->currency->id,
-                        'name' => $offer->currency->name,
+                        'id' => $offer->id,
+                        'name' => $offer->name,
                     ],
                     'user' => [
                         'id' => $offer->user->id,
@@ -38,12 +46,12 @@ class TradeController extends Controller
                 ];
             });
 
-        $currencies = Currency::select('id', 'name')->get();
-        $categories = Category::select('id', 'name')->get();
+      
+       
         return Inertia::render('Trades/Index', [
             'offers' => $offers,
-            'currencies' => $currencies,
-            'categories' => $categories,
+            'categories' => Category::select('id', 'name')->get(),
+            'filters' => $request->only('category_id', 'search')
         ]);
     }
 

@@ -7,19 +7,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-
-class Category extends Model
+class Game extends Model
 {
     use HasFactory;
     protected $fillable = ['name'];
-
-    public function games(): BelongsToMany
+    protected $table = 'games';
+    public function categories(): BelongsToMany
     {
-        return $this->belongsToMany(Game::class);
+        return $this->belongsToMany(Category::class);
     }
 
-    public function offers(): HasMany
+    public function servers(): HasMany
     {
-        return $this->hasMany(Offer::class);
+        return $this->hasMany(Server::class);
     }
 }

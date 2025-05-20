@@ -1,38 +1,35 @@
 <script setup>
-import { ref } from 'vue'
-import { useForm } from '@inertiajs/vue3'
+import { ref, computed } from 'vue'
+import { useForm, router } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
-import { computed } from 'vue'
 
 defineOptions({ layout: (h, page) => h(AppLayout, null, () => page) })
 
 const props = defineProps({
   offers: Array,
-  currencies: Array,
-  categories: Array  
+  categories: Array,
+  filters: Object,
 })
-const selectedCategory = ref('')
 
+const filters = ref({
+  category_id: props.filters?.category_id || '',
+  search: props.filters?.search || '',
+})
 
+// Покупка
 const selectedOffer = ref(null)
-
-// форма покупки
 const form = useForm({
   offer_id: '',
   quantity: 1,
 })
-const filteredOffers = computed(() => {
-  if (!selectedCategory.value) return props.offers
 
-  return props.offers.filter(offer => offer.category_id === selectedCategory.value)
-})
 const buy = (offer) => {
   selectedOffer.value = offer
   form.offer_id = offer.id
   form.quantity = 1
 }
 
-// форма создания оффера
+// Форма создания оффера
 const createForm = useForm({
   title: '',
   description: '',
@@ -40,11 +37,33 @@ const createForm = useForm({
   quantity: '',
   currency_id: '',
 })
+
+// Отфильтрованные офферы
+const filteredOffers = computed(() => {
+  return props.offers.filter((offer) => {
+    const matchesCategory =
+      !filters.value.category_id || offer.category_id == filters.value.category_id
+    const matchesSearch =
+      !filters.value.search || offer.title.toLowerCase().includes(filters.value.search.toLowerCase())
+
+    return matchesCategory && matchesSearch
+  })
+})
+
+// Отправка фильтров
+const submitFilter = () => {
+  router.get('/offers', filters.value, {
+    preserveState: true,
+    preserveScroll: true,
+  })
+}
 </script>
+
 
 <template>
   <div class="max-w-4xl mx-auto py-10">
 
+    <div class="max-w-4xl mx-auto py-10">
     <div class="flex justify-between items-center">
       <h2 class="text-lg font-medium leading-6 text-gray-900">Активные офферы</h2>
       <Link
@@ -55,19 +74,27 @@ const createForm = useForm({
       </Link>
     </div>
 
-    <!-- Таблица офферов -->
-   <!-- Список офферов в стиле списка с иконками -->
-<!-- Таблица офферов для десктопа -->
-<div class="hidden sm:block mt-6">
-    <div class="mb-4">
-  <label for="categoryFilter" class="block font-semibold mb-1">Фильтр по категории</label>
-  <select id="categoryFilter" v-model="selectedCategory" class="border p-2 rounded">
-    <option value="">Все категории</option>
-    <option v-for="category in categories" :key="category.id" :value="category.id">
-      {{ category.name }}
-    </option>
-  </select>
-</div>
+    <!-- Фильтры -->
+    <div class="mt-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:gap-6">
+      <div class="flex-1">
+        <label for="categoryFilter" class="block font-semibold mb-1">Фильтр по категории</label>
+        <select id="categoryFilter" v-model="filters.category_id" @change="submitFilter" class="border p-2 rounded w-full">
+          <option value="">Все категории</option>
+          <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name }}</option>
+        </select>
+      </div>
+      <div class="flex-1">
+        <label for="search" class="block font-semibold mb-1">Поиск по названию</label>
+        <input
+          type="text"
+          id="search"
+          v-model="filters.search"
+          @keyup.enter="submitFilter"
+          class="border p-2 rounded w-full"
+          placeholder="Введите название оффера"
+        />
+      </div>
+    </div>
 
   <div class="mx-auto max-w-4xl">
     <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
@@ -75,6 +102,7 @@ const createForm = useForm({
         <thead class="bg-gray-50">
           <tr>
             <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Название</th>
+            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Описание</th>
             <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Цена за штуку</th>
             <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Всего доступно</th>
             <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Продавец</th>
@@ -82,18 +110,19 @@ const createForm = useForm({
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200 bg-white">
-  <tr v-for="offer in filteredOffers" :key="offer.id">
-    <td class="px-6 py-4 text-sm text-gray-900">{{ offer.title }}</td>
-    <td class="px-6 py-4 text-sm text-gray-500">{{ offer.price_per_unit }}</td>
-    <td class="px-6 py-4 text-sm text-gray-500">{{ offer.quantity }} {{ offer.currency.name }}</td>
-    <td class="px-6 py-4 text-sm text-gray-500">{{ offer.user.name }}</td>
-    <td class="px-6 py-4 text-sm">
-      <button @click="buy(offer)" class="bg-cyan-600 text-white px-3 py-1 rounded text-sm hover:bg-cyan-700">
-        Купить
-      </button>
-    </td>
-  </tr>
-</tbody>
+          <tr v-for="offer in offers" :key="offer.id">
+            <td class="px-6 py-4 text-sm text-gray-900">{{ offer.title }}</td>
+            <td class="px-6 py-4 text-sm text-gray-900">{{ offer.description }}</td>
+            <td class="px-6 py-4 text-sm text-gray-500">{{ offer.price_per_unit }} </td>
+            <td class="px-6 py-4 text-sm text-gray-500">{{ offer.quantity }} {{ offer.currency.name }}</td>
+            <td class="px-6 py-4 text-sm text-gray-500">{{ offer.user.name }}</td>
+            <td class="px-6 py-4 text-sm">
+              <button @click="buy(offer)" class="bg-cyan-600 text-white px-3 py-1 rounded text-sm hover:bg-cyan-700">
+                Купить
+              </button>
+            </td>
+          </tr>
+        </tbody>
       </table>
     </div>
   </div>

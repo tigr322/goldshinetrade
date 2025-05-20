@@ -19,8 +19,8 @@ class MainController extends Controller
         'offers_count' => $user->offers()->count(),
         'deals_count' => $user->deals()->count(),
         'messages_count' => $user->messages()->count(),
-        'reviews_received_count' => $user->reviewsReceived()->count(),
-        'reviews_given_count' => $user->reviewsGiven()->count(),
+       
+       
 
         // 💸 Подготовка списка транзакций (выводов)
         'withdrawals' => $user->withdrawals()->latest()->take(5)->get()->map(function ($w) {

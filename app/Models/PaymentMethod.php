@@ -8,18 +8,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class Category extends Model
+class PaymentMethod extends Model
 {
     use HasFactory;
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'details'];
 
-    public function games(): BelongsToMany
+    public function deals(): HasMany
     {
-        return $this->belongsToMany(Game::class);
-    }
-
-    public function offers(): HasMany
-    {
-        return $this->hasMany(Offer::class);
+        return $this->hasMany(Deal::class);
     }
 }

@@ -3,17 +3,22 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Message extends Model
 {
-    protected $fillable = ['deal_id', 'user_id', 'message'];
+    use HasFactory;
+    protected $fillable = ['deal_id', 'user_id', 'content'];
 
-    public function deal()
+    public function deal(): BelongsTo
     {
         return $this->belongsTo(Deal::class);
     }
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
