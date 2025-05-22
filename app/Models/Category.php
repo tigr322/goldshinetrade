@@ -15,7 +15,7 @@ class Category extends Model
 
     public function games(): BelongsToMany
     {
-        return $this->belongsToMany(Game::class);
+        return $this->belongsToMany(Game::class, 'game_category');
     }
 
     public function offers(): HasMany

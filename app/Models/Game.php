@@ -14,7 +14,7 @@ class Game extends Model
     protected $table = 'games';
     public function categories(): BelongsToMany
     {
-        return $this->belongsToMany(Category::class);
+        return $this->belongsToMany(Category::class, 'game_category');
     }
 
     public function servers(): HasMany

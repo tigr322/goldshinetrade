@@ -13,8 +13,10 @@ const props = defineProps({
 
 const filters = ref({
   category_id: props.filters?.category_id || '',
+  game_category_id: props.filters?.game_category_id || '',
   search: props.filters?.search || '',
 })
+
 
 // Покупка
 const selectedOffer = ref(null)
@@ -83,6 +85,16 @@ const submitFilter = () => {
           <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name }}</option>
         </select>
       </div>
+      <div class="flex-1">
+  <label for="gameCategoryFilter" class="block font-semibold mb-1">Фильтр по категории игры</label>
+  <select id="gameCategoryFilter" v-model="filters.game_category_id" @change="submitFilter" class="border p-2 rounded w-full">
+    <option value="">Все игровые категории</option>
+    <option v-for="category in gameCategories" :key="category.id" :value="category.id">
+      {{ category.name }}
+    </option>
+  </select>
+</div>
+
       <div class="flex-1">
         <label for="search" class="block font-semibold mb-1">Поиск по названию</label>
         <input

@@ -14,46 +14,52 @@ use Inertia\Inertia;
 class TradeController extends Controller
 {
     public function index(Request $request)
-    {
-        $query = Offer::with(['user'])
+{
+    $query = Offer::with(['user', 'server.game'])
         ->where('is_active', 1);
-        if ($request->filled('category_id')) {
-            $query->where('category_id', $request->category_id);
-        }
-    
-        // фильтр по названию
-        if ($request->filled('search')) {
-            $query->where('title', 'like', '%' . $request->search . '%');
-        }
-        $offers = $query->latest()
-            ->take(100)
-            ->get()
-            ->map(function ($offer) {
-                return [
-                    'id' => $offer->id,
-                    'title' => $offer->title,
-                    'description' => $offer->description,
-                    'price_per_unit' => number_format($offer->price, 2, '.', ' '),
-                    'quantity' => $offer->quantity,
-                    'currency' => [
-                        'id' => $offer->id,
-                        'name' => $offer->name,
-                    ],
-                    'user' => [
-                        'id' => $offer->user->id,
-                        'name' => $offer->user->name,
-                    ],
-                ];
-            });
 
-      
-       
-        return Inertia::render('Trades/Index', [
-            'offers' => $offers,
-            'categories' => Category::select('id', 'name')->get(),
-            'filters' => $request->only('category_id', 'search')
-        ]);
+    if ($request->filled('category_id')) {
+        $query->where('category_id', $request->category_id);
     }
+
+    if ($request->filled('game_category_id')) {
+        $query->whereHas('server.game.categories', function ($q) use ($request) {
+            $q->where('categories.id', $request->game_category_id);
+        });
+    }
+
+    if ($request->filled('search')) {
+        $query->where('title', 'like', '%' . $request->search . '%');
+    }
+
+    $offers = $query->latest()->take(100)->get()->map(function ($offer) {
+        return [
+            'id' => $offer->id,
+            'title' => $offer->title,
+            'description' => $offer->description,
+            'price_per_unit' => number_format($offer->price, 2, '.', ' '),
+            'quantity' => $offer->quantity,
+            'currency' => [
+                'id' => $offer->id,
+                'name' => $offer->name,
+            ],
+            'user' => [
+                'id' => $offer->user->id,
+                'name' => $offer->user->name,
+            ],
+            'category_id' => $offer->category_id,
+            'game_category_ids' => $offer->server?->game?->categories->pluck('id') ?? [],
+        ];
+    });
+
+    return Inertia::render('Trades/Index', [
+        'offers' => $offers,
+        'categories' => Category::select('id', 'name')->get(),
+        'gameCategories' => \App\Models\GameCategory::with(['game', 'category'])->get(), 
+        'filters' => $request->only('category_id', 'game_category_id', 'search'),
+    ]);
+}
+
 
     public function store(Request $request)
     {
