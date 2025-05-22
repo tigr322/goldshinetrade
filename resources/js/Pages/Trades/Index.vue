@@ -167,41 +167,52 @@ const submitFilter = () => {
 </div>
 </div>
     <!-- Фильтры -->
-    <div class="mt-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:gap-6">
-      <div class="flex-1">
-        <label for="categoryFilter" class="block font-semibold mb-1">Фильтр по категории</label>
-        <select id="categoryFilter" v-model="filters.category_id" @change="submitFilter" class="border p-2 rounded w-full">
-          <option value="">Все категории</option>
-          <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name }}</option>
-        </select>
-      </div>
-      <div class="flex-1">
-  <label for="gameCategoryFilter" class="block font-semibold mb-1">Фильтр по категории игры</label>
-  <select id="gameCategoryFilter" v-model="filters.game_category_id" @change="submitFilter" class="border p-2 rounded w-full">
-    <option value="">Все игровые категории</option>
-    <option
-  v-for="category in gameCategories"
-  :key="category?.id"
-  :value="category?.id"
->
-  {{ category?.name ?? 'Без названия' }}
-</option>
+    <div class="mt-8 bg-white rounded-xl shadow p-6 space-y-4 sm:space-y-0 sm:flex sm:items-end sm:justify-between sm:gap-6">
+  <!-- Категория -->
+  <div class="flex-1">
+    <label for="categoryFilter" class="block text-sm font-semibold text-gray-700 mb-1">Категория</label>
+    <select
+      id="categoryFilter"
+      v-model="filters.category_id"
+      @change="submitFilter"
+      class="w-full rounded-md border border-gray-300 bg-white p-2 shadow-sm focus:border-cyan-600 focus:ring-cyan-600"
+    >
+      <option value="">Все категории</option>
+      <option v-for="category in categories" :key="category.id" :value="category.id">
+        {{ category.name }}
+      </option>
+    </select>
+  </div>
 
-  </select>
+  <!-- Категория игры -->
+  <div class="flex-1">
+    <label for="gameCategoryFilter" class="block text-sm font-semibold text-gray-700 mb-1">Категория игры</label>
+    <select
+      id="gameCategoryFilter"
+      v-model="filters.game_category_id"
+      @change="submitFilter"
+      class="w-full rounded-md border border-gray-300 bg-white p-2 shadow-sm focus:border-cyan-600 focus:ring-cyan-600"
+    >
+      <option value="">Все игровые категории</option>
+      <option v-for="category in gameCategories" :key="category?.id" :value="category?.id">
+        {{ category?.name ?? 'Без названия' }}
+      </option>
+    </select>
+  </div>
+
+  <!-- Поиск -->
+  <div class="flex-1">
+    <label for="search" class="block text-sm font-semibold text-gray-700 mb-1">Поиск по названию</label>
+    <input
+      type="text"
+      id="search"
+      v-model="filters.search"
+      @keyup.enter="submitFilter"
+      placeholder="Введите название оффера"
+      class="w-full rounded-md border border-gray-300 bg-white p-2 shadow-sm focus:border-cyan-600 focus:ring-cyan-600"
+    />
+  </div>
 </div>
-
-      <div class="flex-1">
-        <label for="search" class="block font-semibold mb-1">Поиск по названию</label>
-        <input
-          type="text"
-          id="search"
-          v-model="filters.search"
-          @keyup.enter="submitFilter"
-          class="border p-2 rounded w-full"
-          placeholder="Введите название оффера"
-        />
-      </div>
-    </div>
 
   <div class="mx-auto max-w-4xl">
     <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
@@ -210,6 +221,7 @@ const submitFilter = () => {
           <tr>
             <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Название</th>
             <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Описание</th>
+            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Игра/Услуга</th>
             <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Цена за штуку</th>
             <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Всего доступно</th>
             <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Продавец</th>
@@ -220,7 +232,8 @@ const submitFilter = () => {
           <tr v-for="offer in offers" :key="offer.id">
             <td class="px-6 py-4 text-sm text-gray-900">{{ offer.title }}</td>
             <td class="px-6 py-4 text-sm text-gray-900">{{ offer.description }}</td>
-            <td class="px-6 py-4 text-sm text-gray-500">{{ offer.price_per_unit }} </td>
+            <td class="px-6 py-4 text-sm text-gray-900">{{ offer.game_name ?? '—' }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">{{ offer.price_per_unit }} </td>
             <td class="px-6 py-4 text-sm text-gray-500">{{ offer.quantity }} {{ offer.currency.name }}</td>
             <td class="px-6 py-4 text-sm text-gray-500">{{ offer.user.name }}</td>
             <td class="px-6 py-4 text-sm">

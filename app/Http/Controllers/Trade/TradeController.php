@@ -26,7 +26,7 @@ class TradeController extends Controller
     // фильтр по категории игры
     if ($request->filled('game_category_id')) {
         $query->whereHas('server.game.categories', function ($q) use ($request) {
-            $q->where('game_categories.id', $request->game_category_id);
+            $q->where('game_category.id', $request->game_category_id);
         });
     }
 
@@ -43,7 +43,7 @@ class TradeController extends Controller
             'quantity' => $offer->quantity,
             'currency' => [
                 'id' => $offer->id,
-                'name' => $offer->name, // предполагается, что это не offer->name, а offer->currency->name
+                'name' => $offer->name, // проверь, что это не ошибка — скорее должно быть $offer->currency->name
             ],
             'user' => [
                 'id' => $offer->user->id,
@@ -51,6 +51,7 @@ class TradeController extends Controller
             ],
             'category_id' => $offer->category_id,
             'game_category_ids' => $offer->gameCategoryIds(),
+            'game_name' => optional($offer->server?->game)->name,
         ];
     });
     $gameCategories = Category::whereHas('games')  // Только те категории, у которых есть игры
