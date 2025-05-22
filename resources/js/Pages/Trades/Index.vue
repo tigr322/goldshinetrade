@@ -8,8 +8,17 @@ defineOptions({ layout: (h, page) => h(AppLayout, null, () => page) })
 const props = defineProps({
   offers: Array,
   categories: Array,
+  gameCategories: {
+    type: Array,
+    default: () => []
+  },
+  games: Array,
+  servers: Array,
+  
   filters: Object,
 })
+const showCreateModal = ref(false)
+
 
 const filters = ref({
   category_id: props.filters?.category_id || '',
@@ -35,10 +44,15 @@ const buy = (offer) => {
 const createForm = useForm({
   title: '',
   description: '',
-  price_per_unit: '',
+  category_id: '',
+  game_category_id: '',
+  game_id: '',
+  server_id: '',
+  price: '',
   quantity: '',
-  currency_id: '',
+ 
 })
+
 
 // Отфильтрованные офферы
 const filteredOffers = computed(() => {
@@ -68,14 +82,90 @@ const submitFilter = () => {
     <div class="max-w-4xl mx-auto py-10">
     <div class="flex justify-between items-center">
       <h2 class="text-lg font-medium leading-6 text-gray-900">Активные офферы</h2>
-      <Link
-        href="/offers/add"
-        class="inline-flex items-center rounded-md border border-transparent bg-cyan-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
-      >
-        Добавить новый оффер
-      </Link>
+      <!-- Кнопка для открытия модалки -->
+<!-- Кнопка открытия -->
+<button
+  @click="showCreateModal = true"
+  class="mt-4 bg-cyan-600 text-white px-4 py-2 rounded shadow hover:bg-cyan-700 transition"
+>
+  Добавить оффер
+</button>
+
+<!-- Модальное окно -->
+<div
+  v-if="showCreateModal"
+  class="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex justify-center items-center z-50"
+>
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4">
+    <div class="flex justify-between items-center">
+      <h2 class="text-lg font-semibold text-gray-800">Новый оффер</h2>
+      <button @click="showCreateModal = false" class="text-gray-400 hover:text-gray-600">&times;</button>
     </div>
 
+    <form @submit.prevent="createForm.post('/offers', { onSuccess: () => showCreateModal = false })" class="space-y-3">
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Заголовок</label>
+        <input v-model="createForm.title" type="text" class="mt-1 w-full border-gray-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Описание</label>
+        <textarea v-model="createForm.description" class="mt-1 w-full border-gray-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500" rows="2" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Категория</label>
+        <select v-model="createForm.category_id" class="mt-1 w-full border-gray-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500">
+          <option value="">Выберите</option>
+          <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name }}</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Категория игры</label>
+        <select v-model="createForm.game_category_id" class="mt-1 w-full border-gray-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500">
+          <option value="">Выберите</option>
+          <option v-for="category in gameCategories" :key="category?.id" :value="category?.id">
+            {{ category?.name ?? 'Без названия' }}
+          </option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Игра</label>
+        <select v-model="createForm.game_id" class="mt-1 w-full border-gray-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500">
+          <option value="">Выберите</option>
+          <option v-for="g in games" :key="g.id" :value="g.id">{{ g.name }}</option>
+        </select>
+      </div>
+
+      <div v-if="servers.length">
+        <label class="block text-sm font-medium text-gray-700">Сервер</label>
+        <select v-model="createForm.server_id" class="mt-1 w-full border-gray-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500">
+          <option value="">Выберите</option>
+          <option v-for="s in servers" :key="s.id" :value="s.id">{{ s.name }}</option>
+        </select>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Цена</label>
+          <input v-model="createForm.price" type="number" step="0.01" class="mt-1 w-full border-gray-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Количество</label>
+          <input v-model="createForm.quantity" type="number" class="mt-1 w-full border-gray-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500" />
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-2">
+        <button @click="showCreateModal = false" type="button" class="mr-3 text-sm text-gray-600 hover:underline">Отмена</button>
+        <button type="submit" class="bg-cyan-600 text-white px-4 py-2 rounded-md hover:bg-cyan-700 transition">Создать</button>
+      </div>
+    </form>
+  </div>
+</div>
+</div>
     <!-- Фильтры -->
     <div class="mt-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:gap-6">
       <div class="flex-1">
@@ -89,9 +179,14 @@ const submitFilter = () => {
   <label for="gameCategoryFilter" class="block font-semibold mb-1">Фильтр по категории игры</label>
   <select id="gameCategoryFilter" v-model="filters.game_category_id" @change="submitFilter" class="border p-2 rounded w-full">
     <option value="">Все игровые категории</option>
-    <option v-for="category in gameCategories" :key="category.id" :value="category.id">
-      {{ category.name }}
-    </option>
+    <option
+  v-for="category in gameCategories"
+  :key="category?.id"
+  :value="category?.id"
+>
+  {{ category?.name ?? 'Без названия' }}
+</option>
+
   </select>
 </div>
 
@@ -156,37 +251,7 @@ const submitFilter = () => {
     </div>
 
     <!-- Форма создания оффера -->
-    <div class="mt-12 border-t pt-6">
-      <h2 class="text-xl font-semibold mb-4">Создать оффер</h2>
-      <form @submit.prevent="createForm.post('/offers')" class="space-y-4">
-        <div>
-          <label>Заголовок</label>
-          <input type="text" v-model="createForm.title" class="border p-2 rounded w-full" />
-          <div v-if="createForm.errors.title" class="text-red-600">{{ createForm.errors.title }}</div>
-        </div>
-        <div>
-          <label>Описание</label>
-          <textarea v-model="createForm.description" class="border p-2 rounded w-full"></textarea>
-        </div>
-        <div>
-          <label>Цена за единицу</label>
-          <input type="number" v-model="createForm.price_per_unit" class="border p-2 rounded w-full" step="0.01" />
-        </div>
-        <div>
-          <label>Количество</label>
-          <input type="number" v-model="createForm.quantity" class="border p-2 rounded w-full" />
-        </div>
-        <div>
-          <label>Валюта</label>
-          <select v-model="createForm.currency_id" class="border p-2 rounded w-full">
-            <option value="">Выберите</option>
-            <option v-for="currency in currencies" :key="currency.id" :value="currency.id">
-              {{ currency.name }}
-            </option>
-          </select>
-        </div>
-        <button type="submit" class=" bg-cyan-600 text-white px-4 py-2 hover:bg-cyan-700 rounded">Создать оффер</button>
-      </form>
+   
     </div>
-  </div>
+ 
 </template>

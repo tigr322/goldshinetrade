@@ -8,23 +8,25 @@ use Illuminate\Http\Request;
 use App\Models\Offer;
 use App\Models\Deal;
 use App\Models\Category;
-use App\Models\Currency;
+use App\Models\Game;
+use App\Models\Server;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 class TradeController extends Controller
 {
     public function index(Request $request)
 {
-    $query = Offer::with(['user', 'server.game'])
+    $query = Offer::with(['user', 'server.game.categories'])
         ->where('is_active', 1);
 
     if ($request->filled('category_id')) {
         $query->where('category_id', $request->category_id);
     }
 
+    // фильтр по категории игры
     if ($request->filled('game_category_id')) {
         $query->whereHas('server.game.categories', function ($q) use ($request) {
-            $q->where('categories.id', $request->game_category_id);
+            $q->where('game_categories.id', $request->game_category_id);
         });
     }
 
@@ -41,45 +43,58 @@ class TradeController extends Controller
             'quantity' => $offer->quantity,
             'currency' => [
                 'id' => $offer->id,
-                'name' => $offer->name,
+                'name' => $offer->name, // предполагается, что это не offer->name, а offer->currency->name
             ],
             'user' => [
                 'id' => $offer->user->id,
                 'name' => $offer->user->name,
             ],
             'category_id' => $offer->category_id,
-            'game_category_ids' => $offer->server?->game?->categories->pluck('id') ?? [],
+            'game_category_ids' => $offer->gameCategoryIds(),
         ];
     });
-
+    $gameCategories = Category::whereHas('games')  // Только те категории, у которых есть игры
+    ->select('id', 'name')
+    ->get();
     return Inertia::render('Trades/Index', [
         'offers' => $offers,
         'categories' => Category::select('id', 'name')->get(),
-        'gameCategories' => \App\Models\GameCategory::with(['game', 'category'])->get(), 
-        'filters' => $request->only('category_id', 'game_category_id', 'search'),
+        'gameCategories' => $gameCategories ,
+        'filters' => $request->only('category_id', 'search', 'game_category_id'),
+        'games' => Game::select('id', 'name')->get(),
+        'servers' => Server::select('id', 'name')->get(),
     ]);
 }
 
 
+
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price_per_unit' => 'required|numeric|min:0.01',
+        $request->validate([
+            'title' => 'required',
+            'description' => 'nullable',
+            'category_id' => 'required|exists:categories,id',
+            'game_category_id' => 'nullable|exists:game_category,id',
+            'game_id' => 'nullable|exists:games,id',
+            'server_id' => 'nullable|exists:servers,id',
+            'price' => 'required|numeric|min:0.01',
             'quantity' => 'required|integer|min:1',
-            'currency_id' => 'required|exists:currencies,id',
+            
         ]);
-
+        
         Offer::create([
             'user_id' => Auth::id(),
-            'currency_id' => $validated['currency_id'],
-            'title' => $validated['title'],
-            'description' => $validated['description'],
-            'price_per_unit' => $validated['price_per_unit'],
-            'quantity' => $validated['quantity'],
+            'category_id' => $request->category_id,
+            'server_id' => $request->server_id,
+            'game_category_id' => $request->game_category_id,
+            'game_id' => $request->game_id,
+            'title' => $request->title,
+            'description' => $request->description,
+            'price' => $request->price,
+            'quantity' => $request->quantity,
             'is_active' => true,
         ]);
+        
 
         return redirect()->route('offers.index')->with('success', 'Оффер создан.');
     }
