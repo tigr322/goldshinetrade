@@ -15,12 +15,11 @@ class MainController extends Controller
 
     return Inertia::render('Dashboard', [
         'user' => $user,
-        'balance' => number_format($user->balance_real ?? 0, 2, '.', ' '),
+        'balance' => number_format($user->balance ?? 0, 2, '.', ' '),
         'offers_count' => $user->offers()->count(),
         'deals_count' => $user->deals()->count(),
         'messages_count' => $user->messages()->count(),
-       
-       
+        
 
         // 💸 Подготовка списка транзакций (выводов)
         'withdrawals' => $user->withdrawals()->latest()->take(5)->get()->map(function ($w) {

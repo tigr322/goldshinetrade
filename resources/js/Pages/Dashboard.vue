@@ -25,7 +25,7 @@
 <script setup>
 import { ref } from 'vue'
 import { Link } from '@inertiajs/vue3'
-
+import { useForm } from '@inertiajs/vue3'
 
 import {
   Dialog,
@@ -36,6 +36,7 @@ import {
   MenuItems,
   TransitionChild,
   TransitionRoot,
+  
 } from '@headlessui/vue'
 import {
   Bars3CenterLeftIcon,
@@ -50,6 +51,7 @@ import {
   ShieldCheckIcon,
   UserGroupIcon,
   XMarkIcon,
+  
 } from '@heroicons/vue/24/outline'
 import {
   BanknotesIcon,
@@ -58,6 +60,7 @@ import {
   ChevronDownIcon,
   ChevronRightIcon,
   MagnifyingGlassIcon,
+  XCircleIcon
 } from '@heroicons/vue/20/solid'
 
 const props = defineProps({
@@ -70,9 +73,28 @@ const props = defineProps({
   reviews_received_count: Number,
   reviews_given_count: Number,
   withdrawals: Array,
+  adress: String,
 })
 defineOptions({ layout: (h, page) => h(AppLayout, null, () => page) })
+const fileInput = ref(null)
 
+const form = useForm({
+  photo: null,
+})
+
+const triggerFileInput = () => {
+  fileInput.value?.click()
+}
+
+const handleFileChange = (e) => {
+  const file = e.target.files[0]
+  if (file) {
+    form.photo = file
+    form.post('/profile/photo', {
+      onSuccess: () => form.reset('photo'),
+    })
+  }
+}
 const statusStyles = {
   success: 'bg-green-100 text-green-800',
   processing: 'bg-yellow-100 text-yellow-800',
@@ -117,12 +139,12 @@ const sidebarOpen = ref(false)
                 <span class="sr-only">View notifications</span>
                 <BellIcon class="h-6 w-6" aria-hidden="true" />
               </button>
-  
+            
               <!-- Profile dropdown -->
               <Menu as="div" class="relative ml-3">
                 <div>
                   <MenuButton class="flex max-w-xs items-center rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 lg:rounded-md lg:p-2 lg:hover:bg-gray-50">
-                    <img class="h-8 w-8 rounded-full" src="/storage/photo1.jpeg" alt="" />
+                    <img class="h-8 w-8 rounded-full" :src="`/storage/${props.user.photo ?? 'default.jpg'}`" alt="" />
                     <span class="ml-3 hidden text-sm font-medium text-gray-700 lg:block"><span class="sr-only">Open user menu for </span>{{ props.user.name }}</span>
                     <ChevronDownIcon class="ml-1 hidden h-5 w-5 flex-shrink-0 text-gray-400 lg:block" aria-hidden="true" />
                   </MenuButton>
@@ -166,23 +188,46 @@ const sidebarOpen = ref(false)
                 <div class="min-w-0 flex-1">
                   <!-- Profile -->
                   <div class="flex items-center">
-                    <img class="hidden h-16 w-16 rounded-full sm:block" src="/storage/photo1.jpeg" alt="" />
+                 
+                
                     <div>
+              
                       <div class="flex items-center">
-                        <img class="h-16 w-16 rounded-full sm:hidden" src="/" alt="" />
+                        <button
+                      @click="triggerFileInput"
+                      class="flex max-w-xs items-center rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 lg:rounded-md lg:p-2 lg:hover:bg-gray-50"
+                    >
+                    <img class="h-16 w-16 rounded-full object-cover" :src="`/storage/${props.user.photo ?? 'default.jpg'}`" alt="Фото профиля" />                      </button>
+                      <input
+                        type="file"
+                        ref="fileInput"
+                        @change="handleFileChange"
+                        accept="image/*"
+                        class="hidden"
+                      />  
                         <h1 class="ml-3 text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:leading-9">Здравствуйте, {{ props.user.name }}</h1>
                       </div>
                       <dl class="mt-6 flex flex-col sm:ml-3 sm:mt-1 sm:flex-row sm:flex-wrap">
                         <dt class="sr-only">Company</dt>
                         <dd class="flex items-center text-sm font-medium capitalize text-gray-500 sm:mr-6">
-                          <BuildingOfficeIcon class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400" aria-hidden="true" />
-                          Краснодар, ул. Красная, Дом 10
+                          <CreditCardIcon class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400" aria-hidden="true" />
+                          {{ props.user.balance }}
                         </dd>
                         <dt class="sr-only">Статус аккаунта</dt>
-                        <dd class="mt-3 flex items-center text-sm font-medium capitalize text-gray-500 sm:mr-6 sm:mt-0">
-                          <CheckCircleIcon class="mr-1.5 h-5 w-5 flex-shrink-0 text-green-400" aria-hidden="true" />
-                          Акканут подтвержден
-                        </dd>
+                        
+                        <dd
+                        class="mt-3 flex items-center text-sm font-medium capitalize sm:mr-6 sm:mt-0"
+                        :class="user.is_verified ? 'text-green-600' : 'text-red-500'"
+                      >
+                        <template v-if="user.is_verified">
+                          <CheckCircleIcon class="mr-1.5 h-5 w-5 flex-shrink-0 text-green-500" />
+                          Аккаунт подтвержден
+                        </template>
+                        <template v-else>
+                          <XMarkIcon class="mr-1.5 h-5 w-5 flex-shrink-0 text-red-500" />
+                          Не подтвержден
+                        </template>
+                      </dd>
                       </dl>
                     </div>
                   </div>

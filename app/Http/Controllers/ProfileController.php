@@ -27,18 +27,19 @@ class ProfileController extends Controller
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
-    {
-        $request->user()->fill($request->validated());
+    public function update(Request $request)
+{
+    $request->validate([
+        'name' => ['required', 'string', 'max:255'],
+        'email' => ['required', 'email'],
+        'adress' => ['required', 'string', 'max:256'],
+    ]);
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
-        }
+    $user = $request->user();
+    $user->update($request->only('name', 'email', 'adress'));
 
-        $request->user()->save();
-
-        return Redirect::route('profile.edit');
-    }
+    return redirect()->route('profile.edit')->with('status', 'profile-updated');
+}
 
     /**
      * Delete the user's account.
@@ -60,4 +61,19 @@ class ProfileController extends Controller
 
         return Redirect::to('/');
     }
+    public function updatePhoto(Request $request)
+{
+    $request->validate([
+        'photo' => ['required', 'image', 'max:2048'], // до 2MB
+    ]);
+
+    $user = $request->user();
+
+    $path = $request->file('photo')->store('profile-photos', 'public');
+
+    $user->photo = $path;
+    $user->save();
+
+    return back()->with('success', 'Фото обновлено.');
+}
 }
