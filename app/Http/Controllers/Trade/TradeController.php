@@ -12,7 +12,7 @@ use App\Models\Server;
 use App\Models\GameType;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
-
+use App\Models\PaymentMethod;
 class TradeController extends Controller
 {
     public function index(Request $request)
@@ -53,6 +53,7 @@ class TradeController extends Controller
                 'game_name' => optional($offer->game)->name,
                 'server_name' => optional($offer->server)->name,
                 'game_type_id' => optional($offer->game)->game_type_id,
+                // добавлено
             ];
         });
 
@@ -63,6 +64,7 @@ class TradeController extends Controller
             'filters' => $request->only('category_id', 'search', 'game_category_id'),
             'games' => Game::select('id', 'name', 'category_id', 'game_type_id')->get(),
            'servers' => Server::select('id', 'name', 'game_id')->get(),
+           'paymentMethods' => PaymentMethod::select('id', 'name')->get(), 
         ]);
     }
 
@@ -98,30 +100,32 @@ class TradeController extends Controller
         $data = $request->validate([
             'offer_id' => 'required|exists:offers,id',
             'quantity' => 'required|integer|min:1',
+            'payment_method_id' => 'required|exists:payment_methods,id',
         ]);
-
+    
         $offer = Offer::findOrFail($data['offer_id']);
-
+    
         if ($data['quantity'] > $offer->quantity) {
             return back()->withErrors(['quantity' => 'Недостаточное количество в наличии.']);
         }
-
+    
         $totalPrice = $offer->price * $data['quantity'];
-
+    
         Deal::create([
             'buyer_id' => Auth::id(),
             'offer_id' => $offer->id,
             'quantity' => $data['quantity'],
+            'payment_method_id' => $data['payment_method_id'],
             'total_price' => $totalPrice,
             'status' => 'pending',
         ]);
-
+    
         $offer->quantity -= $data['quantity'];
         if ($offer->quantity <= 0) {
             $offer->is_active = false;
         }
         $offer->save();
-
+    
         return redirect()->route('offers.index')->with('success', 'Сделка создана.');
     }
 }

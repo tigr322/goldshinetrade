@@ -12,6 +12,7 @@ const props = defineProps({
   games: Array,
   servers: Array,
   filters: Object,
+  paymentMethods: Array,
 })
 
 const showCreateModal = ref(false)
@@ -26,7 +27,8 @@ const filters = ref({
 const selectedOffer = ref(null)
 const form = useForm({
   offer_id: '',
-  quantity: 1,
+  quantity: 1000,
+  payment_method_id: '',
 })
 
 const createForm = useForm({
@@ -80,6 +82,10 @@ const filteredOffers = computed(() => {
   })
 })
 
+
+
+
+
 const buy = (offer) => {
   selectedOffer.value = offer
   form.offer_id = offer.id
@@ -92,6 +98,7 @@ const submitFilter = () => {
     preserveScroll: true,
   })
 }
+
 </script>
 <template>
     <div class="max-w-4xl mx-auto py-10">
@@ -221,6 +228,58 @@ const submitFilter = () => {
       </tbody>
     </table>
   </div>
+</div>
+<!-- Форма покупки -->
+<div v-if="selectedOffer" class="mt-6 max-w-xl mx-auto bg-white border border-gray-200 rounded-xl shadow p-6 space-y-4">
+  <div class="flex justify-between items-start">
+    <div>
+      <h2 class="text-lg font-semibold text-gray-900">Покупка оффера</h2>
+      <p class="text-sm text-gray-600 mt-1">Вы выбрали: <span class="font-medium text-gray-800">{{ selectedOffer.title }}</span></p>
+    </div>
+    <button @click="selectedOffer = null" class="text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
+  </div>
+
+  <form @submit.prevent="form.post('/deals', { onSuccess: () => selectedOffer = null })" class="space-y-4">
+    <div>
+      <label class="block text-sm font-medium text-gray-700">Количество</label>
+      <input
+        type="number"
+        v-model="form.quantity"
+        class="mt-1 w-full rounded-md border border-gray-300 shadow-sm focus:ring-cyan-600 focus:border-cyan-600"
+        min="1"
+        :max="selectedOffer.quantity"
+      />
+      <div v-if="form.errors.quantity" class="text-sm text-red-600 mt-1">{{ form.errors.quantity }}</div>
+    </div>
+    <div>
+  <label class="block text-sm font-medium text-gray-700">Способ оплаты</label>
+  <select
+    v-model="form.payment_method_id"
+    class="mt-1 w-full rounded-md border border-gray-300 shadow-sm focus:ring-cyan-600 focus:border-cyan-600"
+  >
+    <option value="">Выберите способ</option>
+    <option v-for="method in paymentMethods" :key="method.id" :value="method.id">
+      {{ method.name }}
+    </option>
+  </select>
+  <div v-if="form.errors.payment_method_id" class="text-sm text-red-600 mt-1">{{ form.errors.payment_method_id }}</div>
+</div>
+    <div class="flex justify-end space-x-2 pt-2">
+      <button
+        type="button"
+        @click="selectedOffer = null"
+        class="text-sm text-gray-600 hover:underline"
+      >
+        Отмена
+      </button>
+      <button
+        type="submit"
+        class="bg-cyan-600 text-white px-4 py-2 rounded-md text-sm hover:bg-cyan-700 transition"
+      >
+        Подтвердить покупку
+      </button>
+    </div>
+  </form>
 </div>
     </div>
   </template>
