@@ -4,70 +4,67 @@ namespace App\Http\Controllers\Trade;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
 use App\Models\Offer;
 use App\Models\Deal;
 use App\Models\Category;
 use App\Models\Game;
 use App\Models\Server;
+use App\Models\GameType;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+
 class TradeController extends Controller
 {
     public function index(Request $request)
-{
-    $query = Offer::with(['user', 'server.game.categories'])
-        ->where('is_active', 1);
+    {
+        $query = Offer::with(['user', 'game', 'server'])
+            ->where('is_active', 1);
 
-    if ($request->filled('category_id')) {
-        $query->where('category_id', $request->category_id);
-    }
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
 
-    // фильтр по категории игры
-    if ($request->filled('game_category_id')) {
-        $query->whereHas('server.game.categories', function ($q) use ($request) {
-            $q->where('game_category.id', $request->game_category_id);
-        });
-    }
+        if ($request->filled('game_category_id')) {
+            $query->whereHas('game', function ($q) use ($request) {
+                $q->where('game_type_id', $request->game_category_id);
+            });
+        }
 
-    if ($request->filled('search')) {
-        $query->where('title', 'like', '%' . $request->search . '%');
-    }
+        if ($request->filled('search')) {
+            $query->where('title', 'like', '%' . $request->search . '%');
+        }
 
-    $offers = $query->latest()->take(100)->get()->map(function ($offer) {
-        return [
-            'id' => $offer->id,
-            'title' => $offer->title,
-            'description' => $offer->description,
-            'price_per_unit' => number_format($offer->price, 2, '.', ' '),
-            'quantity' => $offer->quantity,
-            'currency' => [
+        $offers = $query->latest()->take(100)->get()->map(function ($offer) {
+            return [
                 'id' => $offer->id,
-                'name' => $offer->name, // проверь, что это не ошибка — скорее должно быть $offer->currency->name
-            ],
-            'user' => [
-                'id' => $offer->user->id,
-                'name' => $offer->user->name,
-            ],
-            'category_id' => $offer->category_id,
-            'game_category_ids' => $offer->gameCategoryIds(),
-            'game_name' => optional($offer->server?->game)->name,
-        ];
-    });
-    $gameCategories = Category::whereHas('games')  // Только те категории, у которых есть игры
-    ->select('id', 'name')
-    ->get();
-    return Inertia::render('Trades/Index', [
-        'offers' => $offers,
-        'categories' => Category::select('id', 'name')->get(),
-        'gameCategories' => $gameCategories ,
-        'filters' => $request->only('category_id', 'search', 'game_category_id'),
-        'games' => Game::select('id', 'name')->get(),
-        'servers' => Server::select('id', 'name')->get(),
-    ]);
-}
+                'title' => $offer->title,
+                'description' => $offer->description,
+                'price_per_unit' => number_format($offer->price, 2, '.', ' '),
+                'quantity' => $offer->quantity,
+                'currency' => [
+                    'id' => $offer->id,
+                    'name' => '₽', // предполагаем, что пока это фиксированная валюта
+                ],
+                'user' => [
+                    'id' => $offer->user->id,
+                    'name' => $offer->user->name,
+                ],
+                'category_id' => $offer->category_id,
+                'game_name' => optional($offer->game)->name,
+                'server_name' => optional($offer->server)->name,
+                'game_type_id' => optional($offer->game)->game_type_id,
+            ];
+        });
 
-
+        return Inertia::render('Trades/Index', [
+            'offers' => $offers,
+           'categories' => Category::withCount('games')->get(),
+            'gameCategories' => GameType::select('id', 'name')->get(),
+            'filters' => $request->only('category_id', 'search', 'game_category_id'),
+            'games' => Game::select('id', 'name', 'category_id', 'game_type_id')->get(),
+           'servers' => Server::select('id', 'name', 'game_id')->get(),
+        ]);
+    }
 
     public function store(Request $request)
     {
@@ -75,27 +72,23 @@ class TradeController extends Controller
             'title' => 'required',
             'description' => 'nullable',
             'category_id' => 'required|exists:categories,id',
-            'game_category_id' => 'nullable|exists:game_category,id',
             'game_id' => 'nullable|exists:games,id',
             'server_id' => 'nullable|exists:servers,id',
             'price' => 'required|numeric|min:0.01',
             'quantity' => 'required|integer|min:1',
-            
         ]);
-        
+
         Offer::create([
             'user_id' => Auth::id(),
             'category_id' => $request->category_id,
-            'server_id' => $request->server_id,
-            'game_category_id' => $request->game_category_id,
             'game_id' => $request->game_id,
+            'server_id' => $request->server_id,
             'title' => $request->title,
             'description' => $request->description,
             'price' => $request->price,
             'quantity' => $request->quantity,
             'is_active' => true,
         ]);
-        
 
         return redirect()->route('offers.index')->with('success', 'Оффер создан.');
     }
@@ -113,7 +106,7 @@ class TradeController extends Controller
             return back()->withErrors(['quantity' => 'Недостаточное количество в наличии.']);
         }
 
-        $totalPrice = $offer->price_per_unit * $data['quantity'];
+        $totalPrice = $offer->price * $data['quantity'];
 
         Deal::create([
             'buyer_id' => Auth::id(),

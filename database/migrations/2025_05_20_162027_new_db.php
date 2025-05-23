@@ -13,31 +13,33 @@ return new class extends Migration
             $table->string('name');
             $table->timestamps();
         });
-
+        
+        Schema::create('game_types', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
+        
         Schema::create('games', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->nullable(); 
+            $table->string('name');
+            $table->foreignId('category_id')->nullable()->constrained('categories')->onDelete('set null');
+            $table->foreignId('game_type_id')->nullable()->constrained('game_types')->onDelete('set null');
             $table->timestamps();
         });
-
-        Schema::create('game_category', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('game_id')->constrained()->onDelete('cascade');
-            $table->foreignId('category_id')->constrained()->onDelete('cascade');
-            $table->timestamps();
-        });
-
+        
         Schema::create('servers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('game_id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->timestamps();
         });
-
+        
         Schema::create('offers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('category_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('game_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('server_id')->nullable()->constrained()->onDelete('set null');
             $table->string('title');
             $table->text('description')->nullable();

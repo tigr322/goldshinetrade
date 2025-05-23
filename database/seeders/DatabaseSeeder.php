@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
             DealSeeder::class,
            CategorySeeder::class,
            GameSeeder::class,
-           GameCategorySeeder::class,
+           
             ServerSeeder::class,
             PaymentMethodSeeder::class,
             WithdrawalSeeder::class,

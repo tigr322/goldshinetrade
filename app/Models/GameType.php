@@ -1,13 +1,12 @@
 <?php
 
-// app/Models/Category.php
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Category extends Model
+class GameType extends Model
 {
     use HasFactory;
 
@@ -16,10 +15,5 @@ class Category extends Model
     public function games(): HasMany
     {
         return $this->hasMany(Game::class);
-    }
-
-    public function offers(): HasMany
-    {
-        return $this->hasMany(Offer::class);
     }
 }
