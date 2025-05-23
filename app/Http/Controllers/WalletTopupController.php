@@ -23,7 +23,7 @@ public function store(Request $request)
     ]);
 
    
-
+////ввыв
     /** @var \App\Models\User $user */
     $user = Auth::user();
     $user->increment('balance', $request->amount);
