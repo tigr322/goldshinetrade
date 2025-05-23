@@ -3,6 +3,7 @@
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CardController;
+use App\Http\Controllers\WalletTopupController;
 
 use Illuminate\Foundation\Application;
 use App\Http\Controllers\Trade\TradeController;
@@ -71,5 +72,10 @@ Route::middleware(['auth'])->group(function () {
 });
 Route::middleware(['auth'])->group(function () {
     Route::get('/messages', [\App\Http\Controllers\MessageController::class, 'index'])->name('messages.index');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/wallet/topup', [WalletTopupController::class, 'create'])->name('wallet.topup');
+    Route::post('/wallet/topup', [WalletTopupController::class, 'store'])->name('wallet.topup.store');
 });
 require __DIR__.'/auth.php';
