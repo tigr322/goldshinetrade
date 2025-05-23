@@ -186,10 +186,13 @@ const submitFilter = () => {
           </form>
         </div>
       </div>
-      <div class="mx-auto max-w-6xl mt-10">
-  <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-    <table class="min-w-full divide-y divide-gray-300">
-      <thead class="bg-gray-50">
+   <!-- Контейнер с горизонтальной прокруткой только на мобильных -->
+<div class="mx-auto max-w-6xl mt-10">
+  <div class="sm:overflow-visible overflow-x-auto">
+    <div class="inline-block min-w-full align-middle">
+      <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+        <table class="min-w-full divide-y divide-gray-300">
+          <thead class="bg-gray-50">
         <tr>
             <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900 cursor-pointer" @click="sortBy('title')">
             Название
@@ -227,6 +230,8 @@ const submitFilter = () => {
         </tr>
       </tbody>
     </table>
+      </div>
+    </div>
   </div>
 </div>
 <!-- Форма покупки -->

@@ -7,9 +7,11 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
-
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 class CardController extends Controller
 {
+    use AuthorizesRequests;
+
     
     public function index()
     {
@@ -53,10 +55,9 @@ class CardController extends Controller
 
     public function destroy(UserCard $card)
     {
-        if (Gate::denies('delete', $card)) {
-            abort(403);
-        }
+        $this->authorize('delete', $card); // требует политику!
         $card->delete();
+    
         return back()->with('success', 'Карта удалена');
     }
 }
