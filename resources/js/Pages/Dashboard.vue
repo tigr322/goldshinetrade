@@ -75,6 +75,11 @@ const props = defineProps({
   withdrawals: Array,
   adress: String,
 })
+const notifications = [
+  { id: 1, text: 'Вы получили новое сообщение', href: '/messages' },
+  { id: 2, text: 'Ваш заказ успешно оформлен', href: '/orders' },
+ 
+]
 defineOptions({ layout: (h, page) => h(AppLayout, null, () => page) })
 const fileInput = ref(null)
 
@@ -135,10 +140,50 @@ const sidebarOpen = ref(false)
               </form>
             </div>
             <div class="ml-4 flex items-center md:ml-6">
-              <button type="button" class="rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2">
-                <span class="sr-only">View notifications</span>
-                <BellIcon class="h-6 w-6" aria-hidden="true" />
-              </button>
+              <Menu as="div" class="relative">
+    <MenuButton
+      class="rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
+    >
+      <span class="sr-only">Оповещения</span>
+      <BellIcon class="h-6 w-6" aria-hidden="true" />
+    </MenuButton>
+
+    <transition
+      enter-active-class="transition duration-100 ease-out"
+      enter-from-class="transform scale-95 opacity-0"
+      enter-to-class="transform scale-100 opacity-100"
+      leave-active-class="transition duration-75 ease-in"
+      leave-from-class="transform scale-100 opacity-100"
+      leave-to-class="transform scale-95 opacity-0"
+    >
+      <MenuItems
+        class="absolute right-0 z-10 mt-2 w-64 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+      >
+        <div class="py-1">
+          <template v-if="notifications.length">
+            <MenuItem
+              v-for="n in notifications"
+              :key="n.id"
+              v-slot="{ active }"
+            >
+              <a
+                :href="n.href"
+                :class="[
+                  active ? 'bg-gray-100' : '',
+                  'block px-4 py-2 text-sm text-gray-700'
+                ]"
+              >
+                {{ n.text }}
+              </a>
+            </MenuItem>
+          </template>
+          <template v-else>
+            <div class="px-4 py-2 text-sm text-gray-500">Нет новых уведомлений</div>
+          </template>
+        </div>
+      </MenuItems>
+    </transition>
+  </Menu>
             
               <!-- Profile dropdown -->
               <Menu as="div" class="relative ml-3">

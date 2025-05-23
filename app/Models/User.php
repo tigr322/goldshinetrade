@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Permission\Traits\HasRoles;
+use App\Models\UserCard; // Не забудь импортировать модель
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
@@ -25,15 +26,19 @@ class User extends Authenticatable
     {
         return $this->hasMany(Offer::class);
     }
-
-    public function deals(): HasMany
+// app/Models/User.php
+public function cards(): HasMany
+    {
+        return $this->hasMany(UserCard::class);
+    }
+        public function deals(): HasMany
     {
         return $this->hasMany(Deal::class, 'buyer_id');
     }
 
-    public function messages(): HasMany
+    public function messages()
     {
-        return $this->hasMany(Message::class);
+        return $this->hasMany(\App\Models\Message::class);
     }
 
     public function reviewsGiven(): HasMany

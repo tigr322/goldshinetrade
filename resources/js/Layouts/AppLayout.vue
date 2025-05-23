@@ -26,8 +26,8 @@ const sidebarOpen = ref(false)
 const navigation = [
   { name: 'Дом', href: route('dashboard'), icon: HomeIcon },
   { name: 'Обмен', href: route('offers.index'), icon: ScaleIcon },
-  { name: 'Мои карты', href: route('cards'), icon: CreditCardIcon },
-  { name: 'Мои счета', href: '#', icon: UserGroupIcon },
+  { name: 'Мои карты', href: route('cards.index'), icon: CreditCardIcon },
+  { name: 'Мои Сообщения', href: route('messages.index'), icon: UserGroupIcon },
   { name: 'Жалобы', href: '#', icon: DocumentChartBarIcon },
 ]
 

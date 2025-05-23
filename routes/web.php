@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CardController;
+
 use Illuminate\Foundation\Application;
 use App\Http\Controllers\Trade\TradeController;
 
@@ -27,9 +29,7 @@ Route::get('/exchange', function () {
 })->name('exchange');
 
 // Мои картывыв
-Route::get('/cards', function () {
-    return Inertia::render('Cards');
-})->name('cards');
+
 
 // Мои счетаfdfdfddsdsd
 Route::get('/accounts', function () {
@@ -62,5 +62,14 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])->name('profile.photo')->middleware('auth');
 });
-
+// routes/web.php
+Route::middleware(['auth'])->group(function () {
+    Route::get('/cards', [CardController::class, 'index'])->name('cards.index');
+    Route::get('/cards/add', [CardController::class, 'create'])->name('cards.create');
+    Route::post('/cards', [CardController::class, 'store'])->name('cards.store');
+    Route::delete('/cards/{card}', [CardController::class, 'destroy'])->name('cards.destroy');
+});
+Route::middleware(['auth'])->group(function () {
+    Route::get('/messages', [\App\Http\Controllers\MessageController::class, 'index'])->name('messages.index');
+});
 require __DIR__.'/auth.php';

@@ -37,12 +37,11 @@ const updatePassword = () => {
     <section>
         <header>
             <h2 class="text-lg font-medium text-gray-900">
-                Update Password
+                Обновить пароль
             </h2>
 
             <p class="mt-1 text-sm text-gray-600">
-                Ensure your account is using a long, random password to stay
-                secure.
+                Используйте этот раздел, чтобы изменить пароль пользователя.
             </p>
         </header>
 
@@ -101,7 +100,8 @@ const updatePassword = () => {
             </div>
 
             <div class="flex items-center gap-4">
-                <PrimaryButton :disabled="form.processing">Save</PrimaryButton>
+
+                <button class="bg-cyan-600 text-white px-5 py-2 rounded-md shadow hover:bg-cyan-700 transition"  :disabled="form.processing">Сохранить</button>
 
                 <Transition
                     enter-active-class="transition ease-in-out"
@@ -113,7 +113,7 @@ const updatePassword = () => {
                         v-if="form.recentlySuccessful"
                         class="text-sm text-gray-600"
                     >
-                        Saved.
+                        Сохранено.
                     </p>
                 </Transition>
             </div>
