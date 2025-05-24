@@ -120,7 +120,7 @@ if (user && user.roles?.includes('Admin')) {
     <div class="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
       <div class="flex flex-grow flex-col overflow-y-auto bg-cyan-700 pt-5">
         <div class="flex items-center px-4">
-          <img class="h-40 w-auto" src="/storage/icon.png" alt="Logo" />
+          <img class="h-50 w-auto" src="/storage/icon.png" alt="Logo" />
         </div>
 
         <nav class="mt-5 flex-1 divide-y divide-cyan-800 overflow-y-auto px-2" aria-label="Sidebar">
