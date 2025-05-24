@@ -2,7 +2,11 @@
 import { ref, computed, watch } from 'vue'
 import { useForm, router } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
-
+import { usePage } from '@inertiajs/vue3'
+const flash = computed(() => {
+  const props = usePage().props
+  return props && props.flash ? props.flash : {}
+})
 defineOptions({ layout: (h, page) => h(AppLayout, null, () => page) })
 
 const props = defineProps({
@@ -186,6 +190,14 @@ const submitFilter = () => {
           </form>
         </div>
       </div>
+      <div v-if="flash.success" class="mb-4 p-4 rounded bg-green-100 text-green-800 border border-green-200">
+  {{ flash.success }}
+</div>
+
+<div v-if="flash.error" class="mb-4 p-4 rounded bg-red-100 text-red-800 border border-red-200">
+  {{ flash.error }}
+</div>
+
    <!-- Контейнер с горизонтальной прокруткой только на мобильных -->
 <div class="mx-auto max-w-6xl mt-10">
   <div class="sm:overflow-visible overflow-x-auto">

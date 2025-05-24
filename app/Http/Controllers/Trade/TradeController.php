@@ -103,16 +103,25 @@ class TradeController extends Controller
             'payment_method_id' => 'required|exists:payment_methods,id',
         ]);
     
+        $user = Auth::user();
         $offer = Offer::findOrFail($data['offer_id']);
     
         if ($data['quantity'] > $offer->quantity) {
-            return back()->withErrors(['quantity' => 'Недостаточное количество в наличии.']);
-        }
+            return back()->withErrors(['quantity' => 'Недостаточное количество в наличии.']);        }
     
         $totalPrice = $offer->price * $data['quantity'];
     
+        // ✅ Проверка баланса пользователя
+        if ($user->balance < $totalPrice) {
+            return back()->withErrors(['quantity' => 'Недостаточное средст для покупки! Пополните счет!']);        }
+    
+        // ✅ Списываем средства
+        $user->balance -= $totalPrice;
+        $user->save();
+    
+        // ✅ Создаём сделку
         Deal::create([
-            'buyer_id' => Auth::id(),
+            'buyer_id' => $user->id,
             'offer_id' => $offer->id,
             'quantity' => $data['quantity'],
             'payment_method_id' => $data['payment_method_id'],
@@ -120,6 +129,7 @@ class TradeController extends Controller
             'status' => 'pending',
         ]);
     
+        // ✅ Обновляем оффер
         $offer->quantity -= $data['quantity'];
         if ($offer->quantity <= 0) {
             $offer->is_active = false;
@@ -127,5 +137,5 @@ class TradeController extends Controller
         $offer->save();
     
         return redirect()->route('offers.index')->with('success', 'Сделка создана.');
-    }
+        }
 }
