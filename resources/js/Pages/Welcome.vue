@@ -87,7 +87,7 @@ function handleImageError() {
                         :href="route('login')"
                                class="-mx-3 block rounded-lg py-2.5 px-3 text-base font-semibold leading-6 text-gray-900 hover:bg-gray-400/10"
                             >
-                                Log in
+                              Войти
                 </Link>
                 </div>
               </div>
@@ -113,7 +113,7 @@ function handleImageError() {
                         :href="route('login')"
                               class="text-sm font-semibold leading-6 text-gray-900"
                             >
-                                Log in
+                                Войти
                 </Link>
         
                 <Link
@@ -121,9 +121,9 @@ function handleImageError() {
                                 :href="route('register')"
                                class="rounded-md bg-cyan-700 px-3.5 py-1.5 text-base font-semibold leading-7 text-white shadow-sm hover:bg-cyan-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                             >
-                                Register
+                                Регистрация
                             </Link>
-                <a href="#" class="text-base font-semibold leading-7 text-gray-900">Learn more <span aria-hidden="true">→</span></a>
+                <a href="#" class="text-base font-semibold leading-7 text-gray-900">Узнать больше <span aria-hidden="true">→</span></a>
               </div>
             </div>
           </div>
