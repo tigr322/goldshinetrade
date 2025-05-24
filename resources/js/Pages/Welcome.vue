@@ -46,7 +46,7 @@ function handleImageError() {
           <div class="flex lg:flex-1">
             <a href="#" class="-m-1.5 p-1.5">
               <span class="sr-only">Your Company</span>
-              <img class="h-12 w-auto" src="/storage/icon1.png" alt="GoldShineTrade" />
+              <img class="h-12 w-auto" src="/storage/iconca.png" alt="GoldShineTrade" />
             </a>
           </div>
           <div class="flex lg:hidden">
