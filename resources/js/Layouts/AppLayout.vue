@@ -39,8 +39,8 @@ const secondaryNavigation = [
 
 const page = usePage()
 const user = page.props.auth.user
-
-if (user && user.roles?.includes('Admin')) {
+console.log('User from Inertia:', user)
+if (user && Array.isArray(user.roles) && user.roles.some(role => role.name === 'admin')) {
   navigation.push({
     name: 'Администрирование',
     href: route('admin.dashboard'),

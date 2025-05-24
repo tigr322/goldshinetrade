@@ -7,9 +7,10 @@ use App\Http\Controllers\WalletTopupController;
 
 use Illuminate\Foundation\Application;
 use App\Http\Controllers\Trade\TradeController;
-
+use App\Http\Controllers\Admin\AdminDashboardController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -19,8 +20,12 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+    // Добавь сюда другие админ-маршруты
+});
 Route::middleware(['auth'])->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('admin.dashboard');
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::get('/offers', [TradeController::class, 'index'])->name('offers.index');
    Route::post('/offers', [TradeController::class, 'store'])->name('offers.store');
     Route::post('/deals', [TradeController::class, 'buy'])->name('deals.buy'); 
@@ -29,7 +34,7 @@ Route::get('/exchange', function () {
     return Inertia::render('Exchange');
 })->name('exchange');
 
-// Мои картывыв
+// Администрирование
 
 
 // Мои счетаfdfdfddsdsd
