@@ -44,7 +44,7 @@ function handleImageError() {
       <div class="px-6 pt-6 lg:px-8">
         <nav class="flex items-center justify-between" aria-label="Global">
           <div class="flex lg:flex-1">
-            <a href="#" class="-m-1.5 p-1.5">
+            <a href="/" class="-m-1.5 p-1.5">
               <span class="sr-only">Your Company</span>
               <img class="h-12 w-auto" src="/storage/iconca.png" alt="GoldShineTrade" />
             </a>
