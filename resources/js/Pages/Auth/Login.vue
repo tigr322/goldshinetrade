@@ -66,7 +66,11 @@ const submit = () => {
       <div class="flex flex-1 flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
         <div class="mx-auto w-full max-w-sm lg:w-96">
           <div>
-            <img class="h-12 w-auto" src="/storage/iconca.png" alt="GoldShineTrade" />
+
+            <a href="/" class="-m-1.5 p-1.5">
+              <span class="sr-only">Your Company</span>
+              <img class="h-12 w-auto" src="/storage/iconca.png" alt="GoldShineTrade" />
+            </a>
             <h2 class="mt-6 text-3xl font-bold tracking-tight text-gray-900">Sign in to your account</h2>
            
           </div>
