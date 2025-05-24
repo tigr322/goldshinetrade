@@ -22,6 +22,14 @@ const submit = () => {
 
 <template>
     <GuestLayout>
+        <div class="flex flex-col items-center">
+            <a href="/" class="mb-6">
+                <img class="h-24 w-auto mx-auto" src="/storage/iconca.png" alt="GoldShineTrade" />
+            </a>
+            <h2 class="text-3xl font-bold tracking-tight text-gray-900 text-center">
+                Регистрация нового аккаунта GoldShineTrade
+            </h2>
+        </div>
         <Head title="Register" />
 
         <form @submit.prevent="submit">
@@ -97,16 +105,17 @@ const submit = () => {
                     :href="route('login')"
                     class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                 >
-                    Already registered?
+                Уже зарегистрированы?
                 </Link>
+               
 
-                <PrimaryButton
-                    class="ms-4"
+                <button
+                    class="flex w-full justify-center rounded-md border border-transparent bg-cyan-700 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-cyan-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                     :class="{ 'opacity-25': form.processing }"
                     :disabled="form.processing"
                 >
-                    Register
-                </PrimaryButton>
+                    Зарегистрироваться
+                </button>
             </div>
         </form>
     </GuestLayout>
