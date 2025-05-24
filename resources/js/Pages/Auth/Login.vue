@@ -123,7 +123,7 @@ const submit = () => {
             <div class="mt-6">
                 <form @submit.prevent="submit">
                 <div>
-                  <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
+                  <label for="email" class="block text-sm font-medium text-gray-700">Почта</label>
                  
                     <div>
                
@@ -145,7 +145,7 @@ const submit = () => {
                 </div>
   
                 <div class="space-y-1">
-                  <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                  <label for="password" class="block text-sm font-medium text-gray-700">Пароль</label>
                   <div class="mt-1">
                     
                
@@ -168,11 +168,11 @@ const submit = () => {
                 <div class="flex items-center justify-between">
                   <div class="flex items-center">
                     <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
-                    <label for="remember-me" class="ml-2 block text-sm text-gray-900">Remember me</label>
+                    <label for="remember-me" class="ml-2 block text-sm text-gray-900">Запомнить меня</label>
                   </div>
   
                   <div class="text-sm">
-                    <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">Forgot your password?</a>
+                    <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">Забыли пароль?</a>
                   </div>
                 </div>
   
