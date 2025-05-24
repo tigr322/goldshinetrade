@@ -24,7 +24,7 @@ const submit = () => {
     <GuestLayout>
         <div class="flex flex-col items-center">
             <a href="/" class="mb-6">
-                <img class="h-24 w-auto mx-auto" src="/storage/iconca.png" alt="GoldShineTrade" />
+                <img class="h-16 w-auto mx-auto" src="/storage/iconca.png" alt="GoldShineTrade" />
             </a>
             <h2 class="text-3xl font-bold tracking-tight text-gray-900 text-center">
                 Регистрация нового аккаунта GoldShineTrade
