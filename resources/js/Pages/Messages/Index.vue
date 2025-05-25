@@ -1,5 +1,7 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue'
+import { Link } from '@inertiajs/vue3'
+
 defineOptions({ layout: (h, page) => h(AppLayout, null, () => page) })
 
 const props = defineProps({
@@ -27,7 +29,16 @@ const props = defineProps({
           </span>
           <span class="text-xs text-gray-400">Сделка: {{ msg.deal?.id ?? '—' }}</span>
         </div>
-        <p class="text-sm text-gray-800">{{ msg.content }}</p>
+        <p class="text-sm text-gray-800 mb-2">{{ msg.content }}</p>
+
+        <div v-if="msg.deal?.id">
+          <Link
+            :href="route('deals.show', msg.deal.id)"
+            class="inline-block text-sm text-cyan-600 hover:underline"
+          >
+            Перейти к сделке #{{ msg.deal.id }}
+          </Link>
+        </div>
       </li>
     </ul>
   </div>

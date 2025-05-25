@@ -9,6 +9,7 @@ use App\Models\Deal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Events\MessageSent;
+use Inertia\Inertia;
 
 class MessageController extends Controller
 {
@@ -31,4 +32,21 @@ class MessageController extends Controller
     {
         return Message::with('user')->where('deal_id', $deal->id)->latest()->get();
     }
+    public function mymasseges()
+{
+    $userId = Auth::id();
+
+    return Inertia::render('Messages/Index', [
+        'messages' => Message::with(['user', 'deal'])
+            ->whereHas('deal', function ($query) use ($userId) {
+                $query->where('buyer_id', $userId)
+                      ->orWhereHas('offer', function ($q) use ($userId) {
+                          $q->where('user_id', $userId);
+                      });
+            })
+            ->latest()
+            ->get(),
+    ]);
+}
+    
 }

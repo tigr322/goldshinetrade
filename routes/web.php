@@ -30,6 +30,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/deals/{deal}/confirm', [TradeController::class, 'confirm'])->name('deals.confirm');
     Route::post('/deals/{deal}/messages', [MessageController::class, 'store'])->name('messages.store');
     Route::get('/deals/{deal}/messages', [MessageController::class, 'index'])->name('messages.index');
+    Route::get('/mymessages', [MessageController::class, 'mymasseges'])->name('mymessages');
+
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
