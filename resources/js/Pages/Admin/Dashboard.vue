@@ -17,8 +17,7 @@ defineOptions({ layout: (h, page) => h(AppLayout, null, () => page) })
       <div class="bg-white shadow rounded-xl p-6">
         <h2 class="text-lg font-semibold text-gray-900">Офферы</h2>
         <p class="text-sm text-gray-500 mt-2">Просмотр всех объявлений</p>
-        <Link href="#" class="mt-4 inline-block text-cyan-600">Перейти</Link>
-      </div>
+        <Link :href="route('admin.offers.index')" class="mt-4 inline-block text-cyan-600 hover:underline">Перейти</Link>      </div>
 
       <div class="bg-white shadow rounded-xl p-6">
         <h2 class="text-lg font-semibold text-gray-900">Жалобы</h2>

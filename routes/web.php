@@ -4,6 +4,7 @@ use App\Http\Controllers\MainController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CardController;
 use App\Http\Controllers\WalletTopupController;
+use App\Http\Controllers\Admin\AdminOfferController;
 
 use Illuminate\Foundation\Application;
 use App\Http\Controllers\Trade\TradeController;
@@ -25,6 +26,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/users', [AdminUsersController::class, 'index'])->name('users.index');
     Route::patch('/users/{user}/role', [AdminUsersController::class, 'updateRole'])->name('users.updateRole');
+    Route::get('/offers', [AdminOfferController::class, 'index'])->name('offers.index');
+Route::get('/offers/{offer}/edit', [AdminOfferController::class, 'edit'])->name('offers.edit');
+Route::put('/offers/{offer}', [AdminOfferController::class, 'update'])->name('offers.update');
+Route::delete('/offers/{offer}', [AdminOfferController::class, 'destroy'])->name('offers.destroy');
     // Добавь сюда другие админ-маршруты
 });
 Route::middleware(['auth'])->group(function () {
