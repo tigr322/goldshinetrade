@@ -10,6 +10,7 @@ use App\Http\Controllers\Trade\TradeController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\Admin\AdminUsersController;
 
 
 Route::get('/', function () {
@@ -22,6 +23,8 @@ Route::get('/', function () {
 });
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/users', [AdminUsersController::class, 'index'])->name('users.index');
+    Route::patch('/users/{user}/role', [AdminUsersController::class, 'updateRole'])->name('users.updateRole');
     // Добавь сюда другие админ-маршруты
 });
 Route::middleware(['auth'])->group(function () {
