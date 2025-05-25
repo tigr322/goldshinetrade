@@ -5,7 +5,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CardController;
 use App\Http\Controllers\WalletTopupController;
 use App\Http\Controllers\Admin\AdminOfferController;
-
+use App\Http\Controllers\Admin\AdminDataController;
 use Illuminate\Foundation\Application;
 use App\Http\Controllers\Trade\TradeController;
 use App\Http\Controllers\Admin\AdminDashboardController;
@@ -30,6 +30,25 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 Route::get('/offers/{offer}/edit', [AdminOfferController::class, 'edit'])->name('offers.edit');
 Route::put('/offers/{offer}', [AdminOfferController::class, 'update'])->name('offers.update');
 Route::delete('/offers/{offer}', [AdminOfferController::class, 'destroy'])->name('offers.destroy');
+
+
+Route::get('/data', [AdminDataController::class, 'index'])->name('data.index');
+
+Route::post('/categories', [AdminDataController::class, 'storeCategory'])->name('categories.store');
+Route::put('/categories/{category}', [AdminDataController::class, 'updateCategory'])->name('categories.update');
+Route::delete('/categories/{category}', [AdminDataController::class, 'destroyCategory'])->name('categories.destroy');
+
+Route::post('/games', [AdminDataController::class, 'storeGame'])->name('games.store');
+Route::put('/games/{game}', [AdminDataController::class, 'updateGame'])->name('games.update');
+Route::delete('/games/{game}', [AdminDataController::class, 'destroyGame'])->name('games.destroy');
+
+Route::post('/servers', [AdminDataController::class, 'storeServer'])->name('servers.store');
+Route::put('/servers/{server}', [AdminDataController::class, 'updateServer'])->name('servers.update');
+Route::delete('/servers/{server}', [AdminDataController::class, 'destroyServer'])->name('servers.destroy');
+
+Route::post('/payment-methods', [AdminDataController::class, 'storePaymentMethod'])->name('payment_methods.store');
+Route::put('/payment-methods/{paymentMethod}', [AdminDataController::class, 'updatePaymentMethod'])->name('payment_methods.update');
+Route::delete('/payment-methods/{paymentMethod}', [AdminDataController::class, 'destroyPaymentMethod'])->name('payment_methods.destroy');
     // Добавь сюда другие админ-маршруты
 });
 Route::middleware(['auth'])->group(function () {

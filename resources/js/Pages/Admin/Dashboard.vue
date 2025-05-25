@@ -19,6 +19,11 @@ defineOptions({ layout: (h, page) => h(AppLayout, null, () => page) })
         <p class="text-sm text-gray-500 mt-2">Просмотр всех объявлений</p>
         <Link :href="route('admin.offers.index')" class="mt-4 inline-block text-cyan-600 hover:underline">Перейти</Link>      </div>
 
+        <div class="bg-white shadow rounded-xl p-6">
+        <h2 class="text-lg font-semibold text-gray-900">Категории, игровые категории, сервера, методы оплаты</h2>
+        <p class="text-sm text-gray-500 mt-2">Просмотр всей информации о сайта</p>
+        <Link :href="route('admin.data.index')" class="mt-4 inline-block text-cyan-600 hover:underline">Перейти</Link>      </div>
+
       <div class="bg-white shadow rounded-xl p-6">
         <h2 class="text-lg font-semibold text-gray-900">Жалобы</h2>
         <p class="text-sm text-gray-500 mt-2">Обработка жалоб пользователей</p>
