@@ -105,7 +105,7 @@ const submitFilter = () => {
 
 </script>
 <template>
-    <div class="max-w-4xl mx-auto py-10">
+   
         
       <!-- Кнопка и модалка -->
       <div class="flex justify-between items-center">
@@ -298,5 +298,5 @@ const submitFilter = () => {
     </div>
   </form>
 </div>
-    </div>
+  
   </template>

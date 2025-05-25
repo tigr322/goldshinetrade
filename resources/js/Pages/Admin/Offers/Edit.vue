@@ -1,6 +1,7 @@
 <script setup>
 import { useForm } from '@inertiajs/vue3'
-
+import AppLayout from '@/Layouts/AppLayout.vue'
+defineOptions({ layout: (h, page) => h(AppLayout, null, () => page) })
 const props = defineProps({ offer: Object })
 
 const form = useForm({
