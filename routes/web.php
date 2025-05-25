@@ -22,6 +22,13 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/deals/{deal}', [TradeController::class, 'show'])->name('deals.show');
+    Route::post('/deals/{deal}/confirm', [TradeController::class, 'confirm'])->name('deals.confirm');
+});
+
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/users', [AdminUsersController::class, 'index'])->name('users.index');

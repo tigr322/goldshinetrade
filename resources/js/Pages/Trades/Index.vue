@@ -17,12 +17,15 @@ const props = defineProps({
   servers: Array,
   filters: Object,
   paymentMethods: Array,
+  filters: Object,
+
 })
 
 const showCreateModal = ref(false)
 const availableServers = ref([])
 
 const filters = ref({
+  game_name: '',
   category_id: props.filters?.category_id || '',
   game_type_id: props.filters?.game_type_id || '',
   search: props.filters?.search || '',
@@ -52,6 +55,11 @@ watch(() => createForm.category_id, () => {
   createForm.server_id = ''
   createForm.game_type_id = ''
 })
+const uniqueGames = computed(() => {
+  const set = new Set()
+  props.offers.forEach(o => o.game_name && set.add(o.game_name))
+  return [...set]
+})
 
 // Игры по выбранной категории
 const availableGames = computed(() => {
@@ -76,13 +84,10 @@ watch(() => createForm.game_id, (gameId) => {
 
 const filteredOffers = computed(() => {
   return props.offers.filter((offer) => {
-    const matchesCategory =
-      !filters.value.category_id || offer.category_id == filters.value.category_id
-    const matchesGameType =
-      !filters.value.game_type_id || offer.game_type_id == filters.value.game_type_id
-    const matchesSearch =
-      !filters.value.search || offer.title.toLowerCase().includes(filters.value.search.toLowerCase())
-    return matchesCategory && matchesGameType && matchesSearch
+    const matchCategory = !filters.value.category_id || offer.category_id == filters.value.category_id
+    const matchGame = !filters.value.game_name || offer.game_name === filters.value.game_name
+    const matchSearch = !filters.value.search || offer.title.toLowerCase().includes(filters.value.search.toLowerCase())
+    return matchCategory && matchGame && matchSearch
   })
 })
 
@@ -197,7 +202,32 @@ const submitFilter = () => {
 <div v-if="flash.error" class="mb-4 p-4 rounded bg-red-100 text-red-800 border border-red-200">
   {{ flash.error }}
 </div>
+<div class="mb-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+  <!-- Фильтр по названию игры -->
+  <div>
+    <label class="block text-sm font-medium text-gray-700 mb-1">Игра</label>
+    <select v-model="filters.game_name" @change="submitFilter" class="w-full border rounded-md shadow-sm">
+      <option value="">Все</option>
+      <option v-for="name in uniqueGames" :key="name" :value="name">{{ name }}</option>
+    </select>
+  </div>
 
+  <!-- Фильтр по категории -->
+  <div>
+    <label class="block text-sm font-medium text-gray-700 mb-1">Категория</label>
+    <select v-model="filters.category_id" @change="submitFilter" class="w-full border rounded-md shadow-sm">
+      <option value="">Все</option>
+      <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
+    </select>
+  </div>
+
+  <!-- Поиск -->
+  <div>
+    <label class="block text-sm font-medium text-gray-700 mb-1">Поиск</label>
+    <input type="text" v-model="filters.search" @input="submitFilter"
+           class="w-full border rounded-md shadow-sm" placeholder="По названию оффера..." />
+  </div>
+</div>
    <!-- Контейнер с горизонтальной прокруткой только на мобильных -->
 <div class="mx-auto max-w-6xl mt-10">
   <div class="sm:overflow-visible overflow-x-auto">
@@ -256,7 +286,15 @@ const submitFilter = () => {
     <button @click="selectedOffer = null" class="text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
   </div>
 
-  <form @submit.prevent="form.post('/deals', { onSuccess: () => selectedOffer = null })" class="space-y-4">
+  <form @submit.prevent="form.post('/deals', {
+  onSuccess: (page) => {
+    const dealId = page.props?.deal?.id // предполагается, что контроллер возвращает ID сделки
+    if (dealId) {
+      selectedOffer.value = null
+      router.visit(`/deals/${dealId}`)
+    }
+  },
+})" class="space-y-4">
     <div>
       <label class="block text-sm font-medium text-gray-700">Количество</label>
       <input

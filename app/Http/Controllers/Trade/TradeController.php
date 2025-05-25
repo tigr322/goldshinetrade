@@ -13,8 +13,10 @@ use App\Models\GameType;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use App\Models\PaymentMethod;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 class TradeController extends Controller
 {
+    use AuthorizesRequests;
     public function index(Request $request)
     {
         $query = Offer::with(['user', 'game', 'server'])
@@ -96,46 +98,70 @@ class TradeController extends Controller
     }
 
     public function buy(Request $request)
-    {
-        $data = $request->validate([
-            'offer_id' => 'required|exists:offers,id',
-            'quantity' => 'required|integer|min:1',
-            'payment_method_id' => 'required|exists:payment_methods,id',
-        ]);
+{
+    $data = $request->validate([
+        'offer_id' => 'required|exists:offers,id',
+        'quantity' => 'required|integer|min:1',
+        'payment_method_id' => 'required|exists:payment_methods,id',
+    ]);
+
+    $user = Auth::user();
+    $offer = Offer::findOrFail($data['offer_id']);
+
+    if ($data['quantity'] > $offer->quantity) {
+        return back()->withErrors(['quantity' => 'Недостаточное количество в наличии.']);
+    }
+
+    $totalPrice = $offer->price * $data['quantity'];
+
+    if ($user->balance < $totalPrice) {
+        return back()->withErrors(['quantity' => 'Недостаточно средств для покупки! Пополните счет.']);
+    }
+
+    $user->balance -= $totalPrice;
+    $user->save();
+
+    $deal = Deal::create([
+        'buyer_id' => $user->id,
+        'offer_id' => $offer->id,
+        'quantity' => $data['quantity'],
+        'payment_method_id' => $data['payment_method_id'],
+        'total_price' => $totalPrice,
+        'status' => 'pending',
+    ]);
+
+    $offer->quantity -= $data['quantity'];
+    if ($offer->quantity <= 0) {
+        $offer->is_active = false;
+    }
+    $offer->save();
+
+    return Inertia::location(route('deals.show', $deal->id));
+}
+        public function show(Deal $deal)
+{
+    $this->authorize('view', $deal); // Покупатель или продавец
+    return Inertia::render('Deals/Show', [
+        'deal' => $deal->load('offer.user'),
+    ]);
+}
+
+public function confirm(Request $request, Deal $deal)
+{
+    $this->authorize('update', $deal);
     
-        $user = Auth::user();
-        $offer = Offer::findOrFail($data['offer_id']);
-    
-        if ($data['quantity'] > $offer->quantity) {
-            return back()->withErrors(['quantity' => 'Недостаточное количество в наличии.']);        }
-    
-        $totalPrice = $offer->price * $data['quantity'];
-    
-        // ✅ Проверка баланса пользователя
-        if ($user->balance < $totalPrice) {
-            return back()->withErrors(['quantity' => 'Недостаточное средст для покупки! Пополните счет!']);        }
-    
-        // ✅ Списываем средства
-        $user->balance -= $totalPrice;
-        $user->save();
-    
-        // ✅ Создаём сделку
-        Deal::create([
-            'buyer_id' => $user->id,
-            'offer_id' => $offer->id,
-            'quantity' => $data['quantity'],
-            'payment_method_id' => $data['payment_method_id'],
-            'total_price' => $totalPrice,
-            'status' => 'pending',
-        ]);
-    
-        // ✅ Обновляем оффер
-        $offer->quantity -= $data['quantity'];
-        if ($offer->quantity <= 0) {
-            $offer->is_active = false;
-        }
-        $offer->save();
-    
-        return redirect()->route('offers.index')->with('success', 'Сделка создана.');
-        }
+    if ($deal->status !== 'paid') {
+        return back()->withErrors(['status' => 'Сделка должна быть оплачена.']);
+    }
+
+    $deal->update([
+        'status' => 'completed',
+    ]);
+
+    $seller = $deal->offer->user;
+    $seller->balance += $deal->total_price;
+    $seller->save();
+
+    return redirect()->route('dashboard')->with('success', 'Сделка подтверждена, средства переведены продавцу.');
+}
 }
