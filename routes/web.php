@@ -3,6 +3,7 @@
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CardController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\WalletTopupController;
 use App\Http\Controllers\Admin\AdminOfferController;
 use App\Http\Controllers\Admin\AdminDataController;
@@ -27,6 +28,8 @@ Route::get('/', function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/deals/{deal}', [TradeController::class, 'show'])->name('deals.show');
     Route::post('/deals/{deal}/confirm', [TradeController::class, 'confirm'])->name('deals.confirm');
+    Route::post('/deals/{deal}/messages', [MessageController::class, 'store'])->name('messages.store');
+    Route::get('/deals/{deal}/messages', [MessageController::class, 'index'])->name('messages.index');
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
