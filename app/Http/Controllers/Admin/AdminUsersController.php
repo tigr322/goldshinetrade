@@ -5,6 +5,8 @@ use App\Models\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Spatie\Permission\Models\Role;
+
 class AdminUsersController extends Controller
 {
     public function index()
@@ -17,11 +19,16 @@ class AdminUsersController extends Controller
    
     public function updateRole(Request $request, User $user)
     {
-        $request->validate([
+        $validated = $request->validate([
             'role' => 'required|string'
         ]);
-
-        $user->syncRoles([$request->role]); // Spatie Laravel Permission
+    
+        // Найти или создать роль, если она не существует
+        $role = Role::findOrCreate($validated['role']);
+    
+        // Назначить роль пользователю
+        $user->syncRoles([$role]);
+    
         return back()->with('success', 'Роль обновлена.');
     }
 }
