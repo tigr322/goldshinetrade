@@ -2,6 +2,8 @@
 import { ref } from 'vue'
 import { router, usePage } from '@inertiajs/vue3'
 import { Link } from '@inertiajs/vue3'
+import AppLayout from '@/Layouts/AppLayout.vue'
+defineOptions({ layout: (h, page) => h(AppLayout, null, () => page) })
 const props = defineProps({
   users: Array
 })

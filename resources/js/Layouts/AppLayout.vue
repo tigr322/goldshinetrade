@@ -28,7 +28,7 @@ const navigation = [
   { name: 'Обмен', href: route('offers.index'), icon: ScaleIcon },
   { name: 'Мои карты', href: route('cards.index'), icon: CreditCardIcon },
   { name: 'Мои Сообщения', href: route('messages.index'), icon: UserGroupIcon },
-  { name: 'Жалобы', href: '#', icon: DocumentChartBarIcon },
+  
 ]
 
 const secondaryNavigation = [

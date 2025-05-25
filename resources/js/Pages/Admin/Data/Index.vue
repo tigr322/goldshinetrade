@@ -1,7 +1,8 @@
 <script setup>
 import { useForm, router } from '@inertiajs/vue3'
 import { ref } from 'vue'
-
+import AppLayout from '@/Layouts/AppLayout.vue'
+defineOptions({ layout: (h, page) => h(AppLayout, null, () => page) })
 const props = defineProps({
   categories: Array,
   games: Array,
