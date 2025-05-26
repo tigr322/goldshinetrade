@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 //Проверка на админаdвв
 
-class Admin
+class Moder
 {
     /**
      * Handle an incoming request.
@@ -16,7 +16,7 @@ class Admin
      */
     public function handle($request, Closure $next)
     {
-        if (!auth()->check() || !auth()->user()->hasRole(['admin'])) {
+        if (!auth()->check() || !auth()->user()->hasRole('moderator')) {
             abort(403);
         }
     

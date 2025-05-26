@@ -34,14 +34,14 @@ Route::middleware(['auth'])->group(function () {
 
 });
 
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'admin_or_moder'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-    Route::get('/users', [AdminUsersController::class, 'index'])->name('users.index');
-    Route::patch('/users/{user}/role', [AdminUsersController::class, 'updateRole'])->name('users.updateRole');
+    Route::get('/users', [AdminUsersController::class, 'index'])->name('users.index')->middleware('admin');
+    Route::patch('/users/{user}/role', [AdminUsersController::class, 'updateRole'])->name('users.updateRole')->middleware('admin');
     Route::get('/offers', [AdminOfferController::class, 'index'])->name('offers.index');
-Route::get('/offers/{offer}/edit', [AdminOfferController::class, 'edit'])->name('offers.edit');
-Route::put('/offers/{offer}', [AdminOfferController::class, 'update'])->name('offers.update');
-Route::delete('/offers/{offer}', [AdminOfferController::class, 'destroy'])->name('offers.destroy');
+Route::get('/offers/{offer}/edit', [AdminOfferController::class, 'edit'])->name('offers.edit')->middleware('admin');
+Route::put('/offers/{offer}', [AdminOfferController::class, 'update'])->name('offers.update')->middleware('admin');
+Route::delete('/offers/{offer}', [AdminOfferController::class, 'destroy'])->name('offers.destroy')->middleware('admin');
 
 
 Route::get('/data', [AdminDataController::class, 'index'])->name('data.index');
