@@ -13,7 +13,7 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\Admin\AdminUsersController;
-
+use App\Models\UserCard;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -111,14 +111,16 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])->name('profile.photo')->middleware('auth');
 });
 // routes/web.php
+Route::bind('card', function ($value) {
+    return UserCard::findOrFail($value);
+});
 Route::middleware(['auth'])->group(function () {
     Route::get('/cards', [CardController::class, 'index'])->name('cards.index');
     Route::get('/cards/add', [CardController::class, 'create'])->name('cards.create');
     Route::post('/cards', [CardController::class, 'store'])->name('cards.store');
-    Route::delete('/cards/{card}', [CardController::class, 'destroy'])->name('cards.destroy');
-
-});
-Route::middleware(['auth'])->group(function () {
+    Route::delete('/cards/{card}', [CardController::class, 'destroy'])->name('cards.destroy');});
+    
+    Route::middleware(['auth'])->group(function () {
     Route::get('/messages', [\App\Http\Controllers\MessageController::class, 'index'])->name('messages.index');
 });
 

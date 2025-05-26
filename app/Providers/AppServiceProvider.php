@@ -11,6 +11,7 @@ use App\Http\Middleware\Moder;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use App\Models\UserCard;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -26,6 +27,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+       
+
+        Route::model('card', UserCard::class);
         Vite::prefetch(concurrency: 3);
         Route::aliasMiddleware('admin', Admin::class);
         Route::aliasMiddleware('moder', Moder::class);

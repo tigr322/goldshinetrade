@@ -11,8 +11,9 @@ const props = defineProps({
 defineOptions({ layout: (h, page) => h(AppLayout, null, () => page) })
 
 const deleteCard = (id) => {
+  console.log('Удаление карты:', id) // ← прspanоверка
   if (confirm('Вы уверены, что хотите удалить эту карту?')) {
-    router.delete(`/cards/${id}`)
+    router.delete(route('cards.destroy', id))
   }
 }
 </script>
@@ -42,7 +43,7 @@ const deleteCard = (id) => {
         </div>
         <div class="flex-1 min-w-0">
           <div class="flex justify-between">
-            <span class="absolute inset-0" aria-hidden="true" />
+           
             <p class="text-sm font-medium text-gray-900">{{ card.name }}</p>
             <span
               v-if="card.primary"

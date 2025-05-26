@@ -55,9 +55,7 @@ class CardController extends Controller
 
     public function destroy(UserCard $card)
     {
-        $this->authorize('delete', $card); // требует политику!
         $card->delete();
-    
         return back()->with('success', 'Карта удалена');
     }
 }

@@ -29,6 +29,6 @@ class UserCardPolicy
 
     public function delete(User $user, UserCard $card): bool
     {
-        return $user->id === $card->user_id;
+        return $card->user_id === $user->id;
     }
 }
