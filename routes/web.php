@@ -32,6 +32,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/deals/{deal}/messages', [MessageController::class, 'index'])->name('messages.index');
     Route::get('/mymessages', [MessageController::class, 'mymasseges'])->name('mymessages');
     Route::get('/privacy', fn () => Inertia::render('Privacy/Privacy'))->name('privacy');
+    Route::get('/policy/offer', fn() => Inertia::render('Privacy/Offert'))->name('policy.offer');
+Route::get('/policy/terms', fn() => Inertia::render('Privacy/Terms'))->name('policy.terms');
 });
 
 Route::middleware(['auth', 'admin_or_moder'])->prefix('admin')->name('admin.')->group(function () {

@@ -35,6 +35,7 @@ const secondaryNavigation = [
   { name: 'Настройки', href: '#', icon: CogIcon },
   { name: 'Помощь', href: '#', icon: QuestionMarkCircleIcon },
   { name: 'Безопасность', href: route('privacy'), icon: ShieldCheckIcon },
+
 ]
 
 const page = usePage()
@@ -145,6 +146,7 @@ if (user && Array.isArray(user.roles) && user.roles.some(role => ['admin', 'mode
           </div>
         </nav>
       </div>
+      
     </div>
 
     <!-- Topbar for mobile toggle -->
@@ -161,6 +163,14 @@ if (user && Array.isArray(user.roles) && user.roles.some(role => ['admin', 'mode
       <!-- Page Content -->
       <main class="p-4">
         <slot />
+
+        <footer class="mt-10 py-6 text-center text-sm text-gray-500 border-t">
+  <div class="space-x-4">
+    <Link :href="route('privacy')" class="hover:underline">Политика конфиденциальности</Link>
+    <Link :href="route('policy.offer')" class="hover:underline">Пользовательское соглашение</Link>
+    <Link :href="route('policy.terms')" class="hover:underline">Условия использования</Link>
+  </div>
+</footer>
       </main>
     </div>
   </div>
