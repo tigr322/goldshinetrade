@@ -23,7 +23,19 @@ class AdminDataController extends Controller
             'gameTypes' => GameType::all(),
         ]);
     }
+    public function storeGameType(Request $request)
+{
+    $request->validate(['name' => 'required|string|max:255']);
+    GameType::create(['name' => $request->name]);
 
+    return back()->with('success', 'Тип игры добавлен.');
+}
+
+public function destroyGameType(GameType $type)
+{
+    $type->delete();
+    return back()->with('success', 'Тип игры удалён.');
+}
     public function storeCategory(Request $request)
     {
         $request->validate(['name' => 'required|string|max:255']);

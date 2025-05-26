@@ -34,7 +34,7 @@ const navigation = [
 const secondaryNavigation = [
   { name: 'Настройки', href: '#', icon: CogIcon },
   { name: 'Помощь', href: '#', icon: QuestionMarkCircleIcon },
-  { name: 'Безопасность', href: route('privacy'), icon: ShieldCheckIcon },
+  { name: 'Безопасность', href: '#', icon: ShieldCheckIcon },
 
 ]
 

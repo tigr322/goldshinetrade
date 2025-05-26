@@ -10,7 +10,7 @@ const props = defineProps({
   paymentMethods: Array,
   gameTypes: Array 
 })
-
+const gameTypeForm = useForm({ name: '' })
 const categoryForm = useForm({ name: '' })
 const gameForm = useForm({ name: '', category_id: '', game_type_id: '' })
 const serverForm = useForm({ name: '', game_id: '' })
@@ -51,7 +51,32 @@ const deleteItem = (routeName, id) => {
         </tbody>
       </table>
     </div>
-
+    <!-- Типы игр -->
+<div class="bg-white shadow rounded-xl p-6">
+  <h2 class="text-lg font-semibold text-gray-900">Типы игр</h2>
+  <form @submit.prevent="gameTypeForm.post(route('admin.game_types.store'))" class="flex gap-2 mt-4">
+    <input v-model="gameTypeForm.name" type="text" placeholder="Название типа игры" class="border rounded p-2 w-full" />
+    <button type="submit" class="bg-cyan-600 text-white px-4 rounded">Добавить</button>
+  </form>
+  <table class="w-full mt-6 text-sm">
+    <thead class="bg-gray-100">
+      <tr>
+        <th class="p-2 text-left">ID</th>
+        <th class="p-2 text-left">Название</th>
+        <th class="p-2 text-left">Действия</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="type in gameTypes" :key="type.id" class="border-t">
+        <td class="p-2">{{ type.id }}</td>
+        <td class="p-2">{{ type.name }}</td>
+        <td class="p-2">
+          <button @click="deleteItem('admin.game_types.destroy', type.id)" class="text-red-600 hover:underline">Удалить</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
     <!-- Игры -->
     <div class="bg-white shadow rounded-xl p-6">
       <h2 class="text-lg font-semibold text-gray-900">Игры</h2>

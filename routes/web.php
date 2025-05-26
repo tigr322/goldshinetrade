@@ -59,7 +59,8 @@ Route::delete('/games/{game}', [AdminDataController::class, 'destroyGame'])->nam
 Route::post('/servers', [AdminDataController::class, 'storeServer'])->name('servers.store');
 Route::put('/servers/{server}', [AdminDataController::class, 'updateServer'])->name('servers.update');
 Route::delete('/servers/{server}', [AdminDataController::class, 'destroyServer'])->name('servers.destroy');
-
+Route::post('/game-types', [AdminDataController::class, 'storeGameType'])->name('game_types.store');
+Route::delete('/game-types/{type}', [AdminDataController::class, 'destroyGameType'])->name('game_types.destroy');
 Route::post('/payment-methods', [AdminDataController::class, 'storePaymentMethod'])->name('payment_methods.store');
 Route::put('/payment-methods/{paymentMethod}', [AdminDataController::class, 'updatePaymentMethod'])->name('payment_methods.update');
 Route::delete('/payment-methods/{paymentMethod}', [AdminDataController::class, 'destroyPaymentMethod'])->name('payment_methods.destroy');
