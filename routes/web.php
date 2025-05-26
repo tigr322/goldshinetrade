@@ -31,7 +31,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/deals/{deal}/messages', [MessageController::class, 'store'])->name('messages.store');
     Route::get('/deals/{deal}/messages', [MessageController::class, 'index'])->name('messages.index');
     Route::get('/mymessages', [MessageController::class, 'mymasseges'])->name('mymessages');
-
+    Route::get('/privacy', fn () => Inertia::render('Privacy/Privacy'))->name('privacy');
 });
 
 Route::middleware(['auth', 'admin_or_moder'])->prefix('admin')->name('admin.')->group(function () {
