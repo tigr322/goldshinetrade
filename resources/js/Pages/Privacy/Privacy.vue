@@ -5,7 +5,7 @@ defineOptions({ layout: (h, page) => h(AppLayout, null, () => page) })
 
 <template>
   <div class="max-w-5xl mx-auto py-12 space-y-8">
-    <h1 class="text-3xl font-bold text-cyan-700">Политика конфиденциальности</h1>
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">Политика конфиденциальности</h1>
 
     <div class="bg-white shadow rounded-xl p-6 space-y-4 text-gray-800 text-sm leading-relaxed">
       <p>
