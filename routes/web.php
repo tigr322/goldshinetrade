@@ -31,11 +31,11 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/deals/{deal}/messages', [MessageController::class, 'store'])->name('messages.store');
     Route::get('/deals/{deal}/messages', [MessageController::class, 'index'])->name('messages.index');
     Route::get('/mymessages', [MessageController::class, 'mymasseges'])->name('mymessages');
-    Route::get('/privacy', fn () => Inertia::render('Privacy/Privacy'))->name('privacy');
+    
+});
+Route::get('/privacy', fn () => Inertia::render('Privacy/Privacy'))->name('privacy');
     Route::get('/policy/offer', fn() => Inertia::render('Privacy/Offert'))->name('policy.offer');
 Route::get('/policy/terms', fn() => Inertia::render('Privacy/Terms'))->name('policy.terms');
-});
-
 Route::middleware(['auth', 'admin_or_moder'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/users', [AdminUsersController::class, 'index'])->name('users.index')->middleware('admin');
@@ -119,7 +119,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/cards/add', [CardController::class, 'create'])->name('cards.create');
     Route::post('/cards', [CardController::class, 'store'])->name('cards.store');
     Route::delete('/cards/{card}', [CardController::class, 'destroy'])->name('cards.destroy');});
-    
+
     Route::middleware(['auth'])->group(function () {
     Route::get('/messages', [\App\Http\Controllers\MessageController::class, 'index'])->name('messages.index');
 });

@@ -139,6 +139,13 @@ function handleImageError() {
             </svg>
           </div>
         </div>
+        <footer class="mt-10 py-6 text-center text-sm text-gray-500 border-t">
+  <div class="space-x-4">
+    <Link :href="route('privacy')" class="hover:underline">Политика конфиденциальности</Link>
+    <Link :href="route('policy.offer')" class="hover:underline">Пользовательское соглашение</Link>
+    <Link :href="route('policy.terms')" class="hover:underline">Условия использования</Link>
+  </div>
+</footer>
       </main>
     </div>
   </template>
