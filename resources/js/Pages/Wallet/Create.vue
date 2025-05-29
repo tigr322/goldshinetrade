@@ -19,6 +19,7 @@ if (defaultCard.value) {
 </script>
 
 <template>
+    <Head title="Кошелек" />
   <div class="max-w-md mx-auto bg-white p-6 rounded shadow">
     <h2 class="text-xl font-bold mb-4">Пополнение кошелька</h2>
     

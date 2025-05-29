@@ -19,6 +19,7 @@ const deleteCard = (id) => {
 </script>
 
 <template>
+    <Head title="Карты" />
   <div class="space-y-6">
     <div class="flex justify-between items-center">
       <h2 class="text-lg font-medium leading-6 text-gray-900">Мои карты</h2>

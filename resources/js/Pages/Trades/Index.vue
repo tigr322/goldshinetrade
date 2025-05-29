@@ -110,7 +110,7 @@ const submitFilter = () => {
 
 </script>
 <template>
-   
+     <Head title="Офферы" />
         
       <!-- Кнопка и модалка -->
       <div class="flex justify-between items-center">

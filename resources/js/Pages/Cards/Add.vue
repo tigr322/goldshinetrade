@@ -20,6 +20,7 @@ const submit = () => {
 </script>
 
 <template>
+    <Head title="Добавление карты" />
   <div class="max-w-2xl mx-auto mt-10 bg-white shadow-md rounded-lg p-6 space-y-6">
     <h2 class="text-2xl font-bold text-gray-800">Добавить карту</h2>
 

@@ -24,6 +24,7 @@ const deleteItem = (routeName, id) => {
 </script>
 
 <template>
+    <Head title="Администрирования категории, игр и методов оплаты" />
   <div class="max-w-7xl mx-auto py-10 space-y-12">
     <!-- Категории -->
     <div class="bg-white shadow rounded-xl p-6">

@@ -36,6 +36,7 @@ onMounted(() => {
 </script>
 
 <template>
+    <Head title="Сделка" />
   <div class="max-w-4xl mx-auto mt-8 space-y-6">
     <h1 class="text-2xl font-bold text-gray-800">Сделка #{{ deal.id }}</h1>
     <p>Продавец: {{ deal.offer.user.name }}</p>

@@ -29,6 +29,7 @@ const isCurrent = (name) => {
 </script>
 
 <template>
+     <Head title="Главная" />
   <nav>
     <div>
       <div>

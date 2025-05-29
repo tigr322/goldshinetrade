@@ -53,6 +53,7 @@ if (user && Array.isArray(user.roles) && user.roles.some(role => ['admin', 'mode
 </script>
 
 <template>
+ 
   <div class="min-h-screen bg-gray-100">
     <!-- Mobile Sidebar -->
     <TransitionRoot as="template" :show="sidebarOpen">

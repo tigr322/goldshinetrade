@@ -1,6 +1,6 @@
 <script setup>
-import AppLayout from '@/Layouts/AppLayout.vue'
-defineOptions({ layout: (h, page) => h(AppLayout, null, () => page) })
+//import AppLayout from '@/Layouts/AppLayout.vue'
+//defineOptions({ layout: (h, page) => h(AppLayout, null, () => page) })
 </script>
 
 <template>

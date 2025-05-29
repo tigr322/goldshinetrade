@@ -10,6 +10,7 @@ const props = defineProps({
 </script>
 
 <template>
+    <Head title="Мои сообщения" />
   <div class="max-w-4xl mx-auto py-10">
     <h2 class="text-xl font-semibold text-gray-900 mb-6">Мои сообщения</h2>
 

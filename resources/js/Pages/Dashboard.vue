@@ -109,6 +109,7 @@ const statusStyles = {
 const sidebarOpen = ref(false)
 </script>
 <template>
+   <Head title="Главная" />
     <!--
       This example requires updating your template:
   
