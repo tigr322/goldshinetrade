@@ -9,13 +9,15 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Permission\Traits\HasRoles;
 use App\Models\UserCard; // Не забудь импортировать модель
+use Laravel\Fortify\TwoFactorAuthenticatable;
+
 /**
  * @method \Illuminate\Support\Collection getRoleNames()
  */
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, Notifiable, HasRoles, TwoFactorAuthenticatable;
     protected $appends = ['role_names']; 
 
     public function getRoleNamesAttribute()
