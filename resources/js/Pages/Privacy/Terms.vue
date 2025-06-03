@@ -52,7 +52,7 @@
       </p>
 
       <p class="text-xs text-gray-500">
-        Последнее обновление: {{ new Date().toLocaleDateString() }}
+        Последнее обновление: {{ new Date().toLocaleDateString() }} ИНН 233608603524   ФИО Адамян Тигран Павлович
       </p>
     </div>
   </div>
