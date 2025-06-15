@@ -98,7 +98,7 @@ class TradeController extends Controller
     }
 
     public function buy(Request $request)
-{
+    {
     $data = $request->validate([
         'offer_id' => 'required|exists:offers,id',
         'quantity' => 'required|integer|min:1',
@@ -137,7 +137,7 @@ class TradeController extends Controller
     $offer->save();
 
     return Inertia::location(route('deals.show', $deal->id));
-}
+    }
         public function show(Deal $deal)
 {
     $this->authorize('view', $deal); // Покупатель или продавец
