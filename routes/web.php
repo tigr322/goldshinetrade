@@ -120,9 +120,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/cards', [CardController::class, 'store'])->name('cards.store');
     Route::delete('/cards/{card}', [CardController::class, 'destroy'])->name('cards.destroy');});
 
-    Route::middleware(['auth'])->group(function () {
-    Route::get('/messages', [\App\Http\Controllers\MessageController::class, 'index'])->name('messages.index');
-});
+
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/wallet/topup', [WalletTopupController::class, 'create'])->name('wallet.topup');
