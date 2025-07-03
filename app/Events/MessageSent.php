@@ -1,16 +1,14 @@
 <?php
 namespace App\Events;
 
-use App\Models\Message;
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Broadcasting\ShouldBroadcast;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use App\Models\Message;
 
-class MessageSent implements ShouldBroadcastNow
+class MessageSent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -18,24 +16,18 @@ class MessageSent implements ShouldBroadcastNow
 
     public function __construct(Message $message)
     {
-        $this->message = $message->load('user');
+        $this->message = $message->load('user'); // если нужна инфа о пользователе
     }
 
-    public function broadcastOn(): Channel
+    public function broadcastOn()
     {
-        return new PrivateChannel("deal.{$this->message->deal_id}");
+        return new PrivateChannel('deal.' . $this->message->deal_id);
     }
 
-    public function broadcastWith(): array
+    public function broadcastWith()
     {
         return [
-            'id' => $this->message->id,
-            'content' => $this->message->content,
-            'user' => [
-                'id' => $this->message->user->id,
-                'name' => $this->message->user->name,
-            ],
-            'created_at' => $this->message->created_at->toDateTimeString(),
+            'message' => $this->message->toArray(),
         ];
     }
 }

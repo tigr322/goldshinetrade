@@ -8,8 +8,9 @@ use App\Models\Message;
 use App\Models\Deal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Events\MessageSent;
+use App\Events\NewMessageSent; 
 use Inertia\Inertia;
+use App\Events\MessageSent;
 
 class MessageController extends Controller
 {
@@ -23,8 +24,7 @@ class MessageController extends Controller
             'content' => $request->content,
         ]);
 
-        broadcast(new MessageSent($message))->toOthers();
-
+        broadcast(new NewMessageSent($message));
         return response()->json($message->load('user'));
     }
 

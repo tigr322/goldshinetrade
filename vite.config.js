@@ -17,15 +17,4 @@ export default defineConfig({
             },
         }),
     ],
-    build: {
-        rollupOptions: {
-          output: {
-            manualChunks: {
-              vue: ['vue', '@inertiajs/vue3'],
-              inertia: ['@inertiajs/inertia', '@inertiajs/inertia-vue3'],
-              ziggy: ['ziggy-js'],
-            },
-          },
-        },
-      },
 });

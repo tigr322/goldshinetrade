@@ -151,4 +151,3 @@ function handleImageError() {
     </div>
   </template>
   
-

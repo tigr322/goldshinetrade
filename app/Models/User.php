@@ -30,7 +30,7 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name', 'email', 'password', 'phone', 'is_verified', 'balance', 'rating', 'adress', 
+        'name', 'email', 'password', 'phone', 'is_verified', 'balance', 'rating', 'adress', 'photo'
     ];
     public function offers(): HasMany
     {

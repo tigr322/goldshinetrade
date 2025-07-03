@@ -1,3 +1,5 @@
+
+
 <?php
 
 use App\Http\Controllers\MainController;
@@ -14,7 +16,10 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\Admin\AdminUsersController;
 use App\Models\UserCard;
+use Laravel\Sanctum\Sanctum;
+use Illuminate\Support\Facades\Broadcast;
 
+Broadcast::routes(['middleware' => ['web', 'auth:sanctum']]);
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -66,12 +71,16 @@ Route::put('/payment-methods/{paymentMethod}', [AdminDataController::class, 'upd
 Route::delete('/payment-methods/{paymentMethod}', [AdminDataController::class, 'destroyPaymentMethod'])->name('payment_methods.destroy');
     // Добавь сюда другие админ-маршруты
 });
-Route::middleware(['auth'])->group(function () {
+Route::middleware([
+    'auth',
+    'auth:sanctum',
+    config('jetstream.auth_session'),
+])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::get('/offers', [TradeController::class, 'index'])->name('offers.index');
    Route::post('/offers', [TradeController::class, 'store'])->name('offers.store');
     Route::post('/deals', [TradeController::class, 'buy'])->name('deals.buy'); 
-Route::get('/dashboard', [MainController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [MainController::class, 'index'])->name('dashboard');
 Route::get('/exchange', function () {
     return Inertia::render('Exchange');
 })->name('exchange');

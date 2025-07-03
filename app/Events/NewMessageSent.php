@@ -12,10 +12,8 @@ use Illuminate\Queue\SerializesModels;
 
 
 
-class NewMessageSent implements ShouldBroadcast
+class NewMessageSent implements ShouldBroadcastNow
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
-
     public $message;
 
     public function __construct(Message $message)
@@ -23,21 +21,18 @@ class NewMessageSent implements ShouldBroadcast
         $this->message = $message->load('user');
     }
 
-    public function broadcastOn(): Channel
+    public function broadcastOn()
     {
-        return new PrivateChannel("deal.{$this->message->deal_id}");
+        return new PrivateChannel('deal.' . $this->message->deal_id);
     }
 
-    public function broadcastWith(): array
+    public function broadcastWith()
     {
         return [
             'id' => $this->message->id,
             'content' => $this->message->content,
-            'user' => [
-                'id' => $this->message->user->id,
-                'name' => $this->message->user->name,
-            ],
-            'created_at' => $this->message->created_at->toDateTimeString(),
+            'user' => $this->message->user,
+            'created_at' => $this->message->created_at,
         ];
     }
 }
