@@ -41,6 +41,7 @@ const form = useForm({
 const createForm = useForm({
   title: '',
   description: '',
+  full_description: '',
   category_id: '',
   game_type_id: '',
   game_id: '',
@@ -144,7 +145,10 @@ const submitFilter = () => {
               <label class="block text-sm font-medium text-gray-700">Описание</label>
               <textarea v-model="createForm.description" rows="2" class="w-full border rounded-md shadow-sm" />
             </div>
-  
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Полное описание</label>
+              <textarea v-model="createForm.full_description" rows="3" class="w-full border rounded-md shadow-sm" />
+            </div>
             <!-- Категория -->
             <div>
               <label class="block text-sm font-medium text-gray-700">Категория</label>

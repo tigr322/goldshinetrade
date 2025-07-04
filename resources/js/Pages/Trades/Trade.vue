@@ -55,7 +55,7 @@ const submit = () => {
       </div>
 
       <div>
-        <label class="block font-semibold mb-1">Цена за единицу</label>
+        <label class="block font-semibold mb-1">Цена за единицу(уточняйте в описании)</label>
         <input v-model="form.price_per_unit" type="number" class="w-full border p-2 rounded" step="0.01" />
         <div v-if="form.errors.price_per_unit" class="text-red-500">{{ form.errors.price_per_unit }}</div>
       </div>

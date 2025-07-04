@@ -41,6 +41,7 @@ class TradeController extends Controller
                 'id' => $offer->id,
                 'title' => $offer->title,
                 'description' => $offer->description,
+                'full_description'=> $offer->full_description,
                 'price_per_unit' => number_format($offer->price, 2, '.', ' '),
                 'quantity' => $offer->quantity,
                 'currency' => [
@@ -75,6 +76,7 @@ class TradeController extends Controller
         $request->validate([
             'title' => 'required',
             'description' => 'nullable',
+            'full_description' => 'nullable',
             'category_id' => 'required|exists:categories,id',
             'game_id' => 'nullable|exists:games,id',
             'server_id' => 'nullable|exists:servers,id',
@@ -89,6 +91,7 @@ class TradeController extends Controller
             'server_id' => $request->server_id,
             'title' => $request->title,
             'description' => $request->description,
+            'full_description'=> $request->full_description,
             'price' => $request->price,
             'quantity' => $request->quantity,
             'is_active' => true,

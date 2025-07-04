@@ -13,7 +13,7 @@ class Offer extends Model
 
     protected $fillable = [
         'user_id', 'category_id', 'game_id', 'server_id',
-        'title', 'description', 'price', 'quantity', 'is_active'
+        'title', 'description', 'full_description', 'price', 'quantity', 'is_active'
     ];
 
     public function user(): BelongsTo
