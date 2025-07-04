@@ -45,32 +45,36 @@ Route::middleware(['auth', 'admin_or_moder'])->prefix('admin')->name('admin.')->
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/users', [AdminUsersController::class, 'index'])->name('users.index')->middleware('admin');
     Route::patch('/users/{user}/role', [AdminUsersController::class, 'updateRole'])->name('users.updateRole')->middleware('admin');
+
     Route::get('/offers', [AdminOfferController::class, 'index'])->name('offers.index');
-Route::get('/offers/{offer}/edit', [AdminOfferController::class, 'edit'])->name('offers.edit')->middleware('admin');
-Route::put('/offers/{offer}', [AdminOfferController::class, 'update'])->name('offers.update')->middleware('admin');
-Route::delete('/offers/{offer}', [AdminOfferController::class, 'destroy'])->name('offers.destroy')->middleware('admin');
+    Route::get('/offers/{offer}/edit', [AdminOfferController::class, 'edit'])->name('offers.edit')->middleware('admin');
+    Route::put('/offers/{offer}', [AdminOfferController::class, 'update'])->name('offers.update')->middleware('admin');
+    Route::delete('/offers/{offer}', [AdminOfferController::class, 'destroy'])->name('offers.destroy')->middleware('admin');
 
+    Route::get('/data', [AdminDataController::class, 'index'])->name('data.index');
 
-Route::get('/data', [AdminDataController::class, 'index'])->name('data.index');
+    Route::post('/categories', [AdminDataController::class, 'storeCategory'])->name('categories.store');
+    Route::put('/categories/{category}', [AdminDataController::class, 'updateCategory'])->name('categories.update');
+    Route::delete('/categories/{category}', [AdminDataController::class, 'destroyCategory'])->name('categories.destroy');
 
-Route::post('/categories', [AdminDataController::class, 'storeCategory'])->name('categories.store');
-Route::put('/categories/{category}', [AdminDataController::class, 'updateCategory'])->name('categories.update');
-Route::delete('/categories/{category}', [AdminDataController::class, 'destroyCategory'])->name('categories.destroy');
+    Route::post('/games', [AdminDataController::class, 'storeGame'])->name('games.store');
+    Route::put('/games/{game}', [AdminDataController::class, 'updateGame'])->name('games.update');
+    Route::delete('/games/{game}', [AdminDataController::class, 'destroyGame'])->name('games.destroy');
 
-Route::post('/games', [AdminDataController::class, 'storeGame'])->name('games.store');
-Route::put('/games/{game}', [AdminDataController::class, 'updateGame'])->name('games.update');
-Route::delete('/games/{game}', [AdminDataController::class, 'destroyGame'])->name('games.destroy');
+    Route::post('/servers', [AdminDataController::class, 'storeServer'])->name('servers.store');
+    Route::put('/servers/{server}', [AdminDataController::class, 'updateServer'])->name('servers.update');
+    Route::delete('/servers/{server}', [AdminDataController::class, 'destroyServer'])->name('servers.destroy');
+    Route::put('/game-types/{type}', [AdminDataController::class, 'updateGameType'])->name('game_types.update')->middleware('admin');
+    Route::post('/game-types', [AdminDataController::class, 'storeGameType'])->name('game_types.store');
+    Route::delete('/game-types/{type}', [AdminDataController::class, 'destroyGameType'])->name('game_types.destroy');
 
-Route::post('/servers', [AdminDataController::class, 'storeServer'])->name('servers.store');
-Route::put('/servers/{server}', [AdminDataController::class, 'updateServer'])->name('servers.update');
-Route::delete('/servers/{server}', [AdminDataController::class, 'destroyServer'])->name('servers.destroy');
-Route::post('/game-types', [AdminDataController::class, 'storeGameType'])->name('game_types.store');
-Route::delete('/game-types/{type}', [AdminDataController::class, 'destroyGameType'])->name('game_types.destroy');
-Route::post('/payment-methods', [AdminDataController::class, 'storePaymentMethod'])->name('payment_methods.store');
-Route::put('/payment-methods/{paymentMethod}', [AdminDataController::class, 'updatePaymentMethod'])->name('payment_methods.update');
-Route::delete('/payment-methods/{paymentMethod}', [AdminDataController::class, 'destroyPaymentMethod'])->name('payment_methods.destroy');
+    Route::post('/payment-methods', [AdminDataController::class, 'storePaymentMethod'])->name('payment_methods.store');
+    Route::put('/payment-methods/{paymentMethod}', [AdminDataController::class, 'updatePaymentMethod'])->name('payment_methods.update');
+    Route::delete('/payment-methods/{paymentMethod}', [AdminDataController::class, 'destroyPaymentMethod'])->name('payment_methods.destroy');
+
     // Добавь сюда другие админ-маршруты
 });
+
 Route::middleware([
     'auth',
     'auth:sanctum',

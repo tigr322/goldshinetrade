@@ -93,7 +93,12 @@ public function destroyGameType(GameType $type)
         Server::create($request->only('name', 'game_id'));
         return back()->with('success', 'Сервер добавлен.');
     }
-
+    public function updateGameType(Request $request, GameType $type)
+    {
+        $request->validate(['name' => 'required|string|max:255']);
+        $type->update($request->only('name'));
+        return back();
+    }
     public function updateServer(Request $request, Server $server)
     {
         $request->validate([
