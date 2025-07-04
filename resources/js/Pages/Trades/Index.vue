@@ -8,7 +8,7 @@ const flash = computed(() => {
   return props && props.flash ? props.flash : {}
 })
 defineOptions({ layout: (h, page) => h(AppLayout, null, () => page) })
-
+const user = usePage().props.auth.user
 const props = defineProps({
   offers: Array,
   categories: Array,
@@ -266,13 +266,15 @@ const submitFilter = () => {
           <td class="px-4 py-3 text-sm text-gray-900">{{ offer.quantity }}</td>
           <td class="px-4 py-3 text-sm text-gray-900">{{ offer.user.name }}</td>
           <td class="px-4 py-3 text-sm">
-            <button
-              @click="buy(offer)"
-              class="bg-cyan-600 text-white px-3 py-1 rounded text-sm hover:bg-cyan-700 transition"
-            >
-              Купить
-            </button>
-          </td>
+  <button
+    v-if="offer.user.id !== user.id"
+    @click="buy(offer)"
+    class="bg-cyan-600 text-white px-3 py-1 rounded text-sm hover:bg-cyan-700 transition"
+  >
+    Купить
+  </button>
+  <span v-else class="text-gray-400 text-xs">Ваш оффер</span>
+</td>
         </tr>
       </tbody>
     </table>
