@@ -36,6 +36,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/deals/{deal}/messages', [MessageController::class, 'store'])->name('messages.store');
     Route::get('/deals/{deal}/messages', [MessageController::class, 'index'])->name('messages.index');
     Route::get('/mymessages', [MessageController::class, 'mymasseges'])->name('mymessages');
+    Route::post('/messages/mark-read', [MessageController::class, 'markAsRead'])->name('messages.markRead');
     
 });
 Route::get('/privacy', fn () => Inertia::render('Privacy/Privacy'))->name('privacy');

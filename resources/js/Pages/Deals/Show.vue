@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import Echo from '@/echo'
@@ -13,27 +13,74 @@ const user = usePage().props.auth.user
 const messages = ref([])
 const newMessage = ref('')
 
+// ✅ Отметка как прочитанное
+const markMessagesAsRead = async () => {
+  const unreadIds = messages.value
+    .filter(msg => msg.user?.id !== user.id && !msg.read_by_me && typeof msg.id === 'number')
+    .map(msg => msg.id)
+
+  if (unreadIds.length > 0) {
+    try {
+      await axios.post(route('messages.markRead'), {
+        message_ids: unreadIds,
+      })
+
+      // Помечаем на клиенте
+      messages.value.forEach(msg => {
+        if (unreadIds.includes(msg.id)) {
+          msg.read_by_me = true
+        }
+      })
+    } catch (err) {
+      console.warn('Ошибка при отметке сообщений как прочитанных:', err)
+    }
+  }
+}
+
 // ✅ Загрузка сообщений + системное предупреждение
 const loadMessages = async () => {
   const res = await axios.get(route('messages.index', props.deal.id))
   messages.value = res.data.reverse()
 
-  // Добавим системное сообщение в начало
-  messages.value.unshift({
-    id: 'warning',
-    user: { name: 'Система' },
-    content:
-      '⚠️ Никогда не отправляйте предоплату до получения товара. Все сообщения сохраняются. В случае подозрительной активности сообщите в поддержку.',
-    created_at: new Date().toISOString(),
-  })
+  const storageKey = `goldshinetrade_conf_notice_${props.deal.id}`
+  let systemMessage = null
+
+  const cached = localStorage.getItem(storageKey)
+  if (cached) {
+    try {
+      systemMessage = JSON.parse(cached)
+    } catch (e) {
+      console.warn('Ошибка чтения системного сообщения:', e)
+    }
+  } else {
+    systemMessage = {
+      id: 'warning',
+      user: { name: 'Система' },
+      content:
+        '⚠️ Никогда не отправляйте предоплату до получения товара. Все сообщения сохраняются. В случае подозрительной активности сообщите в поддержку.',
+      created_at: new Date().toISOString(),
+    }
+
+    localStorage.setItem(storageKey, JSON.stringify(systemMessage))
+  }
+
+  if (systemMessage) {
+    messages.value.push(systemMessage)
+    messages.value.sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+  }
+
+  await nextTick()
+  markMessagesAsRead()
 }
 
 // ✅ Отправка
 const sendMessage = async () => {
   if (!newMessage.value.trim()) return
+
   await axios.post(route('messages.store', props.deal.id), {
     content: newMessage.value,
   })
+
   newMessage.value = ''
 }
 
@@ -44,14 +91,18 @@ onMounted(async () => {
   })
 
   Echo.private(`deal.${props.deal.id}`)
-    .listen('.App\\Events\\NewMessageSent', (e) => {
+    .listen('.App\\Events\\NewMessageSent', async (e) => {
       console.log('📨 Новое сообщение:', e)
       messages.value.push({
         id: e.id,
         content: e.content,
         user: e.user,
         created_at: e.created_at,
+        read_by_me: false,
       })
+
+      await nextTick()
+      markMessagesAsRead()
     })
 
   await loadMessages()
@@ -89,6 +140,7 @@ onMounted(async () => {
           <span class="text-xs text-gray-400 ml-2">
             {{ new Date(m.created_at).toLocaleTimeString() }}
           </span>
+          <span v-if="m.read_by_me" class="text-xs text-gray-500 ml-2">✓ Прочитано</span>
         </div>
       </div>
 

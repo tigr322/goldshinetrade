@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Message;
 use App\Models\Deal;
+use App\Models\MessageRead;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Events\NewMessageSent; 
@@ -27,7 +28,24 @@ class MessageController extends Controller
         broadcast(new NewMessageSent($message));
         return response()->json($message->load('user'));
     }
-
+    public function markAsRead(Request $request)
+    {
+        $user = auth()->user();
+        $messageIds = $request->input('message_ids', []);
+    
+        $now = now();
+    
+        foreach ($messageIds as $id) {
+            MessageRead::firstOrCreate([
+                'message_id' => $id,
+                'user_id' => $user->id,
+            ], [
+                'read_at' => $now,
+            ]);
+        }
+    
+        return response()->noContent();
+    }
     public function index(Deal $deal)
     {
         return Message::with('user')->where('deal_id', $deal->id)->latest()->get();
