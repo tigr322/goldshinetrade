@@ -23,9 +23,11 @@
 -->
 
 <script setup>
-import { ref } from 'vue'
-import { Link } from '@inertiajs/vue3'
+import { ref, onMounted } from 'vue'
+import { Link, usePage } from '@inertiajs/vue3'
 import { useForm } from '@inertiajs/vue3'
+import AppLayout from '@/Layouts/AppLayout.vue'
+import Echo from '@/echo'
 
 import {
   Dialog,
@@ -74,6 +76,7 @@ const props = defineProps({
   reviews_given_count: Number,
   withdrawals: Array,
   adress: String,
+  userDeals: Array,
 })
 const notifications = [
   { id: 1, text: 'Вы получили новое сообщение', href: '/messages' },
@@ -106,7 +109,27 @@ const statusStyles = {
   failed: 'bg-gray-100 text-gray-800',
 }
 
-const sidebarOpen = ref(false)
+const showNotification = (message) => {
+  notifications.value.unshift({
+    id: Date.now(),
+    text: `Новое сообщение от ${message.user.name}: ${message.content}`.slice(0, 50),
+    href: `/deals/${message.deal_id}`,
+  })
+}
+
+onMounted(() => {
+  const user = usePage().props.auth.user
+  const userDeals = props.userDeals || []
+
+  userDeals.forEach((dealId) => {
+    Echo.private(`deal.${dealId}`)
+      .listen('.App\\Events\\NewMessageSent', (e) => {
+        if (e.user.id !== user.id) {
+          showNotification(e)
+        }
+      })
+  })
+})
 </script>
 <template>
    <Head title="Главная" />
@@ -459,6 +482,3 @@ const sidebarOpen = ref(false)
     </div>
   </template>
   
-<script>
-import AppLayout from '@/Layouts/AppLayout.vue'
-</script>

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\Deal;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -13,15 +14,20 @@ class MainController extends Controller
 {
     $user = $request->user();
 
+    // Получаем ID сделок, где пользователь — покупатель или продавец
+    $userDeals = Deal::where('buyer_id', $user->id)
+        ->orWhereHas('offer', function ($query) use ($user) {
+            $query->where('user_id', $user->id);
+        })
+        ->pluck(column: 'id');
     return Inertia::render('Dashboard', [
         'user' => $user,
         'balance' => number_format($user->balance ?? 0, 2, '.', ' '),
         'offers_count' => $user->offers()->count(),
         'deals_count' => $user->deals()->count(),
         'messages_count' => $user->messages()->count(),
-        
+        'userDeals' => $userDeals, 
 
-        // 💸 Подготовка списка транзакций (выводов)
         'withdrawals' => $user->withdrawals()->latest()->take(5)->get()->map(function ($w) {
             return [
                 'id' => $w->id,
