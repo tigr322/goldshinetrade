@@ -138,8 +138,14 @@ onMounted(async () => {
           </span>
           <span>{{ m.content }}</span>
           <span class="text-xs text-gray-400 ml-2">
-            {{ new Date(m.created_at).toLocaleTimeString() }}
-          </span>
+  {{ new Date(m.created_at).toLocaleString(undefined, {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  }) }}
+</span>
           <span v-if="m.read_by_me" class="text-xs text-gray-500 ml-2">✓ Прочитано</span>
         </div>
       </div>
