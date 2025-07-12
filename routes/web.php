@@ -139,5 +139,8 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/wallet/topup', [WalletTopupController::class, 'create'])->name('wallet.topup');
     Route::post('/wallet/topup', [WalletTopupController::class, 'store'])->name('wallet.topup.store');
+Route::post('/payment/callback', [WalletTopupController::class, 'handleCallback'])->name('payment.callback');
+Route::get('/payment/success', fn () => 'Успех!')->name('payment.success');
+Route::get('/payment/fail', fn () => 'Ошибка!')->name('payment.fail');
 });
 require __DIR__.'/auth.php';
