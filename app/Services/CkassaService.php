@@ -15,10 +15,12 @@ class CkassaService
             'servCode' => config('ckassa.serv_code'),
             'startPaySelect' => 'false',
             'invType' => 'READ_ONLY',
-            'amount' => strval($amount),
-            'properties' => ['9999999999', strval($userId)]
+            'amount' => strval($amount*100),
+            'properties' => [
+                '9999999999',          // Провайдер 0 — можно оставить
+            ],
         ];
-
+        Log::info('CKassa payload', $payload);
         try {
             $response = Http::withHeaders([
                 'ApiLoginAuthorization' => config('ckassa.shop_token'),

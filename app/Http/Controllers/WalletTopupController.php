@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\UserCard;
+use Inertia\Inertia;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -25,16 +26,14 @@ public function store(Request $request)
         'amount' => 'required|numeric|min:1',
     ]);
 
-    $user = Auth::user()->id;
+    $user = Auth::id();
 
-    // Получаем карту
     $url = CkassaService::createInvoice($request->amount, $user);
 
     if ($url) {
-        return redirect($url); // Перенаправление на оплату
-    }
+        return Inertia::location($url);    }
 
-    return back()->with('error', 'Не удалось создать счёт для оплаты');
+    return response()->json(['error' => 'Не удалось создать счёт'], 400);
 }
 public function handleCallback(Request $request)
 {
