@@ -14,10 +14,10 @@ class CkassaService
         $payload = [
             'servCode' => config('ckassa.serv_code'),
             'startPaySelect' => 'false',
-            'invType' => 'READ_ONLY',
+            'invType' => 'AMOUNT_READ_ONLY',
             'amount' => strval($amount*100),
             'properties' => [
-                '9999999999',          // Провайдер 0 — можно оставить
+                '9180000000',        
             ],
         ];
         Log::info('CKassa payload', $payload);

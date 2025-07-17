@@ -1,26 +1,4 @@
-<!--
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  const colors = require('tailwindcss/colors')
-  
-  module.exports = {
-    // ...
-    theme: {
-      extend: {
-        colors: {
-          cyan: colors.cyan,
-        },
-      },
-    },
-    plugins: [
-      // ...
-      require('@tailwindcss/forms'),
-    ],
-  }
-  ```
--->
+
 
 <script setup>
 import { ref, onMounted } from 'vue'
@@ -133,6 +111,7 @@ onMounted(() => {
 </script>
 <template>
    <Head title="Главная" />
+   
     <!--
       This example requires updating your template:
   

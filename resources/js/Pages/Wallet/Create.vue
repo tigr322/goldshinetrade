@@ -1,6 +1,7 @@
 <script setup>
 import { useForm } from '@inertiajs/vue3'
 import { computed } from 'vue'
+import AppLayout from '@/Layouts/AppLayout.vue'
 
 const props = defineProps({
   cards: Array,
@@ -16,6 +17,8 @@ const defaultCard = computed(() => props.cards.find(c => c.primary))
 if (defaultCard.value) {
   form.card_id = defaultCard.value.id
 }
+defineOptions({ layout: (h, page) => h(AppLayout, null, () => page) })
+
 </script>
 
 <template>
@@ -25,7 +28,7 @@ if (defaultCard.value) {
     
     <form @submit.prevent="form.post('/wallet/topup')">
       <!-- Выбор карты -->
-      <div class="mb-4">
+      <!-- <div class="mb-4">
         <label class="block text-sm font-medium text-gray-700 mb-1">Выберите карту</label>
         <select
           v-model="form.card_id"
@@ -36,7 +39,7 @@ if (defaultCard.value) {
             {{ card.name }} — {{ card.type }} •••• {{ card.number }}
           </option>
         </select>
-      </div>
+      </div>-->
 
       <!-- Сумма -->
       <div class="mb-4">

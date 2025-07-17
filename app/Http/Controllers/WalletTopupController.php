@@ -13,7 +13,7 @@ use App\Services\CkassaService;
 class WalletTopupController extends Controller
 {
     public function create()
-{
+{   
     $cards = Auth::user()->cards()->get(['id', 'name', 'type', 'number', 'expiry', 'primary']);
 
     return inertia('Wallet/Create', [
