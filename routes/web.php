@@ -27,7 +27,7 @@ Route::get('/', function () {
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
-});
+})->name('Welcome');
 
 
 Route::middleware(['auth'])->group(function () {
@@ -143,4 +143,5 @@ Route::post('/payment/callback', [WalletTopupController::class, 'handleCallback'
 Route::get('/payment/success', fn () => 'Успех!')->name('payment.success');
 Route::get('/payment/fail', fn () => 'Ошибка!')->name('payment.fail');
 });
+Route::get('/info', [MainController::class, 'learnmore'])->name('LearnMore');
 require __DIR__.'/auth.php';

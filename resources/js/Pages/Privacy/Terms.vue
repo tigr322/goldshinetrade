@@ -1,13 +1,12 @@
 <script setup>
-//import AppLayout from '@/Layouts/AppLayout.vue'
-//defineOptions({ layout: (h, page) => h(AppLayout, null, () => page) })
+import { Head, Link } from '@inertiajs/vue3'
 </script>
 
 <template>
-  <div class="max-w-4xl mx-auto py-10">
+  <div class="max-w-5xl mx-auto py-12 space-y-8">
     <h1 class="text-2xl font-bold text-gray-900 mb-6">Условия использования платформы</h1>
 
-    <div class="space-y-6 text-sm text-gray-700 leading-relaxed">
+    <div class="bg-white shadow rounded-xl p-6 space-y-4 text-gray-800 text-sm leading-relaxed">
       <p>
         Добро пожаловать на платформу <strong>GoldShineTrade</strong>. Используя наш сайт, вы соглашаетесь соблюдать следующие условия и правила. Нарушение данных условий может привести к ограничению доступа к функционалу платформы или полной блокировке вашей учётной записи.
       </p>
@@ -51,9 +50,14 @@
         <a href="mailto:goldshinetrade90@gmail.com" class="text-cyan-700 hover:underline">goldshinetrade90@gmail.com</a>
       </p>
 
-      <p class="text-xs text-gray-500">
+      <p class="text-xs text-gray-500 mt-4">
         Последнее обновление: {{ new Date().toLocaleDateString() }} ИНН 233608603524   ФИО Адамян Тигран Павлович
       </p>
     </div>
+    <Link href="/"
+      class="inline-block text-cyan-600 hover:text-cyan-800 text-sm font-medium"
+    >
+      ← Вернуться на главную
+    </Link>
   </div>
 </template>

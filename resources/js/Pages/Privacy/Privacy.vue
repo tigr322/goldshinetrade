@@ -1,6 +1,5 @@
 <script setup>
-//import AppLayout from '@/Layouts/AppLayout.vue'
-//defineOptions({ layout: (h, page) => h(AppLayout, null, () => page) })
+import { Head, Link } from '@inertiajs/vue3'
 </script>
 
 <template>
@@ -50,5 +49,10 @@
         Последнее обновление: {{ new Date().toLocaleDateString() }} ИНН 233608603524   ФИО Адамян Тигран Павлович
       </p>
     </div>
+    <Link href="/"
+      class="inline-block text-cyan-600 hover:text-cyan-800 text-sm font-medium"
+    >
+      ← Вернуться на главную
+    </Link>
   </div>
 </template>

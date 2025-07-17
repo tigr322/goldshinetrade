@@ -42,5 +42,9 @@ class MainController extends Controller
         }),
     ]);
 }
+public function learnmore(Request $request)
+{
+    return Inertia::render('LearnMore');
+}
 
 }
