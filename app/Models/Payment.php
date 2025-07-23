@@ -13,9 +13,13 @@ class Payment extends Model
 
     protected $fillable = [
         'user_id', 'invoice_url', 'game_id', 'amount',
-        'status'
+        'status',        'external_id',
+
     ];
 
-   
+   public function user()
+{
+    return $this->belongsTo(User::class);
+}
 }
 

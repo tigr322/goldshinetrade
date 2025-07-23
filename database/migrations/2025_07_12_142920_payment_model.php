@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('invoice_url');
             $table->integer('amount');
+            $table->string('external_id', 10)->unique();
             $table->enum('status', ['CREATED', 'PAYED', 'FAILED'])->default('CREATED');
             $table->timestamps();
         });

@@ -9,16 +9,28 @@ use App\Models\Payment;
 
 class CkassaService
 {
+    public static function generateExternalId(): string
+{
+    do {
+        $id = str_pad(random_int(0, 9999999999), 10, '0', STR_PAD_LEFT);
+    } while (Payment::where('external_id', $id)->exists());
+
+    return $id;
+}
     public static function createInvoice(int $amount, int $userId): ?string
     {
+        $externalId = self::generateExternalId();
+       
         $payload = [
             'servCode' => config('ckassa.serv_code'),
             'startPaySelect' => 'false',
-            'invType' => 'AMOUNT_READ_ONLY',
+            'invType' => 'READ_ONLY',
             'amount' => strval($amount*100),
             'properties' => [
-                '9180000000',        
+                $externalId,  
+               
             ],
+            
         ];
         Log::info('CKassa payload', $payload);
         try {
@@ -45,6 +57,7 @@ class CkassaService
                     'invoice_url' => $url,
                     'amount' => $amount,
                     'status' => 'CREATED',
+                    'external_id' => $externalId,
                 ]);
 
                 return $url;

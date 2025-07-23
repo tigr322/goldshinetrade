@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Models\UserCard;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Log;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -37,27 +38,38 @@ public function store(Request $request)
 }
 public function handleCallback(Request $request)
 {
-    $payload = $request->all();
+    Log::info('CKassa Callback Received', $request->all());
+    $externalId = data_get($request->input('property'), 'ЛИЦЕВОЙ_СЧЕТ');
 
-    $signature = $request->header('X-Signature');
-    $expected = hash_hmac('sha256', json_encode($payload, JSON_UNESCAPED_UNICODE), config('ckassa.secret'));
-
-    if (!hash_equals($expected, $signature)) {
-      
-        return response()->json(['error' => 'Invalid signature'], 403);
+    if (!$externalId) {
+        return response()->json(['error' => 'Missing external ID'], 400);
     }
 
-    $userId = data_get($payload, 'data.user_id');
-    $amount = (float) data_get($payload, 'amount');
+    $payment = \App\Models\Payment::where('external_id', $externalId)->first();
 
-    $user = \App\Models\User::find($userId);
-    if (!$user) return response()->json(['error' => 'User not found'], 404);
+    if (!$payment) {
+        return response()->json(['error' => 'Payment not found'], 404);
+    }
 
-    // ✅ Создаём запись в таблице payments и увеличиваем баланс
-    DB::transaction(function () use ($user, $amount, $payload) {
+    $state = $request->input('state');
+    $code = data_get($request->input('result'), 'code');
+    $amount = (float) $request->input('amount') / 100;
+
+    if ($state !== 'PAYED' || $code !== 0) {
+        return response()->json(['error' => 'Payment not completed'], 400);
+    }
+
+    if ($payment->status === 'PAID') {
+        return response()->json(['message' => 'Already processed'], 200);
+    }
+
+    DB::transaction(function () use ($payment, $amount) {
+        $user = $payment->user;
         $user->balance += $amount;
         $user->save();
 
+        $payment->status = 'PAID';
+        $payment->save();
     });
 
     return response()->json(['status' => 'ok']);
