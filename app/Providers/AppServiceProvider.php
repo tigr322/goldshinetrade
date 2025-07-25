@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use App\Models\UserCard;
+use App\Http\Middleware\VerifyCsrfToken;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -28,7 +30,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
        
-
+        Route::aliasMiddleware('csrf', VerifyCsrfToken::class);
         Route::model('card', UserCard::class);
         Vite::prefetch(concurrency: 3);
         Route::aliasMiddleware('admin', Admin::class);

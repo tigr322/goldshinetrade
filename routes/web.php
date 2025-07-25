@@ -16,6 +16,7 @@ use App\Http\Controllers\Trade\TradeController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminUsersController;
 use App\Models\UserCard;
+use Illuminate\Support\Facades\Log;
 
 Broadcast::routes(['middleware' => ['web', 'auth:sanctum']]);
 
@@ -77,10 +78,7 @@ Route::middleware([
     // 💰 Пополнение и оплата
     Route::get('/wallet/topup', [WalletTopupController::class, 'create'])->name('wallet.topup');
     Route::post('/wallet/topup', [WalletTopupController::class, 'store'])->name('wallet.topup.store');
-    Route::post('/payment/callback', [WalletTopupController::class, 'handleCallback'])->name('payment.callback');
-    Route::get('/payment/success', fn () => 'Успех!')->name('payment.success');
-    Route::get('/payment/fail', fn () => 'Ошибка!')->name('payment.fail');
-
+   
     // ⚙️ Админ-панель
     Route::middleware(['admin_or_moder'])->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
@@ -114,6 +112,12 @@ Route::middleware([
         Route::delete('/payment-methods/{paymentMethod}', [AdminDataController::class, 'destroyPaymentMethod'])->name('payment_methods.destroy');
     });
 });
+Route::post('/payment/callback', function (\Illuminate\Http\Request $request) {
+    Log::info('🟢 PAYMENT CALLBACK HIT', $request->all());
+    return response()->json(['ok' => true]);
+});
+    Route::get('/payment/success', fn () => 'Успех!')->name('payment.success');
+Route::get('/payment/fail', fn () => 'Ошибка!')->name('payment.fail');
 
 // 🔐 Аутентификация
 require __DIR__.'/auth.php';
