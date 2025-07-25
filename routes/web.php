@@ -112,10 +112,7 @@ Route::middleware([
         Route::delete('/payment-methods/{paymentMethod}', [AdminDataController::class, 'destroyPaymentMethod'])->name('payment_methods.destroy');
     });
 });
-Route::post('/payment/callback', function (\Illuminate\Http\Request $request) {
-    Log::info('🟢 PAYMENT CALLBACK HIT', $request->all());
-    return response()->json(['ok' => true]);
-});
+Route::post('/payment/callback', [WalletTopupController::class, 'handleCallback']);
     Route::get('/payment/success', fn () => 'Успех!')->name('payment.success');
 Route::get('/payment/fail', fn () => 'Ошибка!')->name('payment.fail');
 
