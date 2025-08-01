@@ -53,6 +53,7 @@ const props = defineProps({
   reviews_received_count: Number,
   reviews_given_count: Number,
   withdrawals: Array,
+  withdrawalsPagination: Number,
   adress: String,
   userDeals: Array,
 })
@@ -428,27 +429,40 @@ onMounted(() => {
                       </tbody>
                     </table>
                     <!-- Pagination -->
-                    <nav class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6" aria-label="Pagination">
+                    <nav class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6" aria-label="Пагинация">
                       <div class="hidden sm:block">
                         <p class="text-sm text-gray-700">
-                          Showing
+                          Показано
                           {{ ' ' }}
-                          <span class="font-medium">1</span>
+                          <span class="font-medium">{{ withdrawalsPagination.from }}</span>
                           {{ ' ' }}
-                          to
+                          по
                           {{ ' ' }}
-                          <span class="font-medium">10</span>
+                          <span class="font-medium">{{ withdrawalsPagination.to }}</span>
                           {{ ' ' }}
-                          of
+                          из
                           {{ ' ' }}
-                          <span class="font-medium">20</span>
+                          <span class="font-medium">{{ withdrawalsPagination.total }}</span>
                           {{ ' ' }}
-                          results
+                          выводов
                         </p>
                       </div>
-                      <div class="flex flex-1 justify-between sm:justify-end">
-                        <a href="#" class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Previous</a>
-                        <a href="#" class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Next</a>
+                      <div class="flex justify-end space-x-2">
+                        <button 
+                          v-if="withdrawalsPagination.current_page > 1"
+                          @click="$inertia.get(route('dashboard', { page: withdrawalsPagination.current_page - 1 }))"
+                          class="btn"
+                        >
+                          Назад
+                        </button>
+
+                        <button 
+                          v-if="withdrawalsPagination.current_page < withdrawalsPagination.last_page"
+                          @click="$inertia.get(route('dashboard', { page: withdrawalsPagination.current_page + 1 }))"
+                          class="btn"
+                        >
+                          Далее
+                        </button>
                       </div>
                     </nav>
                   </div>

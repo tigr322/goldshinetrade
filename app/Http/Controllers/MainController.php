@@ -13,7 +13,7 @@ class MainController extends Controller
     public function index(Request $request)
 {
     $user = $request->user();
-
+    $withdrawals = $user->withdrawals()->latest()->paginate(5);
     // Получаем ID сделок, где пользователь — покупатель или продавец
     $userDeals = Deal::where('buyer_id', $user->id)
         ->orWhereHas('offer', function ($query) use ($user) {
@@ -28,18 +28,26 @@ class MainController extends Controller
         'messages_count' => $user->messages()->count(),
         'userDeals' => $userDeals, 
 
-        'withdrawals' => $user->withdrawals()->latest()->take(5)->get()->map(function ($w) {
-            return [
-                'id' => $w->id,
-                'name' => 'Вывод средств (' . ucfirst($w->method) . ')',
-                'amount' => number_format($w->amount, 2, '.', ' '),
-                'currency' => '₽',
-                'status' => $w->status, // можно использовать для бейджей
-                'date' => $w->created_at->translatedFormat('d F Y'),
-                'datetime' => $w->created_at->toDateString(),
-                'href' => '#', // или ссылка на детали, если есть
-            ];
-        }),
+      'withdrawals' => $withdrawals->map(function ($w) {
+        return [
+            'id' => $w->id,
+            'name' => 'Вывод средств (' . ucfirst($w->method) . ')',
+            'amount' => number_format($w->amount, 2, '.', ' '),
+            'currency' => '₽',
+            'status' => $w->status,
+            'date' => $w->created_at->translatedFormat('d F Y'),
+            'datetime' => $w->created_at->toDateString(),
+            'href' => '#',
+        ];
+    }),
+    'withdrawalsPagination' => [
+        'from' => $withdrawals->firstItem(),
+        'to' => $withdrawals->lastItem(),
+        'total' => $withdrawals->total(),
+        'current_page' => $withdrawals->currentPage(),
+        'last_page' => $withdrawals->lastPage(),
+        'per_page' => $withdrawals->perPage(),
+    ],
     ]);
 }
 public function learnmore(Request $request)

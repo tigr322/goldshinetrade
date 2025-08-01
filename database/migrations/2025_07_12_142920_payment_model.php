@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('invoice_url');
             $table->integer('amount');
             $table->string('external_id', 10)->unique();
-            $table->enum('status', ['CREATED', 'PAYED', 'FAILED'])->default('CREATED');
+            $table->enum('status', ['CREATED', 'PAID', 'FAILED'])->default('CREATED');
             $table->timestamps();
         });
     }

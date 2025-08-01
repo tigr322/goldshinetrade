@@ -26,7 +26,7 @@ public function store(Request $request)
     $request->validate([
         'amount' => 'required|numeric|min:1',
     ]);
-
+    Log::info('🟡 WalletTopupController@store called', $request->all());
     $user = Auth::id();
 
     $url = CkassaService::createInvoice($request->amount, $user);

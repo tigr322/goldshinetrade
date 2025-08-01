@@ -17,9 +17,19 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminUsersController;
 use App\Models\UserCard;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 Broadcast::routes(['middleware' => ['web', 'auth:sanctum']]);
+Route::get('/test-mail', function () {
+    Mail::raw('Это тестовое письмо от Laravel', function ($message) {
+        $message->to('you@mailtrap.io') // подставь адрес из Mailtrap Inbox
+                ->subject('Проверка SMTP');
+    });
 
+    return 'Письмо отправлено)';
+});
 // 🌐 Гостевая страница
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -36,12 +46,12 @@ Route::get('/policy/offer', fn () => Inertia::render('Privacy/Offert'))->name('p
 Route::get('/policy/terms', fn () => Inertia::render('Privacy/Terms'))->name('policy.terms');
 Route::get('/info', [MainController::class, 'learnmore'])->name('LearnMore');
 
-// 🛡️ Защищённые страницы
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified',
-])->group(function () {
+// 🛡️ Защищённые страницы           'verified',
+
+    Route::middleware([
+        'auth:sanctum',
+        config('jetstream.auth_session'),
+    ])->group(function () {
     // 🌍 Главная, торговля, маршруты SPA
     Route::get('/dashboard', [MainController::class, 'index'])->name('dashboard');
     Route::get('/offers', [TradeController::class, 'index'])->name('offers.index');
@@ -115,6 +125,19 @@ Route::middleware([
 Route::post('/payment/callback', [WalletTopupController::class, 'handleCallback']);
     Route::get('/payment/success', fn () => 'Успех!')->name('payment.success');
 Route::get('/payment/fail', fn () => 'Ошибка!')->name('payment.fail');
+Route::middleware(['auth:sanctum'])->post('/email/verification-notification', function (Request $request) {
+    if ($request->user()->hasVerifiedEmail()) {
+        return response()->json(['message' => 'Email уже подтверждён.'], 400);
+    }
 
+    $request->user()->sendEmailVerificationNotification();
+
+    return response()->json(['message' => 'Письмо отправлено.']);
+})->name('verification.send');
+
+// Обработка клика по ссылке
+Route::get('/email/verify/{id}/{hash}', App\Http\Controllers\Auth\VerifyEmailController::class)
+    ->middleware(['signed', 'throttle:6,1'])
+    ->name('verification.verify');
 // 🔐 Аутентификация
 require __DIR__.'/auth.php';
