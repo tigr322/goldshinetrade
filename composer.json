@@ -14,7 +14,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
         "pusher/pusher-php-server": "^7.2",
-        "spatie/laravel-permission": "^6.18",
+        "spatie/laravel-permission": "^6.21",
         "symfony/http-client": "^7.3",
         "symfony/mailgun-mailer": "^7.3",
         "synergitech/laravel-postal": "^5.0",
