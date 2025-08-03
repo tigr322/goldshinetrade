@@ -46,7 +46,7 @@ Route::get('/info', [MainController::class, 'learnmore'])->name('LearnMore');
 // 🛡️ Защищённые страницы           'verified',
 
     Route::middleware([
-        
+          'verified',
         config('jetstream.auth_session'), 
     ])->group(function () {
     // 🌍 Главная, торговля, маршруты SPA

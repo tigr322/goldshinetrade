@@ -8,7 +8,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Permission\Traits\HasRoles;
-use App\Models\UserCard; // Не забудь импортировать модель
+use App\Models\UserCard; 
+
+
 use Laravel\Fortify\TwoFactorAuthenticatable;
 
 /**
@@ -87,5 +89,8 @@ public function cards(): HasMany
             'password' => 'hashed',
         ];
     }
-    
+    public function routeNotificationForMail()
+{
+    return $this->email; // или кастомный email, если нужно
+}
 }

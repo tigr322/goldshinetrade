@@ -14,7 +14,7 @@ return [
     |
     */
 
-'default' => env('MAIL_MAILER', 'mailgun'),
+'default' => env('MAIL_MAILER', 'postal'),
     /*
     |--------------------------------------------------------------------------
     | Mailer Configurations
@@ -35,7 +35,9 @@ return [
     */
 
     'mailers' => [
-
+        'postal' => [
+        'transport' => 'postal',
+        ],
         'smtp' => [
             'transport' => 'smtp',
             'scheme' => env('MAIL_SCHEME'),

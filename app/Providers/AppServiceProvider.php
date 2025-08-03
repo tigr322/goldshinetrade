@@ -13,7 +13,8 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use App\Models\UserCard;
 use App\Http\Middleware\VerifyCsrfToken;
-
+use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Notifications\Messages\MailMessage;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -29,7 +30,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-       
+        VerifyEmail::toMailUsing(function (object $notifiable, string $url) {
+            return (new MailMessage)
+                ->subject('Verify Email Address')
+                ->line('Click the button below to verify your email address.')
+                ->action('Verify Email Address', $url);
+        });
         Route::aliasMiddleware('csrf', VerifyCsrfToken::class);
         Route::model('card', UserCard::class);
         Vite::prefetch(concurrency: 3);
