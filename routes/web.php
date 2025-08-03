@@ -131,8 +131,6 @@ Route::middleware(['auth:sanctum'])->post('/email/verification-notification', fu
 })->name('verification.send');
 
 // Обработка клика по ссылке
-Route::get('/email/verify/{id}/{hash}', App\Http\Controllers\Auth\VerifyEmailController::class)
-    ->middleware(['signed', 'throttle:6,1'])
-    ->name('verification.verify');
+Auth::routes(['verify' => true]);
 // 🔐 Аутентификация
 require __DIR__.'/auth.php';
