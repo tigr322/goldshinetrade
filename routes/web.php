@@ -23,14 +23,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 Broadcast::routes(['middleware' => ['web', 'auth:sanctum']]);
-Route::get('/test-mail', function () {
-    Mail::raw('Это тестовое письмо от Laravel', function ($message) {
-        $message->to('you@mailtrap.io') // подставь адрес из Mailtrap Inbox
-                ->subject('Проверка SMTP');
-    });
 
-    return 'Письмо отправлено)';
-});
 // 🌐 Гостевая страница
 Route::get('/', function () {
    
@@ -51,7 +44,7 @@ Route::get('/info', [MainController::class, 'learnmore'])->name('LearnMore');
 // 🛡️ Защищённые страницы           'verified',
 
     Route::middleware([
-       
+        
         config('jetstream.auth_session'), 
     ])->group(function () {
     // 🌍 Главная, торговля, маршруты SPA
