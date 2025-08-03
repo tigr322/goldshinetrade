@@ -23,7 +23,7 @@ const verificationLinkSent = computed(() => props.status === 'verification-link-
 
     <AuthenticationCard>
         <template #logo>
-            <img class="h-100 w-auto" src="/storage/icon.png" alt="Logo" />
+            <img class="h-20 w-auto" src="/storage/icon.png" alt="Logo" />
         </template>
 
         <div class="mb-4 text-sm text-gray-600">
