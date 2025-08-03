@@ -22,6 +22,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
+use Laravel\Fortify\Features;
+
 Broadcast::routes(['middleware' => ['web', 'auth:sanctum']]);
 
 // 🌐 Гостевая страница
@@ -131,6 +133,13 @@ Route::middleware(['auth:sanctum'])->post('/email/verification-notification', fu
 })->name('verification.send');
 
 // Обработка клика по ссылке
-Auth::routes(['verify' => true]);
+/*Fortify::verifyEmailView(function () {
+    return view('auth.verify-email');
+});
+Route::get('/email/verify/{id}/{hash}', App\Http\Controllers\Auth\VerifyEmailController::class)
+    ->middleware(['signed', 'throttle:6,1'])
+    ->name('verification.verify');
+*/
+
 // 🔐 Аутентификация
 require __DIR__.'/auth.php';
