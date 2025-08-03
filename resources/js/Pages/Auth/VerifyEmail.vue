@@ -24,7 +24,7 @@ const verificationLinkSent = computed(() => props.status === 'verification-link-
     <AuthenticationCard>
         <template #logo>
             <a href="/" class="-m-1.5 p-1.5">
-              <span class="sr-only">Your Company</span>
+           
               <img class="h-12 w-auto" src="/storage/iconca.png" alt="GoldShineTrade" />
             </a>
         </template>
@@ -34,7 +34,7 @@ const verificationLinkSent = computed(() => props.status === 'verification-link-
         </div>
 
         <div v-if="verificationLinkSent" class="mb-4 font-medium text-sm text-green-600">
-            A new verification link has been sent to the email address you provided in your profile settings.
+            Новый код отправлен вам на почту. Если его нет, то, пожалуйста, подождите.
         </div>
 
         <form @submit.prevent="submit">
