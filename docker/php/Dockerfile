@@ -24,7 +24,5 @@ RUN composer install --no-dev --no-scripts --prefer-dist --no-progress --no-inte
 
 # Теперь копируем весь проект
 COPY . .
-
 # Повторный запуск composer install с учетом скриптов (если они есть)
-RUN composer install --optimize-autoloader
-
+RUN composer install --optimize-autoloader7               

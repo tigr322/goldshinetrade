@@ -20,7 +20,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
-
+use App\Models\User;
+use Spatie\Permission\Models\Role;
 Broadcast::routes(['middleware' => ['web', 'auth:sanctum']]);
 Route::get('/test-mail', function () {
     Mail::raw('Это тестовое письмо от Laravel', function ($message) {
@@ -32,6 +33,7 @@ Route::get('/test-mail', function () {
 });
 // 🌐 Гостевая страница
 Route::get('/', function () {
+   
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
@@ -50,7 +52,7 @@ Route::get('/info', [MainController::class, 'learnmore'])->name('LearnMore');
 
     Route::middleware([
        
-        config('jetstream.auth_session'),
+        config('jetstream.auth_session'), 
     ])->group(function () {
     // 🌍 Главная, торговля, маршруты SPA
     Route::get('/dashboard', [MainController::class, 'index'])->name('dashboard');

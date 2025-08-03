@@ -25,7 +25,7 @@ services:
 
 # убираем определение db (mysql) и phpmyadmin, чтобы не создавать дубли
 
-networks:
-  default:
-    external:
-      name: goldtrade_default
+#networks:
+#  default:
+#    external:
+#      name: goldtrade_default
