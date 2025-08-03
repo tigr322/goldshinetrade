@@ -266,7 +266,7 @@ onMounted(() => {
                         
                         <dd
                         class="mt-3 flex items-center text-sm font-medium capitalize sm:mr-6 sm:mt-0"
-                        :class="user.is_verified ? 'text-green-600' : 'text-red-500'"
+                        :class="user.email_verified_at ? 'text-green-600' : 'text-red-500'"
                       >
                         <template v-if="user.email_verified_at">
                           <CheckCircleIcon class="mr-1.5 h-5 w-5 flex-shrink-0 text-green-500" />
