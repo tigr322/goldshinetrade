@@ -91,7 +91,7 @@ Route::get('/info', [MainController::class, 'learnmore'])->name('LearnMore');
     Route::get('/wallet/topup', [WalletTopupController::class, 'create'])->name('wallet.topup');
     Route::post('/wallet/topup', [WalletTopupController::class, 'store'])->name('wallet.topup.store');
    
-    // ⚙️ Админ-панель
+    // ⚙️ Админ-панельв
     Route::middleware(['admin_or_moder'])->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
         Route::get('/users', [AdminUsersController::class, 'index'])->name('users.index')->middleware('admin');
