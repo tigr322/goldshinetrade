@@ -26,7 +26,6 @@ public function store(Request $request)
     $request->validate([
         'amount' => 'required|numeric|min:1',
     ]);
-    Log::info('🟡 WalletTopupController@store called', $request->all());
     $user = Auth::id();
 
     $url = CkassaService::createInvoice($request->amount, $user);
@@ -38,7 +37,6 @@ public function store(Request $request)
 }
 public function handleCallback(Request $request)
 {
-    Log::info('CKassa Callback Received', $request->all());
     $externalId = data_get($request->input('property'), 'ЛИЦЕВОЙ_СЧЕТ');
 
     if (!$externalId) {
