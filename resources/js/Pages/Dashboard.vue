@@ -5,6 +5,7 @@ import { useForm } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import Echo from '@/echo'
 import axios from 'axios'
+defineOptions({ layout: (h, page) => h(AppLayout, null, () => page) })
 
 import {
   Dialog,
