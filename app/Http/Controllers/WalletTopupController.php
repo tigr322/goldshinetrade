@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\DB;
 use App\Services\CkassaService;
+use App\Services\EncryptionService;
 
 class WalletTopupController extends Controller
 {
@@ -39,12 +40,27 @@ public function store(Request $request)
 public function handleCallback(Request $request)
 {
     Log::info('CKassa Callback Received', $request->all());
-    $externalId = data_get($request->input('property'), 'ЛИЦЕВОЙ_СЧЕТ');
 
-    if (!$externalId) {
-        return response()->json(['error' => 'Missing external ID'], 400);
+    // Получаем зашифрованный ID из коллбэка
+    $encryptedId = data_get($request->input('property'), 'ID');
+
+    if (!$encryptedId) {
+        return response()->json(['error' => 'Missing encrypted ID'], 400);
     }
 
+    // Пытаемся расшифровать
+    try {
+        $externalId = EncryptionService::decryptExternalId($encryptedId);
+    } catch (\Exception $e) {
+        Log::error('❌ Не удалось расшифровать ID', [
+            'encrypted' => $encryptedId,
+            'message' => $e->getMessage(),
+        ]);
+
+        return response()->json(['error' => 'Invalid external ID'], 400);
+    }
+
+    // Ищем платеж
     $payment = \App\Models\Payment::where('external_id', $externalId)->first();
 
     if (!$payment) {
