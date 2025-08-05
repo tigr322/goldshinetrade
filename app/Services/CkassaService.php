@@ -47,6 +47,7 @@ class CkassaService
 
             if ($response->successful() && filter_var($response->body(), FILTER_VALIDATE_URL)) {
                 $url = trim($response->body());
+               
                 try {
                     $payment = Payment::create([
                         'user_id' => $userId,
