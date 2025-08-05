@@ -99,7 +99,6 @@ const form = useForm({
                     type="text"
                     class="mt-1 block w-full"
                     v-model="form.adress"
-                    required
                     autocomplete="username"
                 />
 

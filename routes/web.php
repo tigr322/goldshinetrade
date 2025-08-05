@@ -86,7 +86,7 @@ Route::get('/info', [MainController::class, 'learnmore'])->name('LearnMore');
     Route::get('/wallet/topup', [WalletTopupController::class, 'create'])->name('wallet.topup');
     Route::post('/wallet/topup', [WalletTopupController::class, 'store'])->name('wallet.topup.store');
    
-    // ⚙️ Админ-панельв
+    // ⚙️ Админ-панель
     Route::middleware(['admin_or_moder'])->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
         Route::get('/users', [AdminUsersController::class, 'index'])->name('users.index')->middleware('admin');
@@ -132,14 +132,6 @@ Route::middleware(['auth:sanctum'])->post('/email/verification-notification', fu
     return response()->json(['message' => 'Письмо отправлено.']);
 })->name('verification.send');
 
-// Обработка клика по ссылке
-/*Fortify::verifyEmailView(function () {
-    return view('auth.verify-email');
-});
-Route::get('/email/verify/{id}/{hash}', App\Http\Controllers\Auth\VerifyEmailController::class)
-    ->middleware(['signed', 'throttle:6,1'])
-    ->name('verification.verify');
-*/
 
 // 🔐 Аутентификация
 require __DIR__.'/auth.php';
