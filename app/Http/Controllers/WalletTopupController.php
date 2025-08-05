@@ -44,17 +44,18 @@ public function handleCallback(Request $request)
     if (!$externalId) {
         return response()->json(['error' => 'Missing external ID'], 400);
     }
-    $checkResponse = Http::withHeaders([
+    $response = Http::withHeaders([
         'ApiLoginAuthorization' => config('ckassa.shop_token'),
         'ApiAuthorization' => config('ckassa.secret_key'),
         'Content-Type' => 'application/json',
-    ])->post('https://api2.ckassa.ru/api-shop/rs/open/invoice/verify', [
-        'regPayNum' => 1,
+        'User-Agent' => 'MyCustomAgent/1.0',
+    ])->timeout(60)->post(config('ckassa.url'), [
+        'regPayNum' => $request->input('regPayNum'), 
     ]);
     
-    $checkData = $checkResponse->json();
+    $checkData = $response->json();
     
-    if (!$checkResponse->successful() || !isset($checkData['state']) || $checkData['state'] !== 'PAYED') {
+    if (!$response->successful() || !isset($checkData['state']) || $checkData['state'] !== 'PAYED') {
         return response()->json(['error' => 'Payment not confirmed by CKassa'], 400);
     }
     
