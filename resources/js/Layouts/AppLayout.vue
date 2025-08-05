@@ -104,7 +104,7 @@ const sendMessage = async () => {
 // Listen to events for balance updates and new messages
 onMounted(async () => {
   // Connect to private channel for each deal
-  echo.connector.pusher.connection.bind('connected', () => {
+  Echo.connector.pusher.connection.bind('connected', () => {
     console.log('✅ Подключено к Pusher')
   })
 
