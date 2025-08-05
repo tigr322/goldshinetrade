@@ -58,16 +58,25 @@ const messages = ref([]) // Список сообщений
 const newMessage = ref('') // Новое сообщение для отправки
 
 // Отправка нового сообщения
-const sendMessage = async () => {
-  if (!newMessage.value.trim()) return
+const fileInput = ref(null)
 
-  await axios.post(route('messages.store', props.deal.id), {
-    content: newMessage.value,
-  })
+const form = useForm({
+  photo: null,
+})
 
-  newMessage.value = ''
+const triggerFileInput = () => {
+  fileInput.value?.click()
 }
 
+const handleFileChange = (e) => {
+  const file = e.target.files[0]
+  if (file) {
+    form.photo = file
+    form.post('/profile/photo', {
+      onSuccess: () => form.reset('photo'),
+    })
+  }
+}
 // Отметка сообщений как прочитанных
 const markMessagesAsRead = async () => {
   const unreadIds = messages.value
@@ -275,7 +284,7 @@ onMounted(async () => {
                     <div>
               
                       <div class="flex items-center">
-                        <button
+                        <button 
                       @click="triggerFileInput"
                       class="flex max-w-xs items-center rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 lg:rounded-md lg:p-2 lg:hover:bg-gray-50"
                     >
