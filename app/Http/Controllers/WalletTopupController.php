@@ -38,6 +38,12 @@ public function store(Request $request)
 }
 public function handleCallback(Request $request)
 {
+    $signature = $request->header('X-Signature');
+    $expected = hash_hmac('sha256', $request->getContent(), config('ckassa.secret'));
+
+    if (!hash_equals($expected, $signature)) {
+        return response()->json(['error' => 'Invalid signature'], 403);
+    }
     Log::info('CKassa Callback Received', $request->all());
     $externalId = data_get($request->input('property'), 'ЛИЦЕВОЙ_СЧЕТ');
 
