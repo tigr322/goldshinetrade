@@ -1,11 +1,10 @@
-
-
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { Link, usePage } from '@inertiajs/vue3'
 import { useForm } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import Echo from '@/echo'
+import axios from 'axios'
 
 import {
   Dialog,
@@ -16,7 +15,6 @@ import {
   MenuItems,
   TransitionChild,
   TransitionRoot,
-  
 } from '@headlessui/vue'
 import {
   Bars3CenterLeftIcon,
@@ -31,17 +29,7 @@ import {
   ShieldCheckIcon,
   UserGroupIcon,
   XMarkIcon,
-  
 } from '@heroicons/vue/24/outline'
-import {
-  BanknotesIcon,
-  BuildingOfficeIcon,
-  CheckCircleIcon,
-  ChevronDownIcon,
-  ChevronRightIcon,
-  MagnifyingGlassIcon,
-  XCircleIcon
-} from '@heroicons/vue/20/solid'
 
 const props = defineProps({
   title: String,
@@ -57,37 +45,58 @@ const props = defineProps({
   adress: String,
   userDeals: Array,
 })
-const notifications = [
-  { id: 1, text: 'Вы получили новое сообщение', href: '/messages' },
-  { id: 2, text: 'Ваш заказ успешно оформлен', href: '/orders' },
- 
-]
-defineOptions({ layout: (h, page) => h(AppLayout, null, () => page) })
-const fileInput = ref(null)
 
-const form = useForm({
-  photo: null,
-})
+const notifications = ref([]) // Список уведомлений
+const messages = ref([]) // Список сообщений
+const newMessage = ref('') // Новое сообщение для отправки
 
-const triggerFileInput = () => {
-  fileInput.value?.click()
+// Отправка нового сообщения
+const sendMessage = async () => {
+  if (!newMessage.value.trim()) return
+
+  await axios.post(route('messages.store', props.deal.id), {
+    content: newMessage.value,
+  })
+
+  newMessage.value = ''
 }
 
-const handleFileChange = (e) => {
-  const file = e.target.files[0]
-  if (file) {
-    form.photo = file
-    form.post('/profile/photo', {
-      onSuccess: () => form.reset('photo'),
-    })
+// Отметка сообщений как прочитанных
+const markMessagesAsRead = async () => {
+  const unreadIds = messages.value
+    .filter(msg => msg.user?.id !== props.user.id && !msg.read_by_me && typeof msg.id === 'number')
+    .map(msg => msg.id)
+
+  if (unreadIds.length > 0) {
+    try {
+      await axios.post(route('messages.markRead'), {
+        message_ids: unreadIds,
+      })
+
+      // Помечаем на клиенте
+      messages.value.forEach(msg => {
+        if (unreadIds.includes(msg.id)) {
+          msg.read_by_me = true
+        }
+      })
+    } catch (err) {
+      console.warn('Ошибка при отметке сообщений как прочитанных:', err)
+    }
   }
 }
-const statusStyles = {
-  success: 'bg-green-100 text-green-800',
-  processing: 'bg-yellow-100 text-yellow-800',
-  failed: 'bg-gray-100 text-gray-800',
+
+// Загрузка сообщений для каждой сделки
+const loadMessages = async () => {
+  for (const deal of props.userDeals) {
+    const res = await axios.get(route('messages.index', deal.id))
+    messages.value.push(...res.data.reverse())
+  }
+
+  await nextTick()
+  markMessagesAsRead()
 }
 
+// Функция для отображения уведомлений
 const showNotification = (message) => {
   notifications.value.unshift({
     id: Date.now(),
@@ -96,20 +105,37 @@ const showNotification = (message) => {
   })
 }
 
-onMounted(() => {
+onMounted(async () => {
   const user = usePage().props.auth.user
-  const userDeals = props.userDeals || []
 
-  userDeals.forEach((dealId) => {
+  // Подключение к каналу Pusher для каждой сделки пользователя
+  for (const dealId of props.userDeals) {
     Echo.private(`deal.${dealId}`)
-      .listen('.App\\Events\\NewMessageSent', (e) => {
-        if (e.user.id !== user.id) {
-          showNotification(e)
-        }
+      .listen('.App\\Events\\NewMessageSent', async (e) => {
+        console.log('📨 Новое сообщение:', e)
+
+        // Добавление нового сообщения в список
+        messages.value.push({
+          id: e.id,
+          content: e.content,
+          user: e.user,
+          created_at: e.created_at,
+          read_by_me: false,
+        })
+
+        // Вывод уведомления
+        showNotification(e)
+
+        await nextTick()
+        markMessagesAsRead()
       })
-  })
+  }
+
+  // Загрузка сообщений при монтировании компонента
+  await loadMessages()
 })
 </script>
+
 <template>
    <Head title="Главная" />
    
