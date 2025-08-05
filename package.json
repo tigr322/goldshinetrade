@@ -26,7 +26,7 @@
         "@inertiajs/inertia": "^0.11.1",
         "@inertiajs/inertia-vue3": "^0.6.0",
         "@inertiajs/progress": "^0.2.7",
-        "laravel-echo": "^2.1.4",
+        "laravel-echo": "^2.1.7",
         "pusher-js": "^8.4.0",
         "ziggy": "^2.4.0",
         "ziggy-js": "^1.8.2"

@@ -1,6 +1,8 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Link, usePage } from '@inertiajs/vue3'
+
+import echo from '@/echo'
 import {
   Dialog,
   DialogPanel,
@@ -21,26 +23,27 @@ import {
   CogIcon,
 } from '@heroicons/vue/24/outline'
 
+// Sidebar state
 const sidebarOpen = ref(false)
 
+// Navigation and secondary navigation
 const navigation = [
   { name: 'Дом', href: route('dashboard'), icon: HomeIcon },
   { name: 'Обмен', href: route('offers.index'), icon: ScaleIcon },
   { name: 'Мои карты', href: route('cards.index'), icon: CreditCardIcon },
   { name: 'Мои Сообщения', href: route('mymessages'), icon: UserGroupIcon },
-  
 ]
 
 const secondaryNavigation = [
   { name: 'Настройки', href: '#', icon: CogIcon },
   { name: 'Помощь', href: '#', icon: QuestionMarkCircleIcon },
   { name: 'Безопасность', href: '#', icon: ShieldCheckIcon },
-
 ]
 
 const page = usePage()
 const user = page.props.auth.user
-console.log('User from Inertia:', user)
+
+// Add Admin section to navigation if user is an admin or moderator
 if (user && Array.isArray(user.roles) && user.roles.some(role => ['admin', 'moderator'].includes(role.name))) {
   navigation.push({
     name: 'Администрирование',
@@ -49,11 +52,33 @@ if (user && Array.isArray(user.roles) && user.roles.some(role => ['admin', 'mode
   })
 }
 
+// Notifications
+const notifications = ref([])  // List of notifications
+
+// Function to display notifications
+const showNotification = (message) => {
+  notifications.value.unshift({
+    id: Date.now(),
+    text: `Новое сообщение от ${message.user.name}: ${message.content}`.slice(0, 50),
+    href: `/deals/${message.deal_id}`,
+  })
+}
+
+// Listen to balance update and new message events
+onMounted(() => {
+  // Connect to private channel for user
+  echo.private(`user.${user.id}`)
+    .listen('BalanceUpdated', (e) => {
+      showNotification(`Ваш баланс был обновлен. Новый баланс: ${e.newBalance}`)
+    })
+    .listen('NewMessageSent', (e) => {
+      showNotification(`Новое сообщение от ${e.user.name}: ${e.message.content}`)
+    })
+})
 
 </script>
 
 <template>
- 
   <div class="min-h-screen bg-gray-100">
     <!-- Mobile Sidebar -->
     <TransitionRoot as="template" :show="sidebarOpen">
@@ -147,7 +172,6 @@ if (user && Array.isArray(user.roles) && user.roles.some(role => ['admin', 'mode
           </div>
         </nav>
       </div>
-      
     </div>
 
     <!-- Topbar for mobile toggle -->
@@ -166,12 +190,12 @@ if (user && Array.isArray(user.roles) && user.roles.some(role => ['admin', 'mode
         <slot />
 
         <footer class="mt-10 py-6 text-center text-sm text-gray-500 border-t">
-  <div class="space-x-4">
-    <Link :href="route('privacy')" class="hover:underline">Политика конфиденциальности</Link>
-    <Link :href="route('policy.offer')" class="hover:underline">Пользовательское соглашение</Link>
-    <Link :href="route('policy.terms')" class="hover:underline">Условия использования</Link>
-  </div>
-</footer>
+          <div class="space-x-4">
+            <Link :href="route('privacy')" class="hover:underline">Политика конфиденциальности</Link>
+            <Link :href="route('policy.offer')" class="hover:underline">Пользовательское соглашение</Link>
+            <Link :href="route('policy.terms')" class="hover:underline">Условия использования</Link>
+          </div>
+        </footer>
       </main>
     </div>
   </div>
