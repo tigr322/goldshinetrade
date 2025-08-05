@@ -1,27 +1,10 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { Link, usePage } from '@inertiajs/vue3'
-
-import echo from '@/echo'
-import {
-  Dialog,
-  DialogPanel,
-  TransitionChild,
-  TransitionRoot,
-} from '@headlessui/vue'
-import {
-  Bars3CenterLeftIcon,
-  XMarkIcon,
-  ClockIcon,
-  CreditCardIcon,
-  DocumentChartBarIcon,
-  HomeIcon,
-  QuestionMarkCircleIcon,
-  ScaleIcon,
-  ShieldCheckIcon,
-  UserGroupIcon,
-  CogIcon,
-} from '@heroicons/vue/24/outline'
+import Echo from '@/echo'
+import axios from 'axios'
+import { Bars3CenterLeftIcon, XMarkIcon, HomeIcon, ScaleIcon, CreditCardIcon, UserGroupIcon, CogIcon, QuestionMarkCircleIcon, ShieldCheckIcon } from '@heroicons/vue/24/outline'
+import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
 
 // Sidebar state
 const sidebarOpen = ref(false)
@@ -52,7 +35,7 @@ if (user && Array.isArray(user.roles) && user.roles.some(role => ['admin', 'mode
   })
 }
 
-// Notifications
+// Notification system
 const notifications = ref([])  // List of notifications
 
 // Function to display notifications
@@ -64,18 +47,89 @@ const showNotification = (message) => {
   })
 }
 
-// Listen to balance update and new message events
-onMounted(() => {
-  // Connect to private channel for user
-  echo.private(`user.${user.id}`)
-    .listen('BalanceUpdated', (e) => {
-      showNotification(`Ваш баланс был обновлен. Новый баланс: ${e.newBalance}`)
-    })
-    .listen('NewMessageSent', (e) => {
-      showNotification(`Новое сообщение от ${e.user.name}: ${e.message.content}`)
-    })
+// Messages handling
+const props = defineProps({
+  userDeals: Array // List of all user deals
 })
 
+const messages = ref([]) // List of messages
+const newMessage = ref('') // New message for sending
+
+// Mark messages as read
+const markMessagesAsRead = async () => {
+  const unreadIds = messages.value
+    .filter(msg => msg.user?.id !== user.id && !msg.read_by_me && typeof msg.id === 'number')
+    .map(msg => msg.id)
+
+  if (unreadIds.length > 0) {
+    try {
+      await axios.post(route('messages.markRead'), {
+        message_ids: unreadIds,
+      })
+
+      // Mark them as read on client side
+      messages.value.forEach(msg => {
+        if (unreadIds.includes(msg.id)) {
+          msg.read_by_me = true
+        }
+      })
+    } catch (err) {
+      console.warn('Ошибка при отметке сообщений как прочитанных:', err)
+    }
+  }
+}
+
+// Load messages for each deal
+const loadMessages = async () => {
+  for (const deal of props.userDeals) {
+    const res = await axios.get(route('messages.index', deal.id))
+    messages.value.push(...res.data.reverse())
+  }
+
+  await nextTick()
+  markMessagesAsRead()
+}
+
+// Send new message
+const sendMessage = async () => {
+  if (!newMessage.value.trim()) return
+
+  await axios.post(route('messages.store', props.deal.id), {
+    content: newMessage.value,
+  })
+
+  newMessage.value = ''
+}
+
+// Listen to events for balance updates and new messages
+onMounted(async () => {
+  // Connect to private channel for each deal
+  echo.connector.pusher.connection.bind('connected', () => {
+    console.log('✅ Подключено к Pusher')
+  })
+
+  // Subscribe to channels for each user's deals
+  for (const deal of props.userDeals) {
+    Echo.private(`deal.${deal.id}`)
+      .listen('.App\\Events\\NewMessageSent', async (e) => {
+        console.log('📨 Новое сообщение:', e)
+
+        // Add new message to the list
+        messages.value.push({
+          id: e.id,
+          content: e.content,
+          user: e.user,
+          created_at: e.created_at,
+          read_by_me: false,
+        })
+
+        await nextTick()
+        markMessagesAsRead()
+      })
+  }
+
+  await loadMessages()
+})
 </script>
 
 <template>
@@ -188,14 +242,7 @@ onMounted(() => {
       <!-- Page Content -->
       <main class="p-4">
         <slot />
-
-        <footer class="mt-10 py-6 text-center text-sm text-gray-500 border-t">
-          <div class="space-x-4">
-            <Link :href="route('privacy')" class="hover:underline">Политика конфиденциальности</Link>
-            <Link :href="route('policy.offer')" class="hover:underline">Пользовательское соглашение</Link>
-            <Link :href="route('policy.terms')" class="hover:underline">Условия использования</Link>
-          </div>
-        </footer>
+        <!-- Add Footer here -->
       </main>
     </div>
   </div>
