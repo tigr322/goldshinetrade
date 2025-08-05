@@ -5,8 +5,14 @@ import { useForm } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import Echo from '@/echo'
 import axios from 'axios'
-defineOptions({ layout: (h, page) => h(AppLayout, null, () => page) })
+import { useRouter } from 'vue-router'; // Для Vue Router
 
+defineOptions({ layout: (h, page) => h(AppLayout, null, () => page) })
+const router = useRouter();
+const goToDeal = (url) => {
+  // Переход на страницу сделки
+  router.push(url);  // Переход на URL, который передается через `n.href`
+};
 import {
   Dialog,
   DialogPanel,
