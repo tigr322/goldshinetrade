@@ -88,13 +88,16 @@ const markMessagesAsRead = async () => {
 // Загрузка сообщений для каждой сделки
 const loadMessages = async () => {
   for (const deal of props.userDeals) {
-    const res = await axios.get(route('messages.index', deal.id))
-    messages.value.push(...res.data.reverse())
+    if (deal.id) {  // Убедитесь, что id сделки существует
+      const res = await axios.get(route('messages.index', { deal: deal.id }))
+      messages.value.push(...res.data.reverse())
+    }
   }
 
   await nextTick()
   markMessagesAsRead()
 }
+
 
 // Функция для отображения уведомлений
 const showNotification = (message) => {
