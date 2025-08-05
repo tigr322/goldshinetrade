@@ -83,7 +83,7 @@ public function handleCallback(Request $request)
         $payment->status = 'PAID';
         $payment->save();
     });
-    event(new BalanceUpdated($userId, $user->balance));
+ //event(new BalanceUpdated($userId, $user->balance));
     return response()->json(['status' => 'ok']);
 }
 }
