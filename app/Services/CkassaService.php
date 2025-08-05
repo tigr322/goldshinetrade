@@ -20,15 +20,14 @@ class CkassaService
     public static function createInvoice(int $amount, int $userId): ?string
     {
         $externalId = self::generateExternalId();
-        $encryptedId = \App\Services\EncryptionService::encryptExternalId($externalId);
+        //$encryptedId = \App\Services\EncryptionService::encryptExternalId($externalId);
         $payload = [
             'servCode' => config('ckassa.serv_code'),
             'startPaySelect' => 'false',
             'invType' => 'READ_ONLY',
             'amount' => strval($amount*100),
             'properties' => [
-                7900000000,  
-                $encryptedId,
+                $externalId
             ],
             
         ];
@@ -48,13 +47,6 @@ class CkassaService
 
             if ($response->successful() && filter_var($response->body(), FILTER_VALIDATE_URL)) {
                 $url = trim($response->body());
-                Log::info('📤 Creating payment record', [
-                    'user_id' => $userId,
-                    'invoice_url' => $url,
-                    'amount' => $amount,
-                    'status' => 'CREATED',
-                    'external_id' => $externalId,
-                ]);
                 try {
                     $payment = Payment::create([
                         'user_id' => $userId,
