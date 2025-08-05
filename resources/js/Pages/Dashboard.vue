@@ -197,7 +197,7 @@ onMounted(async () => {
     <template v-if="notifications.length">
       <MenuItem v-for="n in notifications" :key="n.id" v-slot="{ active }">
         <a
-          @click="goToDeal(n.href)"  <!-- Добавляем обработчик клика -->
+          @click="goToDeal(n.href)" 
           :class="[
             active ? 'bg-gray-100' : '',
             'block px-4 py-2 text-sm text-gray-700'
