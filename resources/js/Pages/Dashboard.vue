@@ -190,32 +190,29 @@ onMounted(async () => {
       leave-from-class="transform scale-100 opacity-100"
       leave-to-class="transform scale-95 opacity-0"
     >
-      <MenuItems
-        class="absolute right-0 z-10 mt-2 w-64 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-      >
-        <div class="py-1">
-          <template v-if="notifications.length">
-            <MenuItem
-              v-for="n in notifications"
-              :key="n.id"
-              v-slot="{ active }"
-            >
-              <a
-                :href="n.href"
-                :class="[
-                  active ? 'bg-gray-100' : '',
-                  'block px-4 py-2 text-sm text-gray-700'
-                ]"
-              >
-                {{ n.text }}
-              </a>
-            </MenuItem>
-          </template>
-          <template v-else>
-            <div class="px-4 py-2 text-sm text-gray-500">Нет новых уведомлений</div>
-          </template>
-        </div>
-      </MenuItems>
+    <MenuItems
+  class="absolute right-0 z-10 mt-2 w-64 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+>
+  <div class="py-1">
+    <template v-if="notifications.length">
+      <MenuItem v-for="n in notifications" :key="n.id" v-slot="{ active }">
+        <a
+          @click="goToDeal(n.href)"  <!-- Добавляем обработчик клика -->
+          :class="[
+            active ? 'bg-gray-100' : '',
+            'block px-4 py-2 text-sm text-gray-700'
+          ]"
+        >
+          {{ n.text }}
+        </a>
+      </MenuItem>
+    </template>
+    <template v-else>
+      <div class="px-4 py-2 text-sm text-gray-500">Нет новых уведомлений</div>
+    </template>
+  </div>
+</MenuItems>
+
     </transition>
   </Menu>
             
