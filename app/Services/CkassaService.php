@@ -12,7 +12,7 @@ class CkassaService
     public static function generateExternalId(): string
 {
     do {
-        $id = str_pad(random_int(0, 999999999999), 12, '0', STR_PAD_LEFT);
+        $id = str_pad(random_int(0, 9999999999), 10, '0', STR_PAD_LEFT);
     } while (Payment::where('external_id', $id)->exists());
 
     return $id;
