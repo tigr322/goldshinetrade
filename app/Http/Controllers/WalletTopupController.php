@@ -44,24 +44,7 @@ public function handleCallback(Request $request)
     if (!$externalId) {
         return response()->json(['error' => 'Missing external ID'], 400);
     }
-    if (!$regPayNum) {
-        return response()->json(['error' => 'Missing regPayNum'], 400);
-    }
-
-    // 5. Запрос на FZ_CHECK в CKassa
-    $checkResponse = Http::withHeaders([
-        'ApiLoginAuthorization' => config('ckassa.shop_token'),
-        'ApiAuthorization' => config('ckassa.secret_key'),
-        'Content-Type' => 'application/json',
-    ])->post('https://api2.ckassa.ru/api-shop/rs/open/invoice/verify', [
-        'regPayNum' => $request->input('regPayNum'),
-    ]);
-    
-    $checkData = $checkResponse->json();
-    
-    if (!$checkResponse->successful() || !isset($checkData['state']) || $checkData['state'] !== 'PAYED') {
-        return response()->json(['error' => 'Payment not confirmed by CKassa'], 400);
-    }
+  
     
     $payment = \App\Models\Payment::where('external_id', $externalId)->first();
 
