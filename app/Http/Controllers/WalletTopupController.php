@@ -40,12 +40,11 @@ public function handleCallback(Request $request)
 {
     Log::info('CKassa Callback Received', $request->all());
     $externalId = data_get($request->input('property'), 'ЛИЦЕВОЙ_СЧЕТ');
-    $regPayNum = data_get($request->input('regPayNum'));
+
     if (!$externalId) {
         return response()->json(['error' => 'Missing external ID'], 400);
     }
-  
-    
+
     $payment = \App\Models\Payment::where('external_id', $externalId)->first();
 
     if (!$payment) {
