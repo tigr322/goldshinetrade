@@ -49,7 +49,7 @@ public function handleCallback(Request $request)
         'ApiAuthorization' => config('ckassa.secret_key'),
         'Content-Type' => 'application/json',
     ])->post('https://api2.ckassa.ru/api-shop/rs/open/invoice/verify', [
-        'regPayNum' => $request->input('regPayNum'),
+        'regPayNum' => 1,
     ]);
     
     $checkData = $checkResponse->json();
