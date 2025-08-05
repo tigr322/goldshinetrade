@@ -130,24 +130,41 @@ onMounted(async () => {
       <h2 class="font-semibold text-lg mb-2">Чат с продавцом</h2>
 
       <div class="border rounded p-4 bg-white max-h-96 overflow-y-auto space-y-2">
-        <div v-for="m in messages" :key="m.id" class="text-sm">
-          <span
-            :class="m.user.name === 'Система' ? 'text-yellow-700 font-semibold' : 'font-semibold text-gray-900'"
-          >
-            {{ m.user.name }}:
-          </span>
-          <span>{{ m.content }}</span>
-          <span class="text-xs text-gray-400 ml-2">
-  {{ new Date(m.created_at).toLocaleString(undefined, {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  }) }}
-</span>
-          <span v-if="m.read_by_me" class="text-xs text-gray-500 ml-2">✓ Прочитано</span>
-        </div>
+        <div v-for="m in messages" :key="m.id" class="text-sm flex items-start gap-2">
+  <!-- Аватарка -->
+  <img
+    v-if="m.user && m.user.name !== 'Система'"
+    :src="`/storage/${m.user.photo ?? 'default.jpg'}`"
+    alt="avatar"
+    class="h-8 w-8 rounded-full object-cover"
+  />
+  <div>
+    <!-- Имя -->
+    <span
+      :class="m.user.name === 'Система' ? 'text-yellow-700 font-semibold' : 'font-semibold text-gray-900'"
+    >
+      {{ m.user.name }}:
+    </span>
+
+    <!-- Сообщение -->
+    <span>{{ m.content }}</span>
+
+    <!-- Время -->
+    <span class="text-xs text-gray-400 ml-2">
+      {{ new Date(m.created_at).toLocaleString(undefined, {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }) }}
+    </span>
+
+    <!-- Прочитано -->
+    <span v-if="m.read_by_me" class="text-xs text-gray-500 ml-2">✓ Прочитано</span>
+  </div>
+</div>
+
       </div>
 
       <form @submit.prevent="sendMessage" class="flex gap-2 mt-4">
