@@ -1,6 +1,5 @@
 FROM php:8.3-fpm
 
-# Установим нужные зависимости
 RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \

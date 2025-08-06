@@ -47,7 +47,7 @@ public function handleCallback(Request $request)
         'ApiAuthorization' => config('ckassa.secret_key'),
         'Content-Type' => 'application/json',
         'User-Agent' => 'MyCustomAgent/1.0',
-    ])->timeout(60)->post(config('ckassa.url'), [
+    ])->timeout(60)->post(config('https://api2.ckassa.ru/api-shop/rs/open/payment/receipt2'), [
         'regPayNum' => $request->input('regPayNum'), 
     ]);
     
