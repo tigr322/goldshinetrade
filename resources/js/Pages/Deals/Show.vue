@@ -114,7 +114,20 @@ onMounted(async () => {
 
   <div class="max-w-4xl mx-auto mt-8 space-y-6">
     <h1 class="text-2xl font-bold text-gray-800">Сделка #{{ deal.id }}</h1>
-    <p>Продавец: {{ deal.offer.user.name }}</p>
+    <p><img
+         
+         :src="`/storage/${user.photo}`"
+         class="w-4 h-4 rounded-full object-cover border"
+         alt="Аватар"
+       />
+      Продавец:
+      <a
+        :href="route('users.show', { user: deal.offer.user.id })"
+        class="text-blue-600 hover:underline"
+      >
+        {{ deal.offer.user.name }}
+      </a>
+    </p>
     <p>Описание {{ deal.offer.description }}</p>
     <p>Полное описание {{ deal.offer.full_description }}</p>
     <p>Сумма: {{ deal.total_price }} ₽</p>

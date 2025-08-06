@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Support\Facades\Auth;
-
+use App\Models\User;
 class MainController extends Controller
 {
     public function index(Request $request)
@@ -53,6 +53,15 @@ class MainController extends Controller
 public function learnmore(Request $request)
 {
     return Inertia::render('LearnMore');
+}
+
+public function show(User $user)
+{
+    return inertia('Users/Show', [
+        'user' => $user->only(['id', 'name', 'email', 'photo', 'balance', 'rating', 'adress']),
+        'offers' => $user->offers()->latest()->get(['id', 'title', 'description', 'price']),
+        'reviews' => $user->reviewsReceived()->latest()->with('fromUser:id,name')->get(),
+    ]);
 }
 
 }

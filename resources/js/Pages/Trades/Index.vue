@@ -233,11 +233,11 @@ const submitFilter = () => {
   </div>
 </div>
    <!-- Контейнер с горизонтальной прокруткой только на мобильных -->
-<div class="mx-auto max-w-6xl mt-10">
+<div class="mx-auto mt-10">
   <div class="sm:overflow-visible overflow-x-auto">
     <div class="inline-block min-w-full align-middle">
       <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-        <table class="min-w-full divide-y divide-gray-300">
+        <table class="w-full min-w-[700px] divide-y divide-gray-300 table-fixed">
           <thead class="bg-gray-50">
         <tr>
             <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900 cursor-pointer" @click="sortBy('title')">
@@ -264,7 +264,20 @@ const submitFilter = () => {
           <td class="px-4 py-3 text-sm text-gray-900">{{ offer.server_name ?? '—' }}</td>
           <td class="px-4 py-3 text-sm text-gray-900">{{ offer.price_per_unit }} ₽</td>
           <td class="px-4 py-3 text-sm text-gray-900">{{ offer.quantity }}</td>
-          <td class="px-4 py-3 text-sm text-gray-900">{{ offer.user.name }}</td>
+          <td class="px-4 py-3 text-sm text-gray-900"> 
+      <a
+        :href="route('users.show', { user: offer.user.id })"
+        class="text-blue-600 hover:underline"
+      >
+      <img
+         
+         :src="`/storage/${user.photo}`"
+         class="w-4 h-4 rounded-full object-cover border"
+         alt="Аватар"
+       />
+        {{ offer.user.name }}
+      </a>
+   </td>
           <td class="px-4 py-3 text-sm">
   <button
     v-if="offer.user.id !== user.id"

@@ -42,6 +42,7 @@ Route::get('/privacy', fn () => Inertia::render('Privacy/Privacy'))->name('priva
 Route::get('/policy/offer', fn () => Inertia::render('Privacy/Offert'))->name('policy.offer');
 Route::get('/policy/terms', fn () => Inertia::render('Privacy/Terms'))->name('policy.terms');
 Route::get('/info', [MainController::class, 'learnmore'])->name('LearnMore');
+Route::get('/users/{user}', [MainController::class, 'show'])->name('users.show');
 
 // 🛡️ Защищённые страницы           'verified',
 
