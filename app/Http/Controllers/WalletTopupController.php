@@ -38,31 +38,36 @@ public function store(Request $request)
 public function handleCallback(Request $request)
 {
     $externalId = data_get($request->input('property'), 'ЛИЦЕВОЙ_СЧЕТ');
+    $regPayNum = $request->input('regPayNum');
 
-    if (!$externalId) {
-        return response()->json(['error' => 'Missing external ID'], 400);
+    if (!$externalId || !$regPayNum) {
+        return response()->json(['error' => 'Missing external ID or regPayNum'], 400);
     }
+
+    // 1. Отправляем запрос на receipt2 с regPayNum в URL
     $response = Http::withHeaders([
         'ApiLoginAuthorization' => config('ckassa.shop_token'),
         'ApiAuthorization' => config('ckassa.secret_key'),
-        'Content-Type' => 'application/json',
         'User-Agent' => 'MyCustomAgent/1.0',
-    ])->timeout(60)->post(config('https://api2.ckassa.ru/api-shop/rs/open/payment/receipt2'), [
-        'regPayNum' => $request->input('regPayNum'), 
-    ]);
-    
+    ])
+    ->timeout(60)
+    ->post("https://api2.ckassa.ru/api-shop/rs/open/payment/receipt2?regPayNum={$regPayNum}", ''); // Пустое тело
+
     $checkData = $response->json();
-    
-    if (!$response->successful() || !isset($checkData['state']) || $checkData['state'] !== 'PAYED') {
+
+    // 2. Проверяем успешность запроса и статус
+    if (!$response->successful() || !isset($checkData['fiscalUrl'])) {
         return response()->json(['error' => 'Payment not confirmed by CKassa'], 400);
     }
-    
+
+    // 3. Находим локальный платеж по externalId
     $payment = \App\Models\Payment::where('external_id', $externalId)->first();
 
     if (!$payment) {
         return response()->json(['error' => 'Payment not found'], 404);
     }
 
+    // 4. Проверяем оригинальный callback
     $state = $request->input('state');
     $code = data_get($request->input('result'), 'code');
     $amount = (float) $request->input('amount') / 100;
@@ -71,6 +76,7 @@ public function handleCallback(Request $request)
         return response()->json(['error' => 'Payment not completed'], 400);
     }
 
+    // 5. Обновляем статус и баланс
     if ($payment->status === 'PAID') {
         return response()->json(['message' => 'Already processed'], 200);
     }
@@ -83,7 +89,8 @@ public function handleCallback(Request $request)
         $payment->status = 'PAID';
         $payment->save();
     });
- //event(new BalanceUpdated($userId, $user->balance));
+
     return response()->json(['status' => 'ok']);
 }
+
 }
