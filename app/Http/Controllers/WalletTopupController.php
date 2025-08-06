@@ -51,7 +51,7 @@ public function handleCallback(Request $request)
         'User-Agent' => 'MyCustomAgent/1.0',
     ])
     ->timeout(60)
-    ->post("https://api2.ckassa.ru/api-shop/rs/open/payment/receipt2?regPayNum={$regPayNum}", ''); // Пустое тело
+    ->post("https://api2.ckassa.ru/api-shop/rs/open/payment/receipt2?regPayNum={$regPayNum}", ''); 
 
     $checkData = $response->json();
 
