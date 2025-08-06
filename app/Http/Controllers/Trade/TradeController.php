@@ -51,6 +51,7 @@ class TradeController extends Controller
                 'user' => [
                     'id' => $offer->user->id,
                     'name' => $offer->user->name,
+                    'photo' => $offer->user->photo,
                 ],
                 'category_id' => $offer->category_id,
                 'game_name' => optional($offer->game)->name,
