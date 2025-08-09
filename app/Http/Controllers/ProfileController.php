@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -69,6 +70,12 @@ class ProfileController extends Controller
 
     $user = $request->user();
 
+    // Если есть старое фото и оно не дефолтное — удаляем
+    if ($user->photo && Storage::disk('public')->exists($user->photo)) {
+        Storage::disk('public')->delete($user->photo);
+    }
+
+    // Сохраняем новое фото
     $path = $request->file('photo')->store('profile-photos', 'public');
 
     $user->photo = $path;
