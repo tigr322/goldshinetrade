@@ -116,8 +116,7 @@ onMounted(async () => {
     <h1 class="text-2xl font-bold text-gray-800">Сделка #{{ deal.id }}</h1>
     <p><img
          
-      :src="props.user.photo ? `/storage/${props.user.photo}` : '/storage/default.png'"
-
+         :src="`/storage/${user.photo ?? 'default.png'}`"
          class="w-4 h-4 rounded-full object-cover border"
          alt="Аватар"
        />
