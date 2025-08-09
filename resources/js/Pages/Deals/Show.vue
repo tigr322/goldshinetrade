@@ -148,8 +148,7 @@ onMounted(async () => {
   <!-- Аватарка -->
   <img
     v-if="m.user && m.user.name !== 'Система'"
-    :src="props.user.photo ? `/storage/${props.user.photo}` : '/storage/default.png'"
-
+    :src="`/storage/${m.user.photo ?? 'default.png'}`"
     alt="avatar"
     class="h-8 w-8 rounded-full object-cover"
   />
