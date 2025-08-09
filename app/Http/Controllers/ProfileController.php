@@ -12,6 +12,8 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Support\Facades\Storage;
 
+use Intervention\Image\Laravel\Facades\Image; // Laravel 11+/12 синтаксис
+
 class ProfileController extends Controller
 {
     /**
@@ -62,9 +64,7 @@ class ProfileController extends Controller
 
         return Redirect::to('/');
     }
-    use Illuminate\Support\Facades\Storage;
-    use Intervention\Image\Laravel\Facades\Image; // Laravel 11+/12 синтаксис
-    
+
     public function updatePhoto(Request $request)
     {
         $request->validate([
