@@ -24,6 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // И можно также настроить исключения, если хочешь так:
         $middleware->validateCsrfTokens(except: [
             'payment/callback',
+            '/auth/callback/vkontakte',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
