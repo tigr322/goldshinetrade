@@ -11,7 +11,7 @@ const props = defineProps({
 defineOptions({ layout: (h, page) => h(AppLayout, null, () => page) })
 
 const deleteCard = (id) => {
-  console.log('Удаление карты:', id) // ← прspanоверка
+
   if (confirm('Вы уверены, что хотите удалить эту карту?')) {
     router.delete(route('cards.destroy', id))
   }

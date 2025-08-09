@@ -92,7 +92,7 @@ onMounted(async () => {
 
   Echo.private(`deal.${props.deal.id}`)
     .listen('.App\\Events\\NewMessageSent', async (e) => {
-      console.log('📨 Новое сообщение:', e)
+      
       messages.value.push({
         id: e.id,
         content: e.content,

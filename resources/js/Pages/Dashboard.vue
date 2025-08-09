@@ -131,7 +131,7 @@ onMounted(async () => {
   for (const dealId of props.userDeals) {
     Echo.private(`deal.${dealId}`)
       .listen('.App\\Events\\NewMessageSent', async (e) => {
-        console.log('📨 Новое сообщение:', e)
+      
 
         // Добавление нового сообщения в список
         messages.value.push({

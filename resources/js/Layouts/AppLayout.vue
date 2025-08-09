@@ -40,7 +40,7 @@ const secondaryNavigation = [
 
 const page = usePage()
 const user = page.props.auth.user
-console.log('User from Inertia:', user)
+
 if (user && Array.isArray(user.roles) && user.roles.some(role => ['admin', 'moderator'].includes(role.name))) {
   navigation.push({
     name: 'Администрирование',
