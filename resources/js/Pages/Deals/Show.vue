@@ -144,10 +144,10 @@ onMounted(async () => {
 
       <div class="border rounded p-4 bg-white max-h-96 overflow-y-auto space-y-2">
         <div v-for="m in messages" :key="m.id" class="text-sm flex items-start gap-2">
-  <!-- Аватарка -->
+  <!-- :src="`/storage/${m.user.photo ?? 'default.png'}`" Аватарка :src="props.user.photo ? `/storage/${props.user.photo}` : '/storage/default.png'" -->
   <img
     v-if="m.user && m.user.name !== 'Система'"
-    :src="props.user.photo ? `/storage/${props.user.photo}` : '/storage/default.png'"
+    :src="m.user.photo ? `/storage/${m.user.photo}` : '/storage/default.png'"
     alt="avatar"
     class="h-8 w-8 rounded-full object-cover"
   />
