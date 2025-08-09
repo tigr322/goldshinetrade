@@ -87,6 +87,7 @@ public function cards(): HasMany
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'oauth' => 'array',
         ];
     }
     public function routeNotificationForMail()

@@ -34,5 +34,17 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    'google' => [
+        'client_id'     => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect'      => env('GOOGLE_REDIRECT_URI'), // https://домен/auth/callback/google
+    ],
 
+    'vkontakte' => [
+        'client_id'     => env('VKONTAKTE_CLIENT_ID'),
+        'client_secret' => env('VKONTAKTE_CLIENT_SECRET'),
+        'redirect'      => env('VKONTAKTE_REDIRECT_URI'), // https://домен/auth/callback/vkontakte
+        // 'scopes'     => ['email'], // рекомендуем
+        // 'version'    => '5.131',
+    ],
 ];

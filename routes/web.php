@@ -43,6 +43,16 @@ Route::get('/policy/offer', fn () => Inertia::render('Privacy/Offert'))->name('p
 Route::get('/policy/terms', fn () => Inertia::render('Privacy/Terms'))->name('policy.terms');
 Route::get('/info', [MainController::class, 'learnmore'])->name('LearnMore');
 Route::get('/users/{user}', [MainController::class, 'show'])->name('users.show');
+// routes/web.php
+use App\Http\Controllers\Auth\SocialController;
+
+Route::get('/auth/redirect/{provider}', [SocialController::class, 'redirect'])
+    ->whereIn('provider', ['google','vkontakte'])
+    ->name('oauth.redirect');
+
+Route::get('/auth/callback/{provider}', [SocialController::class, 'callback'])
+    ->whereIn('provider', ['google','vkontakte'])
+    ->name('oauth.callback');
 
 // 🛡️ Защищённые страницы           'verified',
 
