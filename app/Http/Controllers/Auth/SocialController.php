@@ -3,52 +3,53 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+
+use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
-use Laravel\Socialite\Facades\Socialite;
 
 class SocialController extends Controller
 {
     public function redirect(string $provider)
     {
         if ($provider === 'vkontakte') {
-            return Socialite::driver('vkontakte')->scopes(['email'])->redirect();
+            return Socialite::driver('vkontakte')
+                ->scopes(['email'])
+                ->redirect();
         }
+
         return Socialite::driver($provider)->redirect();
     }
 
     public function callback(string $provider)
     {
-        $social = Socialite::driver($provider)->stateless()->user();
+        $socialUser = Socialite::driver($provider)->user();
 
-        $providerId = $social->getId();
-        $email      = $social->getEmail(); // у VK может быть null
-        $name       = $social->getName() ?: ($social->getNickname() ?: 'User_'.Str::random(6));
+        // Для VK email может быть в $socialUser->getEmail() или $socialUser->user['email']
+        $email = $socialUser->getEmail()
+              ?: ($socialUser->user['email'] ?? null);
 
-        // ищем по связке провайдера или по email
-        $user = User::whereJsonContains('oauth', [$provider => $providerId])->first()
-             ?? ($email ? User::where('email', $email)->first() : null);
+        // Если email не пришёл — подставляем служебный (иначе unique(email) не пройдёт)
+        $email = $email ?: "{$provider}_{$socialUser->getId()}@example.local";
 
-        DB::transaction(function () use (&$user, $provider, $providerId, $email, $name) {
-            if (!$user) {
-                $user = User::create([
-                    'name'              => $name,
-                    'email'             => $email ?: strtolower($provider).'_'.$providerId.'@example.local',
-                    'password'          => bcrypt(Str::random(32)),
-                    'email_verified_at' => now(), // если доверяешь провайдеру
-                    'oauth'             => [$provider => $providerId], // json колонка
-                ]);
-            } else {
-                $oauth = $user->oauth ?? [];
-                $oauth[$provider] = $providerId;
-                $user->oauth = $oauth;
-                $user->save();
-            }
-        });
+        $user = User::firstOrCreate(
+            ['email' => $email],
+            [
+                'name'     => $socialUser->getName() ?: ($socialUser->getNickname() ?: 'User'),
+                'password' => bcrypt(str()->random(32)),
+            ]
+        );
 
-        Auth::login($user, remember: true);
+        // сохраним немного OAuth-меты (если есть json-колонка oauth)
+        $user->oauth = array_merge((array) $user->oauth, [
+            $provider => [
+                'id'    => $socialUser->getId(),
+                'email' => $email,
+            ],
+        ]);
+        $user->save();
+
+        Auth::login($user, true);
 
         return redirect()->intended(route('dashboard'));
     }

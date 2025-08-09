@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Laravel\Fortify\Features;
-
+use App\Http\Controllers\Auth\SocialController;
 Broadcast::routes(['middleware' => ['web', 'auth:sanctum']]);
 
 // 🌐 Гостевая страница
@@ -44,14 +44,15 @@ Route::get('/policy/terms', fn () => Inertia::render('Privacy/Terms'))->name('po
 Route::get('/info', [MainController::class, 'learnmore'])->name('LearnMore');
 Route::get('/users/{user}', [MainController::class, 'show'])->name('users.show');
 // routes/web.php
-use App\Http\Controllers\Auth\SocialController;
+
+
 
 Route::get('/auth/redirect/{provider}', [SocialController::class, 'redirect'])
-    ->whereIn('provider', ['google','vkontakte'])
+    ->whereIn('provider', ['vkontakte','google'])
     ->name('oauth.redirect');
 
 Route::get('/auth/callback/{provider}', [SocialController::class, 'callback'])
-    ->whereIn('provider', ['google','vkontakte'])
+    ->whereIn('provider', ['vkontakte','google'])
     ->name('oauth.callback');
 
 // 🛡️ Защищённые страницы           'verified',
