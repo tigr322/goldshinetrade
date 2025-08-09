@@ -12,7 +12,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Support\Facades\Storage;
 
-use Intervention\Image\Laravel\Facades\Image; // Laravel 11+/12 синтаксис
+use Intervention\Image\Laravel\Facades\Image;
 
 class ProfileController extends Controller
 {
@@ -87,7 +87,8 @@ class ProfileController extends Controller
         // Генерируем миниатюру 64x64 WebP
         $img = Image::read($request->file('photo'))->cover(64, 64);
         $thumbPath = 'profile-photos/thumbs/'.pathinfo($originalPath, PATHINFO_FILENAME).'.webp';
-        Storage::disk('public')->put($thumbPath, $img->toWebp(80)); // качество 80
+        Storage::disk('public')->put($thumbPath, $img->toWebp(80));
+        
     
         $user->photo = $originalPath;
         $user->photo_thumb = $thumbPath; // добавь колонку в users (string nullable)
