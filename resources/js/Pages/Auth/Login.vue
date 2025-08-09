@@ -28,35 +28,8 @@ const submit = () => {
     });
 };
 </script>
-<!--
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/forms'),
-    ],
-  }
-  ```
--->
+
 <template>
-    <!--
-      This example requires updating your template:
-  
-      ```
-      <html class="h-full bg-white">
-      <body class="h-full">
-      <div class="flex lg:flex-1">
-            <a href="/" class="-m-1.5 p-1.5">
-              <span class="sr-only">Your Company</span>
-              <img class="h-12 w-auto" src="/storage/iconca.png" alt="GoldShineTrade" />
-            </a>
-          </div>
-      ```
-    -->
     
         <Head title="Log in" />
         <div v-if="status" class="mb-4 text-sm font-medium text-green-600">

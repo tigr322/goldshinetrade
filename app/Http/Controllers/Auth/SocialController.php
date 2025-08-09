@@ -49,7 +49,10 @@ class SocialController extends Controller
         ]);
         $user->save();
 
-        Auth::login($user, true);
+        event(new Registered($user));
+      
+        Auth::login($user);
+        $user->sendEmailVerificationNotification();
 
         return redirect()->intended(route('dashboard'));
     }

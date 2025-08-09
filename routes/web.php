@@ -46,7 +46,7 @@ Route::get('/users/{user}', [MainController::class, 'show'])->name('users.show')
 // routes/web.php
 
 
-https://goldshinetrade.ru/auth/callback/vkontakte
+
 
 Route::get('/auth/redirect/{provider}', [SocialController::class, 'redirect'])
     ->whereIn('provider', ['vkontakte','google'])
