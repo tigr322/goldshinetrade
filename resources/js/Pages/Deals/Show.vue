@@ -116,7 +116,8 @@ onMounted(async () => {
     <h1 class="text-2xl font-bold text-gray-800">Сделка #{{ deal.id }}</h1>
     <p><img
          
-         :src="`/storage/${user.photo ?? 'default.png'}`"
+      :src="props.user.photo ? `/storage/${props.user.photo}` : '/storage/default.png'"
+
          class="w-4 h-4 rounded-full object-cover border"
          alt="Аватар"
        />
@@ -147,7 +148,8 @@ onMounted(async () => {
   <!-- Аватарка -->
   <img
     v-if="m.user && m.user.name !== 'Система'"
-    :src="`/storage/${m.user.photo ?? 'default.png'}`"
+    :src="props.user.photo ? `/storage/${props.user.photo}` : '/storage/default.png'"
+
     alt="avatar"
     class="h-8 w-8 rounded-full object-cover"
   />
