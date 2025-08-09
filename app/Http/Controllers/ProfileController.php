@@ -62,25 +62,38 @@ class ProfileController extends Controller
 
         return Redirect::to('/');
     }
+    use Illuminate\Support\Facades\Storage;
+    use Intervention\Image\Laravel\Facades\Image; // Laravel 11+/12 синтаксис
+    
     public function updatePhoto(Request $request)
-{
-    $request->validate([
-        'photo' => ['required', 'image', 'max:2048'], // до 2MB
-    ]);
-
-    $user = $request->user();
-
-    // Если есть старое фото и оно не дефолтное — удаляем
-    if ($user->photo && Storage::disk('public')->exists($user->photo)) {
-        Storage::disk('public')->delete($user->photo);
+    {
+        $request->validate([
+            'photo' => ['required', 'image', 'max:2048'],
+        ]);
+    
+        $user = $request->user();
+    
+        // Удаляем старые файлы (и оригинал, и миниатюру), если были и не дефолт
+        if ($user->photo && Storage::disk('public')->exists($user->photo)) {
+            Storage::disk('public')->delete($user->photo);
+        }
+        if (!empty($user->photo_thumb) && Storage::disk('public')->exists($user->photo_thumb)) {
+            Storage::disk('public')->delete($user->photo_thumb);
+        }
+    
+        // Сохраняем оригинал
+        $originalPath = $request->file('photo')->store('profile-photos/original', 'public');
+    
+        // Генерируем миниатюру 64x64 WebP
+        $img = Image::read($request->file('photo'))->cover(64, 64);
+        $thumbPath = 'profile-photos/thumbs/'.pathinfo($originalPath, PATHINFO_FILENAME).'.webp';
+        Storage::disk('public')->put($thumbPath, $img->toWebp(80)); // качество 80
+    
+        $user->photo = $originalPath;
+        $user->photo_thumb = $thumbPath; // добавь колонку в users (string nullable)
+        $user->save();
+    
+        return back()->with('success', 'Фото обновлено.');
     }
-
-    // Сохраняем новое фото
-    $path = $request->file('photo')->store('profile-photos', 'public');
-
-    $user->photo = $path;
-    $user->save();
-
-    return back()->with('success', 'Фото обновлено.');
-}
+    
 }

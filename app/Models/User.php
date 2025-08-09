@@ -32,7 +32,7 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var list<string>
      */
     protected $fillable = [
-        'name', 'email', 'password', 'phone', 'is_verified', 'balance', 'rating', 'adress', 'photo'
+        'name', 'email', 'password', 'phone', 'is_verified', 'balance', 'rating', 'adress', 'photo', 'photo_thumb'
     ];
     public function offers(): HasMany
     {
