@@ -235,7 +235,7 @@ onMounted(async () => {
               <Menu as="div" class="relative ml-3">
                 <div>
                   <MenuButton class="flex max-w-xs items-center rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 lg:rounded-md lg:p-2 lg:hover:bg-gray-50">
-                    <img class="h-8 w-8 rounded-full" :src="`/storage/${props.user.photo ?? 'default.jpg'}`" alt="" />
+                    <img class="h-8 w-8 rounded-full" :src="`/storage/${props.user.photo ?? 'default.png'}`" alt="" />
                     <span class="ml-3 hidden text-sm font-medium text-gray-700 lg:block"><span class="sr-only">Open user menu for </span>{{ props.user.name }}</span>
                     <ChevronDownIcon class="ml-1 hidden h-5 w-5 flex-shrink-0 text-gray-400 lg:block" aria-hidden="true" />
                   </MenuButton>
@@ -288,7 +288,7 @@ onMounted(async () => {
                       @click="triggerFileInput"
                       class="flex max-w-xs items-center rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 lg:rounded-md lg:p-2 lg:hover:bg-gray-50"
                     >
-                    <img class="h-16 w-16 rounded-full object-cover" :src="`/storage/${props.user.photo ?? 'default.jpg'}`" alt="Фото профиля" />                      </button>
+                    <img class="h-16 w-16 rounded-full object-cover" :src="`/storage/${props.user.photo ?? 'default.png'}`" alt="Фото профиля" />                      </button>
                       <input
                         type="file"
                         ref="fileInput"

@@ -271,7 +271,7 @@ const submitFilter = () => {
       >
       <img
          
-         :src="`/storage/${offer.user.photo}`"
+         :src="`/storage/${offer.user.photo ?? 'default.png'}`"
          class="w-8 h-8 rounded-full object-cover border"
          alt="Аватар"
        />
