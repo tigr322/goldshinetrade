@@ -173,7 +173,6 @@ const submit = () => {
 
   <!-- Контент -->
   <div class="max-w-3xl mx-auto bg-transparent">
-    <img class="h-70 w-70 mx-auto mb-6" src="/storage/icon.png" alt="Logo" />
 
     <h2 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white drop-shadow-lg mb-10">
       Почему <span class="text-yellow-300">GoldShineTrade</span>?
@@ -182,21 +181,22 @@ const submit = () => {
     <ul class="space-y-6 text-left max-w-xl mx-auto">
       <li class="flex items-center gap-4">
         <span class="text-4xl">💱</span>
-        <span class="text-2xl font-semibold text-white drop-shadow">Мгновенные сделки</span>
+        <span class="text-2xl font-semibold text-gray-800 drop-shadow">Мгновенные сделки</span>
       </li>
       <li class="flex items-center gap-4">
         <span class="text-4xl">🔒</span>
-        <span class="text-2xl font-semibold text-white drop-shadow">Безопасность транзакций</span>
+        <span class="text-2xl font-semibold text-gray-800 drop-shadow">Безопасность транзакций</span>
       </li>
       <li class="flex items-center gap-4">
         <span class="text-4xl">💰</span>
-        <span class="text-2xl font-semibold text-white drop-shadow">Выгодный курс обмена</span>
+        <span class="text-2xl font-semibold text-gray-800 drop-shadow">Выгодный курс обмена</span>
       </li>
       <li class="flex items-center gap-4">
         <span class="text-4xl">⚡</span>
-        <span class="text-2xl font-semibold text-white drop-shadow">Моментальные выплаты</span>
+        <span class="text-2xl font-semibold text-gray-800 drop-shadow">Моментальные выплаты</span>
       </li>
     </ul>
+
   </div>
 </div>
 
