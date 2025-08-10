@@ -172,9 +172,10 @@ const submit = () => {
   </div>
 
   <!-- Контент -->
-  <div class="max-w-3xl mx-auto bg-transparent">
+  <div class="flex items-center justify-center min-h-screen max-w-3xl mx-auto bg-transparent">
 
-    <h2 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white drop-shadow-lg mb-10">
+
+    <h2 class="text-4xl sm:text-5xl font-extrabold tracking-tight drop-shadow-lg mb-10" style="color: rgb(38, 41, 44);">
       Почему <span class="text-yellow-300">GoldShineTrade</span>?
     </h2>
 
