@@ -35,7 +35,7 @@ const navigation = [
       <nav class="mx-auto flex max-w-7xl items-center justify-between" aria-label="Global">
         <div class="flex lg:flex-1 items-center gap-3">
           <Link href="/" class="-m-1.5 p-1.5 inline-flex items-center gap-2">
-            <img class="h-auto w-auto rounded-md object-contain" src="/storage/iconca.png" alt="GoldShineTrade" />
+            <img class="max-h-16 w-auto rounded-md object-contain" src="/storage/iconca.png" alt="GoldShineTrade" />
             <span class="sr-only">GoldShineTrade</span>
           </Link>
         </div>
