@@ -32,7 +32,11 @@ const submit = () => {
 
     <AuthenticationCard>
         <template #logo>
-            <AuthenticationCardLogo />
+            <a href="/" class="-m-1.5 p-1.5">
+           
+              <img class="h-12 w-auto" src="/storage/iconca.png" alt="GoldShineTrade" />
+            </a>
+      
         </template>
 
         <form @submit.prevent="submit">
