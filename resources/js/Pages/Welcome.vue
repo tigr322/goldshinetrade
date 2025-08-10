@@ -167,6 +167,15 @@ const navigation = [
           </div>
         </div>
       </section>
+      <section id="about" class="bg-gray-50">
+      <div class="mx-auto max-w-7xl px-6 py-16 lg:px-8 text-center">
+        <h2 class="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">О нас</h2>
+        <p class="mt-4 text-gray-600 max-w-3xl mx-auto">
+          GoldShineTrade — это удобная и безопасная платформа для обмена игровых достижений, валюты и предметов на реальные деньги. 
+          Мы обеспечиваем быстрые сделки, прозрачные условия и моментальные выплаты.
+        </p>
+      </div>
+    </section>
 
       <!-- Как это работает -->
       <section id="how" class="bg-gray-50">
