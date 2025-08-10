@@ -39,7 +39,7 @@ const submit = () => {
         <!-- Лого + заголовок -->
         <div class="text-center sm:text-left">
           <Link href="/" class="-m-1.5 p-1.5 inline-flex items-center gap-2">
-            <img class="h-12 w-12 rounded-md object-contain" src="/storage/iconca.png" alt="GoldShineTrade" />
+            <img class="h-auto w-auto rounded-md object-contain" src="/storage/iconca.png" alt="GoldShineTrade" />
             <span class="sr-only">GoldShineTrade</span>
           </Link>
           <h1 class="mt-6 text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">
