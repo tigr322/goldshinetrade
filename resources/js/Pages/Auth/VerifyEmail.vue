@@ -30,7 +30,7 @@ const verificationLinkSent = computed(() => props.status === 'verification-link-
         </template>
 
         <div class="mb-4 text-sm text-gray-600">
-            До того, как продолжить, вам придет сообщение с кодом на вашу электронную почту. 
+            До того, как продолжить, вам придет сообщение с ссылка на вашу электронную почту. 
         </div>
 
         <div v-if="verificationLinkSent" class="mb-4 font-medium text-sm text-green-600">

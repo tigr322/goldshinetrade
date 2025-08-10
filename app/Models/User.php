@@ -16,7 +16,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 /**
  * @method \Illuminate\Support\Collection getRoleNames()
  */
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable implements \Illuminate\Contracts\Auth\MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasRoles, TwoFactorAuthenticatable;
@@ -88,6 +88,7 @@ public function cards(): HasMany
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'oauth' => 'array',
+            'two_factor_confirmed_at' => 'datetime',
         ];
     }
     public function routeNotificationForMail()
