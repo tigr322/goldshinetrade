@@ -173,7 +173,7 @@ const submit = () => {
 
   <!-- Контент -->
   <div class="max-w-3xl mx-auto bg-transparent">
-    <img class="h-150 w-150 mx-auto mb-6" src="/storage/icon.png" alt="Logo" />
+    <img class="h-70 w-70 mx-auto mb-6" src="/storage/icon.png" alt="Logo" />
 
     <h2 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white drop-shadow-lg mb-10">
       Почему <span class="text-yellow-300">GoldShineTrade</span>?
