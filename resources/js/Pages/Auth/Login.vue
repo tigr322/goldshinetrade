@@ -181,21 +181,22 @@ const submit = () => {
     <ul class="space-y-6 text-left max-w-xl mx-auto">
       <li class="flex items-center gap-4">
         <span class="text-4xl">💱</span>
-        <span class="text-2xl font-semibold text-gray-800 drop-shadow">Мгновенные сделки</span>
+        <span class="text-2xl font-semibold" style="color: rgb(38, 41, 44);">Мгновенные сделки</span>
       </li>
       <li class="flex items-center gap-4">
         <span class="text-4xl">🔒</span>
-        <span class="text-2xl font-semibold text-gray-800 drop-shadow">Безопасность транзакций</span>
+        <span class="text-2xl font-semibold" style="color: rgb(38, 41, 44);">Безопасность транзакций</span>
       </li>
       <li class="flex items-center gap-4">
         <span class="text-4xl">💰</span>
-        <span class="text-2xl font-semibold text-gray-800 drop-shadow">Выгодный курс обмена</span>
+        <span class="text-2xl font-semibold" style="color: rgb(38, 41, 44);">Выгодный курс обмена</span>
       </li>
       <li class="flex items-center gap-4">
         <span class="text-4xl">⚡</span>
-        <span class="text-2xl font-semibold text-gray-800 drop-shadow">Моментальные выплаты</span>
+        <span class="text-2xl font-semibold" style="color: rgb(38, 41, 44);">Моментальные выплаты</span>
       </li>
     </ul>
+
 
   </div>
 </div>
