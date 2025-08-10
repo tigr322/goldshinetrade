@@ -29,8 +29,24 @@ const submit = () => {
 
 <template>
     <Head title="Reset Password" />
+    <div class="relative isolate min-h-screen bg-white flex items-center justify-center">
+    <!-- Градиентный фон -->
+    <div
+      aria-hidden="true"
+      class="pointer-events-none absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
+    >
+      <div
+        class="relative left-1/2 aspect-[1155/678] w-[72.1875rem] 
+               -translate-x-1/2 rotate-[30deg] 
+               bg-gradient-to-tr from-cyan-400 via-cyan-500 to-emerald-400 opacity-40"
+        style="clip-path: polygon(74% 44%, 100% 59%, 97% 79%, 
+                                   86% 100%, 58% 93%, 35% 100%, 
+                                   0 76%, 18% 51%, 34% 32%, 
+                                   58% 28%, 66% 12%, 79% 0, 89% 18%)"
+      />
+    </div>
+    <AuthenticationCard class="bg-transparent shadow-none" >
 
-    <AuthenticationCard>
         <template #logo>
             <a href="/" class="-m-1.5 p-1.5">
            
@@ -87,4 +103,5 @@ const submit = () => {
             </div>
         </form>
     </AuthenticationCard>
+</div>
 </template>
