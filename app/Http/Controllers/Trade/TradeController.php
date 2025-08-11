@@ -137,7 +137,7 @@ public function buy(Request $request)
         'buyer_id'    => $user->id,
         'offer_id'    => $offer->id,
         'quantity'    => 1,
-        'total_price' => $offer->buyer_final_price ?? $offer->price,
+        'total_price' => $offer->price,
         'status'      => 'pending',
         'payment_method_id' => null, // <- важно
     ]);
