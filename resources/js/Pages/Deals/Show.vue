@@ -233,7 +233,7 @@ const pay = async () => {
       </div>
 
       <!-- Кнопка подтверждения -->
-      <div v-if="deal.status === 'paid'" class="flex justify-end">
+      <div v-if="deal.status !== 'paid'" class="flex justify-end">
         <button
           @click="confirmDeal"
           :disabled="confirming"

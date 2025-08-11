@@ -120,36 +120,48 @@ class TradeController extends Controller
             return response()->json(['message' => 'Сделка уже оплачена или завершена.'], 422);
         }
     
-        $offer = $deal->offer()->lockForUpdate()->first();
-        $qty   = min($data['quantity'], $offer->quantity);
-        if ($qty < 1) {
-            return response()->json(['message' => 'Недостаточно товара в наличии.'], 422);
+        try {
+            DB::transaction(function () use ($deal, $user, $data) {
+                // ВАЖНО: lockForUpdate ТОЛЬКО внутри транзакции
+                $offer = $deal->offer()->lockForUpdate()->firstOrFail();
+    
+                $qty = min((int)$data['quantity'], (int)$offer->quantity);
+                if ($qty < 1) {
+                    abort(422, 'Недостаточно товара в наличии.');
+                }
+    
+                $unitPrice = (float) $offer->price; // цена для покупателя (уже с +%)
+                $total     = round($unitPrice * $qty, 2);
+    
+                // Можно тоже залочить пользователя, если очень щепетильно (опционально):
+                // $user->refresh();
+                if ($user->balance < $total) {
+                    abort(422, 'Недостаточно средств на балансе.');
+                }
+    
+                // списываем у покупателя и замораживаем
+                $user->decrement('balance', $total);
+    
+                $deal->update([
+                    'quantity'      => $qty,
+                    'total_price'   => $total,
+                    'status'        => 'paid',
+                    'escrow_amount' => $total,
+                ]);
+    
+                // уменьшаем остаток оффера
+                $offer->decrement('quantity', $qty);
+                if ($offer->quantity - $qty <= 0) {
+                    $offer->is_active = false;
+                    $offer->save();
+                }
+            });
+    
+            return response()->json(['ok' => true]);
+        } catch (\Throwable $e) {
+            // в лог можно кинуть $e->getMessage()
+            return response()->json(['message' => 'Серверная ошибка при оплате'], 500);
         }
-    
-        $unitPrice = (float) $offer->price; // уже с +% для покупателя
-        $total = round($unitPrice * $qty, 2);
-    
-        if ($user->balance < $total) {
-            return response()->json(['message' => 'Недостаточно средств на балансе.'], 422);
-        }
-    
-        DB::transaction(function () use ($user, $deal, $offer, $qty, $total) {
-            $user->decrement('balance', $total);
-    
-            $deal->update([
-                'quantity'      => $qty,
-                'total_price'   => $total,
-                'status'        => 'paid',
-                'escrow_amount' => $total,
-            ]);
-    
-            $offer->decrement('quantity', $qty);
-            if ($offer->quantity <= 0) {
-                $offer->update(['is_active' => false]);
-            }
-        });
-    
-        return response()->json(['ok' => true]);
     }
     
 public function buy(Request $request)
@@ -207,41 +219,37 @@ public function confirm(\App\Models\Deal $deal)
 {
     $user = auth()->user();
 
-    // 1) только покупатель
     if ($deal->buyer_id !== $user->id) {
         return response()->json(['message' => 'Подтверждать может только покупатель.'], 422);
     }
-
-    // 2) сделка должна быть оплачена и с заморозкой
     if ($deal->status !== 'paid') {
-        return response()->json(['message' => 'Сделка ещё не оплачена. Сначала оплатите.'], 422);
+        return response()->json(['message' => 'Сделка ещё не оплачена.'], 422);
     }
-    if ((float) $deal->escrow_amount <= 0) {
+    if ((float)$deal->escrow_amount <= 0) {
         return response()->json(['message' => 'Нет замороженных средств для выплаты.'], 422);
     }
 
-    DB::transaction(function () use ($deal) {
-        $offer  = $deal->offer()->lockForUpdate()->first();
-        $seller = $offer->user()->lockForUpdate()->first();
+    try {
+        DB::transaction(function () use ($deal) {
+            $offer  = $deal->offer()->lockForUpdate()->firstOrFail();
+            $seller = $offer->user()->lockForUpdate()->firstOrFail();
 
-        // базовая цена продавца
-        $buyerPercent = (float) config('fees.buyer_percent', 3.5);
-        $baseUnit = $offer->base_price ?: round($offer->price / (1 + $buyerPercent/100), 2);
+            // Простой вариант: выплачиваем ВСЮ сумму из эскроу
+            $payout = (float) $deal->escrow_amount;
 
-        $payout = round($baseUnit * $deal->quantity, 2);
+            $seller->increment('balance', $payout);
 
-        // Выплата продавцу
-        $seller->increment('balance', $payout);
+            $deal->update([
+                'confirmed_at'  => now(),
+                'released_at'   => now(),
+                'status'        => 'released',
+                'escrow_amount' => 0,
+            ]);
+        });
 
-        $deal->update([
-            'confirmed_at'  => now(),
-            'released_at'   => now(),
-            'status'        => 'released',
-            'escrow_amount' => 0,
-        ]);
-    });
-
-    return response()->json(['ok' => true]);
+        return response()->json(['ok' => true]);
+    } catch (\Throwable $e) {
+        return response()->json(['message' => 'Внутренняя ошибка при подтверждении'], 500);
+    }
 }
-
 }
