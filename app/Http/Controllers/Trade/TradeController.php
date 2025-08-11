@@ -162,7 +162,7 @@ class TradeController extends Controller
     
             DB::afterCommit(function () use ($msg) {
                 // если у тебя событие принимает сам Message
-                NewMessageSent::dispatch($msg);
+                event(new NewMessageSent($msg));
                 // или под твой формат:
                 // NewMessageSent::dispatch(
                 //     id: $msg->id,
