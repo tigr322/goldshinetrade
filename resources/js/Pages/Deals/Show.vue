@@ -96,88 +96,221 @@ onMounted(async () => {
 
   await loadMessages()
 })
-</script>
 
+
+const confirming = ref(false)
+
+const confirmDeal = async () => {
+  if (confirming.value) return
+  confirming.value = true
+  try {
+    await axios.post(route('deals.confirm', props.deal.id))
+    location.reload()
+  } catch (e) {
+    console.warn(e)
+  } finally {
+    confirming.value = false
+  }
+}
+
+const statusBadgeClass = (s) => {
+  switch (s) {
+    case 'pending':  return 'bg-amber-50 text-amber-700 ring-amber-200'
+    case 'paid':     return 'bg-blue-50 text-blue-700 ring-blue-200'
+    case 'released': return 'bg-emerald-50 text-emerald-700 ring-emerald-200'
+    case 'canceled': return 'bg-gray-100 text-gray-600 ring-gray-200'
+    case 'disputed': return 'bg-rose-50 text-rose-700 ring-rose-200'
+    default:         return 'bg-gray-100 text-gray-600 ring-gray-200'
+  }
+}
+
+</script>
 <template>
   <Head title="Сделка" />
 
-  <div class="max-w-4xl mx-auto mt-8 space-y-6">
-    <h1 class="text-2xl font-bold text-gray-800">Сделка #{{ deal.id }}</h1>
-
-    <!-- [ОБНОВЛЕНО] аватар текущего пользователя -->
-    <p>
-      <img
-        :src="avatarUrl(user)"
-        alt="Аватар"
-        class="w-4 h-4 rounded-full object-cover border"
-        loading="lazy"
-        decoding="async"
-        @error="onImgErr"
+  <div class="relative isolate min-h-[calc(100vh-5rem)]">
+    <!-- Градиентный фон -->
+    <div
+      aria-hidden="true"
+      class="pointer-events-none absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
+    >
+      <div
+        class="relative left-1/2 aspect-[1155/678] w-[72rem] -translate-x-1/2 rotate-[30deg]
+               bg-gradient-to-tr from-cyan-300 via-cyan-500 to-emerald-400 opacity-25"
+        style="clip-path: polygon(74% 44%, 100% 59%, 97% 79%, 86% 100%, 58% 93%, 35% 100%, 0 76%, 18% 51%, 34% 32%, 58% 28%, 66% 12%, 79% 0, 89% 18%)"
       />
-      Продавец:
-      <a
-        :href="route('users.show', { user: deal.offer.user.id })"
-        class="text-blue-600 hover:underline"
-      >
-        {{ deal.offer.user.name }}
-      </a>
-    </p>
+    </div>
 
-    <p>Описание {{ deal.offer.description }}</p>
-    <p>Полное описание {{ deal.offer.full_description }}</p>
-    <p>Сумма: {{ deal.total_price }} ₽</p>
-    <p>Статус: {{ deal.status }}</p>
+    <div class="mx-auto max-w-5xl px-4 py-8 space-y-6">
+      <!-- Заголовок + статус -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <h1 class="text-2xl font-bold text-gray-900">
+          Сделка <span class="text-gray-500">#{{ deal.id }}</span>
+        </h1>
+        <span
+          class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium ring-1"
+          :class="statusBadgeClass(deal.status)"
+        >
+          <span class="inline-block h-2 w-2 rounded-full bg-current opacity-60" />
+          {{ deal.status }}
+        </span>
+      </div>
 
-    <div v-if="deal.status === 'paid'">
-  <button
-    @click="axios.post(route('deals.confirm', deal.id)).then(()=>location.reload())"
-    class="bg-cyan-600 text-white px-4 py-2 rounded hover:bg-cyan-700">
-    Подтвердить получение
-  </button>
-</div>
+      <!-- Карточки-инфо -->
+      <div class="grid gap-4 sm:grid-cols-3">
+        <!-- Продавец -->
+        <div class="rounded-2xl bg-white/80 backdrop-blur border border-gray-100 p-5 shadow-sm">
+          <div class="text-sm text-gray-500">Продавец</div>
+          <div class="mt-3 flex items-center gap-3">
+            <img
+              :src="avatarUrl(deal.offer.user)"
+              @error="onImgErr"
+              class="h-10 w-10 rounded-full object-cover border"
+              alt="avatar"
+              loading="lazy"
+              decoding="async"
+            />
+            <div class="min-w-0">
+              <a
+                :href="route('users.show', { user: deal.offer.user.id })"
+                class="font-semibold text-gray-900 hover:text-cyan-700 truncate"
+              >
+                {{ deal.offer.user.name }}
+              </a>
+              <div class="text-xs text-gray-500 truncate">{{ deal.offer.game?.name || deal.offer.game_name || 'Игра не указана' }}</div>
+            </div>
+          </div>
+        </div>
 
+        <!-- Сумма -->
+        <div class="rounded-2xl bg-white/80 backdrop-blur border border-gray-100 p-5 shadow-sm">
+          <div class="text-sm text-gray-500">Сумма сделки</div>
+          <div class="mt-3 text-2xl font-bold text-gray-900">
+            {{ Number(deal.total_price).toLocaleString() }} ₽
+          </div>
+          <div class="mt-1 text-xs text-gray-500">Итог к оплате покупателя</div>
+        </div>
 
-    <div class="mt-6">
-      <h2 class="font-semibold text-lg mb-2">Чат с продавцом</h2>
-
-      <div class="border rounded p-4 bg-white max-h-96 overflow-y-auto space-y-2">
-        <div v-for="m in messages" :key="m.id" class="text-sm flex items-start gap-2">
-
-          <!-- [ОБНОВЛЕНО] аватар собеседника с lazy + fallback -->
-          <img
-            v-if="m.user && m.user.name !== 'Система'"
-            :src="avatarUrl(m.user)"
-            alt="avatar"
-            class="h-8 w-8 rounded-full object-cover"
-            loading="lazy"
-            decoding="async"
-            @error="onImgErr"
-          />
-
-          <div>
-            <span :class="m.user.name === 'Система' ? 'text-yellow-700 font-semibold' : 'font-semibold text-gray-900'">
-              {{ m.user.name }}:
-            </span>
-            <span>{{ m.content }}</span>
-            <span class="text-xs text-gray-400 ml-2">
-              {{ new Date(m.created_at).toLocaleString(undefined, { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }) }}
-            </span>
-            <span v-if="m.read_by_me" class="text-xs text-gray-500 ml-2">✓ Прочитано</span>
+        <!-- Оффер -->
+        <div class="rounded-2xl bg-white/80 backdrop-blur border border-gray-100 p-5 shadow-sm">
+          <div class="text-sm text-gray-500">Оффер</div>
+          <div class="mt-1 font-semibold text-gray-900 truncate">{{ deal.offer.title }}</div>
+          <div class="mt-1 text-xs text-gray-500 line-clamp-2">
+            {{ deal.offer.description || 'Без описания' }}
           </div>
         </div>
       </div>
 
-      <form @submit.prevent="sendMessage" class="flex gap-2 mt-4">
-        <input
-          v-model="newMessage"
-          type="text"
-          placeholder="Сообщение..."
-          class="flex-1 border rounded px-4 py-2"
-        />
-        <button type="submit" class="bg-cyan-600 text-white px-4 py-2 rounded hover:bg-cyan-700">
-          Отправить
+      <!-- Кнопка подтверждения -->
+      <div v-if="deal.status === 'paid'" class="flex justify-end">
+        <button
+          @click="confirmDeal"
+          :disabled="confirming"
+          class="inline-flex items-center gap-2 rounded-xl bg-cyan-700 px-4 py-2.5 text-sm font-semibold text-white
+                     hover:bg-cyan-600 shadow-sm focus-visible:outline focus-visible:outline-2
+                     focus-visible:outline-offset-2 focus-visible:outline-cyan-600 disabled:opacity-50"
+        >
+          <svg v-if="confirming" class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+            <path class="opacity-75" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" fill="currentColor"/>
+          </svg>
+          Подтвердить получение
         </button>
-      </form>
+      </div>
+
+      <!-- Блок описаний -->
+      <div class="rounded-2xl bg-white/80 backdrop-blur border border-gray-100 p-6 shadow-sm space-y-2">
+        <div class="text-sm text-gray-500">Детали</div>
+        <p class="text-gray-800">
+          <span class="font-medium text-gray-900">Описание:</span>
+          <span class="text-gray-700"> {{ deal.offer.description || '—' }} </span>
+        </p>
+        <p class="text-gray-800">
+          <span class="font-medium text-gray-900">Полное описание:</span>
+          <span class="text-gray-700"> {{ deal.offer.full_description || '—' }} </span>
+        </p>
+      </div>
+
+      <!-- Чат -->
+      <div class="rounded-2xl bg-white/80 backdrop-blur border border-gray-100 shadow-sm">
+        <div class="px-5 pt-5 pb-3 flex items-center justify-between">
+          <h2 class="font-semibold text-gray-900">Чат с продавцом</h2>
+          <div class="text-xs text-gray-500">Все сообщения сохраняются</div>
+        </div>
+
+        <div class="px-5 pb-5">
+          <div class="max-h-[50vh] overflow-y-auto space-y-3 pr-1">
+            <div v-for="m in messages" :key="m.id" class="flex items-start gap-2"
+                 :class="{
+                   'justify-end': m.user?.id === user.id,
+                   'justify-center': m.user?.name === 'Система'
+                 }">
+
+              <!-- Система -->
+              <div v-if="m.user?.name === 'Система'"
+                   class="mx-auto rounded-full bg-yellow-50 text-yellow-800 text-xs px-3 py-1 ring-1 ring-yellow-200">
+                {{ m.content }}
+              </div>
+
+              <!-- Сообщение другого пользователя -->
+              <template v-else-if="m.user?.id !== user.id">
+                <img
+                  :src="avatarUrl(m.user)"
+                  alt="avatar"
+                  class="h-8 w-8 rounded-full object-cover border"
+                  loading="lazy"
+                  decoding="async"
+                  @error="onImgErr"
+                />
+                <div class="max-w-[75%] rounded-2xl rounded-tl-sm bg-gray-100 px-3 py-2 shadow-sm">
+                  <div class="text-xs font-medium text-gray-900">{{ m.user?.name }}</div>
+                  <div class="text-sm text-gray-800 whitespace-pre-line">{{ m.content }}</div>
+                  <div class="mt-1 text-[11px] text-gray-500">
+                    {{ new Date(m.created_at).toLocaleString(undefined,{ day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }) }}
+                    <span v-if="m.read_by_me" class="ml-1">• прочитано</span>
+                  </div>
+                </div>
+              </template>
+
+              <!-- Моё сообщение -->
+              <template v-else>
+                <div class="max-w-[75%] rounded-2xl rounded-tr-sm bg-cyan-600/90 px-3 py-2 text-white shadow-sm">
+                  <div class="text-sm whitespace-pre-line">{{ m.content }}</div>
+                  <div class="mt-1 text-[11px] text-white/80">
+                    {{ new Date(m.created_at).toLocaleString(undefined,{ day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }) }}
+                    <span v-if="m.read_by_me" class="ml-1">• прочитано</span>
+                  </div>
+                </div>
+                <img
+                  :src="avatarUrl(user)"
+                  alt="avatar"
+                  class="h-8 w-8 rounded-full object-cover border"
+                  loading="lazy"
+                  decoding="async"
+                  @error="onImgErr"
+                />
+              </template>
+            </div>
+          </div>
+
+          <!-- Инпут -->
+          <form @submit.prevent="sendMessage" class="mt-4 flex items-center gap-2">
+            <input
+              v-model="newMessage"
+              type="text"
+              placeholder="Сообщение..."
+              class="flex-1 rounded-xl border border-gray-300 px-4 py-2 focus:border-cyan-600 focus:ring-cyan-600"
+            />
+            <button
+              type="submit"
+              class="rounded-xl bg-cyan-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-cyan-600 shadow-sm
+                     focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
+            >
+              Отправить
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
 </template>
