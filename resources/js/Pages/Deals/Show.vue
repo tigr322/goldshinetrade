@@ -233,21 +233,22 @@ const pay = async () => {
       </div>
 
       <!-- Кнопка подтверждения -->
-      <div v-if="deal.status === 'paid'" class="flex justify-end">
-        <button
-          @click="confirmDeal"
-          :disabled="confirming"
-          class="inline-flex items-center gap-2 rounded-xl bg-cyan-700 px-4 py-2.5 text-sm font-semibold text-white
-                     hover:bg-cyan-600 shadow-sm focus-visible:outline focus-visible:outline-2
-                     focus-visible:outline-offset-2 focus-visible:outline-cyan-600 disabled:opacity-50"
-        >
-          <svg v-if="confirming" class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-            <path class="opacity-75" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" fill="currentColor"/>
-          </svg>
-          Подтвердить получение
+      <div v-if="deal.status === 'paid' && deal.buyer_id === user.id" class="flex justify-end">
+      <button
+        @click="confirmDeal"
+        :disabled="confirming"
+        class="inline-flex items-center gap-2 rounded-xl bg-cyan-700 px-4 py-2.5 text-sm font-semibold text-white
+                  hover:bg-cyan-600 shadow-sm focus-visible:outline focus-visible:outline-2
+                  focus-visible:outline-offset-2 focus-visible:outline-cyan-600 disabled:opacity-50"
+      >
+        <svg v-if="confirming" class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" fill="currentColor"/>
+        </svg>
+        Подтвердить получение
         </button>
       </div>
+
 
       <!-- Блок описаний -->
       <div class="rounded-2xl bg-white/80 backdrop-blur border border-gray-100 p-6 shadow-sm space-y-2">
