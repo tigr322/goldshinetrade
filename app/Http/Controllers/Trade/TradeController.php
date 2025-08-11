@@ -15,8 +15,8 @@ use Inertia\Inertia;
 use App\Models\PaymentMethod;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB; 
-
-
+use App\Models\Message;
+use App\Events\NewMessageSent; 
 class TradeController extends Controller
 {
     use AuthorizesRequests;
@@ -120,50 +120,62 @@ class TradeController extends Controller
             return response()->json(['message' => 'Сделка уже оплачена или завершена.'], 422);
         }
     
-        try {
-            DB::transaction(function () use ($deal, $user, $data) {
-                // ВАЖНО: lockForUpdate ТОЛЬКО внутри транзакции
-                $offer = $deal->offer()->lockForUpdate()->firstOrFail();
+        DB::transaction(function () use ($deal, $user, $data) {
+            $offer = $deal->offer()->lockForUpdate()->firstOrFail();
     
-                $qty = min((int)$data['quantity'], (int)$offer->quantity);
-                if ($qty < 1) {
-                    abort(422, 'Недостаточно товара в наличии.');
-                }
+            $qty = min((int)$data['quantity'], (int)$offer->quantity);
+            if ($qty < 1) {
+                abort(422, 'Недостаточно товара в наличии.');
+            }
     
-                $unitPrice = (float) $offer->price; // цена для покупателя (уже с +%)
-                $total     = round($unitPrice * $qty, 2);
+            $unitPrice = (float) $offer->price; // цена для покупателя (с %)
+            $total     = round($unitPrice * $qty, 2);
     
-                // Можно тоже залочить пользователя, если очень щепетильно (опционально):
-                // $user->refresh();
-                if ($user->balance < $total) {
-                    abort(422, 'Недостаточно средств на балансе.');
-                }
+            if ($user->balance < $total) {
+                abort(422, 'Недостаточно средств на балансе.');
+            }
     
-                // списываем у покупателя и замораживаем
-                $user->decrement('balance', $total);
+            // списываем/морозим
+            $user->decrement('balance', $total);
     
-                $deal->update([
-                    'quantity'      => $qty,
-                    'total_price'   => $total,
-                    'status'        => 'paid',
-                    'escrow_amount' => $total,
-                ]);
+            $deal->update([
+                'quantity'      => $qty,
+                'total_price'   => $total,
+                'status'        => 'paid',
+                'escrow_amount' => $total,
+            ]);
     
-                // уменьшаем остаток оффера
-                $offer->decrement('quantity', $qty);
-                if ($offer->quantity - $qty <= 0) {
-                    $offer->is_active = false;
-                    $offer->save();
-                }
+            $offer->decrement('quantity', $qty);
+            if ($offer->quantity - $qty <= 0) {
+                $offer->is_active = false;
+                $offer->save();
+            }
+    
+            // --- Авто-сообщение от покупателя ---
+            // Создаём сообщение внутри транзакции,
+            // а событие на пуш — после коммита:
+            $msg = Message::create([
+                'deal_id'  => $deal->id,
+                'user_id'  => $user->id, // от лица покупателя
+                'content'  => "Оплата прошла ✅\nКоличество: {$qty}\nИтог к оплате: {$total} ₽.\nГотов к получению товара.",
+            ]);
+    
+            DB::afterCommit(function () use ($msg) {
+                // если у тебя событие принимает сам Message
+                NewMessageSent::dispatch($msg);
+                // или под твой формат:
+                // NewMessageSent::dispatch(
+                //     id: $msg->id,
+                //     content: $msg->content,
+                //     user: $msg->user,          // $msg->load('user') если нужно
+                //     created_at: $msg->created_at
+                // );
             });
+            // --- /Авто-сообщение ---
+        });
     
-            return response()->json(['ok' => true]);
-        } catch (\Throwable $e) {
-            // в лог можно кинуть $e->getMessage()
-            return response()->json(['message' => 'Серверная ошибка при оплате'], 500);
-        }
+        return response()->json(['ok' => true]);
     }
-    
 public function buy(Request $request)
 {
     $data = $request->validate([
