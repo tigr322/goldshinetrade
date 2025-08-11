@@ -62,6 +62,9 @@ Route::get('/auth/callback/{provider}', [SocialController::class, 'callback'])
           'verified',
         config('jetstream.auth_session'), 
     ])->group(function () {
+        // routes/web.php
+Route::post('/deals/{deal}/confirm', [TradeController::class, 'confirm'])->name('deals.confirm')->middleware('auth');
+
     // 🌍 Главная, торговля, маршруты SPA
     Route::get('/dashboard', [MainController::class, 'index'])->name('dashboard');
     Route::get('/offers', [TradeController::class, 'index'])->name('offers.index');
@@ -76,7 +79,7 @@ Route::get('/auth/callback/{provider}', [SocialController::class, 'callback'])
 
     // 📩 Сделки и сообщения
     Route::get('/deals/{deal}', [TradeController::class, 'show'])->name('deals.show');
-    Route::post('/deals/{deal}/confirm', [TradeController::class, 'confirm'])->name('deals.confirm');
+   
     Route::get('/deals/{deal}/messages', [MessageController::class, 'index'])->name('messages.index');
     Route::post('/deals/{deal}/messages', [MessageController::class, 'store'])->name('messages.store');
     Route::get('/mymessages', [MessageController::class, 'mymasseges'])->name('mymessages');

@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use App\Models\PaymentMethod;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+
+
 class TradeController extends Controller
 {
     use AuthorizesRequests;
@@ -76,77 +78,80 @@ class TradeController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'title' => 'required',
-            'description' => 'nullable',
-            'full_description' => 'nullable',
-            'category_id' => 'required|exists:categories,id',
-            'game_id' => 'nullable|exists:games,id',
-            'server_id' => 'nullable|exists:servers,id',
-            'price' => 'required|numeric|min:0.01',
-            'quantity' => 'required|integer|min:1',
+            'title'=>'required','description'=>'nullable','full_description'=>'nullable',
+            'category_id'=>'required|exists:categories,id',
+            'game_id'=>'nullable|exists:games,id',
+            'server_id'=>'nullable|exists:servers,id',
+            'price'=>'required|numeric|min:0.01',
+            'quantity'=>'required|integer|min:1',
         ]);
-        $buyerPercent = config('fees.buyer_percent');
-        $rawPrice   = (float) $data['price'];
-        $finalPrice = round($rawPrice * (1 + $buyerPercent / 100), 2);
+        
+        $buyerPercent = (float) config('fees.buyer_percent'); // из конфига
+        $basePrice    = (float) $data['price'];               // цена продавца
+        $finalPrice   = round($basePrice * (1 + $buyerPercent/100), 2); // что видит покупатель
+        
         Offer::create([
             'user_id' => auth()->id(),
-            'category_id' => $request->category_id,
-            'game_id' => $request->game_id,
-            'server_id' => $request->server_id,
-            'title' => $request->title,
-            'description' => $request->description,
-            'price' =>  $finalPrice,
-            'quantity' => $request->quantity,
+            'category_id' => $data['category_id'],
+            'game_id' => $data['game_id'],
+            'server_id' => $data['server_id'],
+            'title' => $data['title'],
+            'description' => $data['description'],
+            'full_description' => $data['full_description'],
+            'base_price' => $basePrice, // сохраняем базовую
+            'price' => $finalPrice,     // итог для покупателя
+            'quantity' => $data['quantity'],
             'is_active' => true,
-            'fee_model' => config('fees.model'),       // по умолчанию покупатель платит
-            'fee_buyer_percent' => config('fees.buyer_percent'),       // процент комиссии для покупателя
-            'fee_seller_percent' => config('fees.seller_percent'),        // продавец не платит
         ]);
+        
 
         return redirect()->route('offers.index')->with('success', 'Оффер создан.');
     }
 
-    public function buy(Request $request)
-    {
+    
+public function buy(Request $request)
+{
     $data = $request->validate([
-        'offer_id' => 'required|exists:offers,id',
-        'quantity' => 'required|integer|min:1',
-        'payment_method_id' => 'required|exists:payment_methods,id',
+        'offer_id' => ['required','exists:offers,id'],
     ]);
 
-    $user = Auth::user();
-    $offer = Offer::findOrFail($data['offer_id']);
+    $user  = Auth::user();
+    $offer = \App\Models\Offer::findOrFail($data['offer_id']);
 
-    if ($data['quantity'] > $offer->quantity) {
-        return back()->withErrors(['quantity' => 'Недостаточное количество в наличии.']);
+    // нельзя купить свой оффер
+    if ($offer->user_id === $user->id) {
+        return $request->wantsJson()
+            ? response()->json(['message' => 'Нельзя купить свой оффер'], 422)
+            : back()->withErrors(['offer' => 'Нельзя купить свой оффер']);
     }
 
-    $totalPrice = $offer->price * $data['quantity'];
-
-    if ($user->balance < $totalPrice) {
-        return back()->withErrors(['quantity' => 'Недостаточно средств для покупки! Пополните счет.']);
+    // оффер должен быть активен и иметь остаток
+    if (!$offer->is_active || (int) $offer->quantity <= 0) {
+        return $request->wantsJson()
+            ? response()->json(['message' => 'Оффер недоступен'], 422)
+            : back()->withErrors(['offer' => 'Оффер недоступен']);
     }
 
-    $user->balance -= $totalPrice;
-    $user->save();
-
+    // создаём заготовку сделки (дальше количество/оплата на странице сделки)
     $deal = Deal::create([
-        'buyer_id' => $user->id,
-        'offer_id' => $offer->id,
-        'quantity' => $data['quantity'],
-        'payment_method_id' => $data['payment_method_id'],
-        'total_price' => $totalPrice,
-        'status' => 'pending',
+        'buyer_id'    => $user->id,
+        'offer_id'    => $offer->id,
+        'quantity'    => 1,
+        'total_price' => $offer->buyer_final_price ?? $offer->price,
+        'status'      => 'pending',
+        'payment_method_id' => null, // <- важно
     ]);
 
-    $offer->quantity -= $data['quantity'];
-    if ($offer->quantity <= 0) {
-        $offer->is_active = false;
+    // XHR → JSON с redirect; обычный запрос → обычный redirect
+    if ($request->wantsJson()) {
+        return response()->json([
+            'deal_id'  => $deal->id,
+            'redirect' => route('deals.show', $deal->id),
+        ]);
     }
-    $offer->save();
 
-    return Inertia::location(route('deals.show', $deal->id));
-    }
+    return redirect()->route('deals.show', $deal->id);
+}
         public function show(Deal $deal)
 {
     $this->authorize('view', $deal); // Покупатель или продавец
@@ -155,22 +160,37 @@ class TradeController extends Controller
     ]);
 }
 
-public function confirm(Request $request, Deal $deal)
+public function confirm(Deal $deal)
 {
-    $this->authorize('update', $deal);
-    
-    if ($deal->status !== 'paid') {
-        return back()->withErrors(['status' => 'Сделка должна быть оплачена.']);
-    }
+    $user = Auth::user();
+    abort_unless($deal->buyer_id === $user->id, 403);
+    abort_unless($deal->status === 'paid' && $deal->escrow_amount > 0, 422);
 
-    $deal->update([
-        'status' => 'completed',
-    ]);
+    DB::transaction(function () use ($deal) {
+        $offer  = $deal->offer()->lockForUpdate()->first();
+        $seller = $offer->user()->lockForUpdate()->first();
 
-    $seller = $deal->offer->user;
-    $seller->balance += $deal->total_price;
-    $seller->save();
+        // сколько выплатить продавцу: базовая цена * qty
+        // если base_price отсутствует (старые офферы) — вычислим из текущего price и процента
+        $buyerPercent = (float) config('fees.buyer_percent');
+        $baseUnit = $offer->base_price
+            ?? round($offer->price / (1 + $buyerPercent/100), 2);
 
-    return redirect()->route('dashboard')->with('success', 'Сделка подтверждена, средства переведены продавцу.');
+        $payout = round($baseUnit * $deal->quantity, 2);
+
+        // переводим продавцу
+        $seller->increment('balance', $payout);
+
+        // обновляем сделку
+        $deal->update([
+            'confirmed_at' => now(),
+            'released_at'  => now(),
+            'status'       => 'released',
+            'escrow_amount'=> 0,
+        ]);
+    });
+
+    return back()->with('status', 'Получение подтверждено, средства выплачены продавцу.');
 }
+
 }

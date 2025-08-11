@@ -129,10 +129,13 @@ onMounted(async () => {
     <p>Статус: {{ deal.status }}</p>
 
     <div v-if="deal.status === 'paid'">
-      <button class="bg-cyan-600 text-white px-4 py-2 rounded hover:bg-cyan-700">
-        Подтвердить получение
-      </button>
-    </div>
+  <button
+    @click="axios.post(route('deals.confirm', deal.id)).then(()=>location.reload())"
+    class="bg-cyan-600 text-white px-4 py-2 rounded hover:bg-cyan-700">
+    Подтвердить получение
+  </button>
+</div>
+
 
     <div class="mt-6">
       <h2 class="font-semibold text-lg mb-2">Чат с продавцом</h2>

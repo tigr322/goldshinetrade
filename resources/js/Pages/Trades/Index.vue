@@ -3,6 +3,7 @@ import { ref, computed, watch } from 'vue'
 import { useForm, router } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import { usePage } from '@inertiajs/vue3'
+import axios from 'axios'
 
 const flash = computed(() => {
   const props = usePage().props
@@ -96,12 +97,21 @@ const filteredOffers = computed(() => {
   })
 })
 
-const buy = (offer) => {
-  selectedOffer.value = offer
-  form.offer_id = offer.id
-  form.quantity = 1
+const startDeal = async (offer) => {
+  try {
+    const { data } = await axios.post(route('deals.buy'), { offer_id: offer.id })
+    if (data?.redirect) {
+      window.location = data.redirect
+    } else if (data?.deal_id) {
+      router.visit(route('deals.show', data.deal_id))
+    } else {
+      // fallback на случай обычного redirect() с сервера
+      router.visit(route('deals.show', offer.id))
+    }
+  } catch (e) {
+    alert(e?.response?.data?.message || 'Не удалось создать сделку')
+  }
 }
-
 const submitFilter = () => {
   router.get('/offers', filters.value, {
     preserveState: true,
@@ -337,14 +347,15 @@ const buyerPriceForOffer = (offer) => {
       </a>
    </td>
           <td class="px-4 py-3 text-sm">
-  <button
-    v-if="offer.user.id !== user.id"
-    @click="buy(offer)"
-    class="bg-cyan-600 text-white px-3 py-1 rounded text-sm hover:bg-cyan-700 transition"
-  >
-    Купить
-  </button>
-  <span v-else class="text-gray-400 text-xs">Ваш оффер</span>
+            <button
+  v-if="offer.user.id !== user.id"
+  @click="startDeal(offer)"
+  class="bg-cyan-600 text-white px-3 py-1 rounded text-sm hover:bg-cyan-700 transition"
+>
+  Купить
+</button>
+<span v-else class="text-gray-400 text-xs">Ваш оффер</span>
+
 </td>
         </tr>
       </tbody>
@@ -353,65 +364,6 @@ const buyerPriceForOffer = (offer) => {
     </div>
   </div>
 </div>
-<!-- Форма покупки -->
-<div v-if="selectedOffer" class="mt-6 max-w-xl mx-auto bg-white border border-gray-200 rounded-xl shadow p-6 space-y-4">
-  <div class="flex justify-between items-start">
-    <div>
-      <h2 class="text-lg font-semibold text-gray-900">Покупка оффера</h2>
-      <p class="text-sm text-gray-600 mt-1">Вы выбрали: <span class="font-medium text-gray-800">{{ selectedOffer.title }}</span></p>
-    </div>
-    <button @click="selectedOffer = null" class="text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
-  </div>
 
-  <form @submit.prevent="form.post('/deals', {
-  onSuccess: (page) => {
-    const dealId = page.props?.deal?.id // предполагается, что контроллер возвращает ID сделки
-    if (dealId) {
-      selectedOffer.value = null
-      router.visit(`/deals/${dealId}`)
-    }
-  },
-})" class="space-y-4">
-    <div>
-      <label class="block text-sm font-medium text-gray-700">Количество</label>
-      <input
-        type="number"
-        v-model="form.quantity"
-        class="mt-1 w-full rounded-md border border-gray-300 shadow-sm focus:ring-cyan-600 focus:border-cyan-600"
-        min="1"
-        :max="selectedOffer.quantity"
-      />
-      <div v-if="form.errors.quantity" class="text-sm text-red-600 mt-1">{{ form.errors.quantity }}</div>
-    </div>
-    <div>
-  <label class="block text-sm font-medium text-gray-700">Способ оплаты</label>
-  <select
-    v-model="form.payment_method_id"
-    class="mt-1 w-full rounded-md border border-gray-300 shadow-sm focus:ring-cyan-600 focus:border-cyan-600"
-  >
-    <option value="">Выберите способ</option>
-    <option v-for="method in paymentMethods" :key="method.id" :value="method.id">
-      {{ method.name }}
-    </option>
-  </select>
-  <div v-if="form.errors.payment_method_id" class="text-sm text-red-600 mt-1">{{ form.errors.payment_method_id }}</div>
-</div>
-    <div class="flex justify-end space-x-2 pt-2">
-      <button
-        type="button"
-        @click="selectedOffer = null"
-        class="text-sm text-gray-600 hover:underline"
-      >
-        Отмена
-      </button>
-      <button
-        type="submit"
-        class="bg-cyan-600 text-white px-4 py-2 rounded-md text-sm hover:bg-cyan-700 transition"
-      >
-        Подтвердить покупку
-      </button>
-    </div>
-  </form>
-</div>
   
   </template>
