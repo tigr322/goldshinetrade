@@ -64,6 +64,7 @@ Route::get('/auth/callback/{provider}', [SocialController::class, 'callback'])
     ])->group(function () {
         // routes/web.php
 Route::post('/deals/{deal}/confirm', [TradeController::class, 'confirm'])->name('deals.confirm')->middleware('auth');
+Route::post('/deals/{deal}/pay', [TradeController::class, 'pay'])->name('deals.pay');
 
     // 🌍 Главная, торговля, маршруты SPA
     Route::get('/dashboard', [MainController::class, 'index'])->name('dashboard');

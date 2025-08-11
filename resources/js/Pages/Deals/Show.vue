@@ -1,6 +1,6 @@
 <script setup>
-import { ref, onMounted, nextTick } from 'vue'
-import { usePage } from '@inertiajs/vue3'
+import { ref, onMounted, nextTick, computed  } from 'vue'
+import {Head, usePage } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import Echo from '@/echo'
 import axios from 'axios'
@@ -123,7 +123,38 @@ const statusBadgeClass = (s) => {
     default:         return 'bg-gray-100 text-gray-600 ring-gray-200'
   }
 }
+const isBuyer = computed(() => user?.id === props.deal?.buyer_id)
 
+// ввод количества (по умолчанию 1 или уже выбранное)
+const payQty = ref(props.deal?.quantity || 1)
+
+// максимально можно купить не больше остатка оффера
+const maxQty = computed(() => Number(props.deal?.offer?.quantity ?? 1))
+
+// цена за единицу для покупателя (в оффере уже с процентом)
+const unitPrice = computed(() => Number(props.deal?.offer?.price ?? 0))
+
+// итог к оплате
+const payTotal = computed(() => (Math.max(1, Math.min(payQty.value, maxQty.value)) * unitPrice.value).toFixed(2))
+
+// можно ли показывать форму оплаты (юзер = покупатель и сделка ещё не оплачена)
+const canPay = computed(() => isBuyer.value && props.deal?.status === 'pending')
+
+const paying = ref(false)
+const pay = async () => {
+  if (paying.value) return
+  // страховка по диапазону
+  const qty = Math.max(1, Math.min(Number(payQty.value || 1), maxQty.value))
+  paying.value = true
+  try {
+    await axios.post(route('deals.pay', props.deal.id), { quantity: qty })
+    location.reload() // после успешной оплаты покажется блок подтверждения
+  } catch (e) {
+    alert(e?.response?.data?.message || 'Не удалось выполнить оплату')
+  } finally {
+    paying.value = false
+  }
+}
 </script>
 <template>
   <Head title="Сделка" />
@@ -311,6 +342,56 @@ const statusBadgeClass = (s) => {
           </form>
         </div>
       </div>
+      <!-- Оплата (эскроу) -->
+<div v-if="canPay" class="rounded-2xl bg-white/80 backdrop-blur border border-gray-100 p-6 shadow-sm">
+  <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+    <div class="space-y-2">
+      <div class="text-sm text-gray-500">Покупка</div>
+
+      <div class="flex items-center gap-3">
+        <label for="qty" class="text-sm font-medium text-gray-700">Количество</label>
+        <input
+          id="qty"
+          v-model.number="payQty"
+          type="number"
+          min="1"
+          :max="maxQty"
+          class="w-28 rounded-xl border border-gray-300 px-3 py-2 text-sm focus:border-cyan-600 focus:ring-cyan-600"
+        />
+        <span class="text-xs text-gray-500">Доступно: {{ maxQty }}</span>
+      </div>
+
+      <div class="text-sm text-gray-600">
+        Цена за единицу: <span class="font-semibold text-gray-900">{{ unitPrice.toLocaleString() }} ₽</span>
+      </div>
+      <div class="text-sm text-gray-600">
+        Итог к оплате: <span class="text-lg font-bold text-gray-900">{{ Number(payTotal).toLocaleString() }} ₽</span>
+      </div>
+
+      <p class="text-xs text-gray-500">
+        Средства будут <span class="font-medium text-gray-700">заморожены</span> до подтверждения получения.
+        После подтверждения деньги автоматически перечислятся продавцу.
+      </p>
+    </div>
+
+    <div class="shrink-0">
+      <button
+        @click="pay"
+        :disabled="paying"
+        class="inline-flex items-center gap-2 rounded-xl bg-cyan-700 px-5 py-2.5 text-sm font-semibold text-white
+               hover:bg-cyan-600 shadow-sm focus-visible:outline focus-visible:outline-2
+               focus-visible:outline-offset-2 focus-visible:outline-cyan-600 disabled:opacity-50"
+      >
+        <svg v-if="paying" class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" fill="currentColor"/>
+        </svg>
+        Купить
+      </button>
+    </div>
+  </div>
+</div>
+
     </div>
   </div>
 </template>

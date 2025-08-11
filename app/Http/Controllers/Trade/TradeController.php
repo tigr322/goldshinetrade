@@ -107,7 +107,47 @@ class TradeController extends Controller
 
         return redirect()->route('offers.index')->with('success', 'Оффер создан.');
     }
-
+    public function pay(Request $request, Deal $deal)
+    {
+        $data = $request->validate([
+            'quantity' => ['required','integer','min:1'],
+        ]);
+    
+        $user = auth()->user();
+        abort_if($deal->buyer_id !== $user->id, 403);
+        abort_if($deal->status !== 'pending', 422, 'Сделка уже оплачена или завершена');
+    
+        $offer = $deal->offer()->lockForUpdate()->first();
+        $qty   = min($data['quantity'], $offer->quantity); // не больше остатка
+        if ($qty < 1) {
+            return response()->json(['message' => 'Недостаточно товара в наличии'], 422);
+        }
+    
+        $unitPrice = (float) $offer->price; // уже с процентом
+        $total = round($unitPrice * $qty, 2);
+    
+        if ($user->balance < $total) {
+            return response()->json(['message' => 'Недостаточно средств на балансе'], 422);
+        }
+    
+        DB::transaction(function () use ($user, $deal, $offer, $qty, $total) {
+            $user->decrement('balance', $total);
+    
+            $deal->update([
+                'quantity'      => $qty,
+                'total_price'   => $total,
+                'status'        => 'paid',
+                'escrow_amount' => $total,
+            ]);
+    
+            $offer->decrement('quantity', $qty);
+            if ($offer->quantity <= 0) {
+                $offer->update(['is_active' => false]);
+            }
+        });
+    
+        return response()->json(['ok' => true]);
+    }
     
 public function buy(Request $request)
 {
