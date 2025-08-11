@@ -203,26 +203,31 @@ public function buy(Request $request)
 
 public function confirm(Deal $deal)
 {
-    $user = Auth::user();
-    abort_unless($deal->buyer_id === $user->id, 403);
-    abort_unless($deal->status === 'paid' && $deal->escrow_amount > 0, 422);
+    $user = auth()->user();
+
+    if ($deal->buyer_id !== $user->id) {
+        return response()->json(['message' => 'Подтверждать может только покупатель.'], 422);
+    }
+
+    if ($deal->status !== 'paid') {
+        return response()->json(['message' => 'Сделка ещё не оплачена. Сначала оплатите.'], 422);
+    }
+
+    if ((float) $deal->escrow_amount <= 0) {
+        return response()->json(['message' => 'Нет замороженных средств для выплаты.'], 422);
+    }
 
     DB::transaction(function () use ($deal) {
         $offer  = $deal->offer()->lockForUpdate()->first();
         $seller = $offer->user()->lockForUpdate()->first();
 
-        // сколько выплатить продавцу: базовая цена * qty
-        // если base_price отсутствует (старые офферы) — вычислим из текущего price и процента
         $buyerPercent = (float) config('fees.buyer_percent');
-        $baseUnit = $offer->base_price
-            ?? round($offer->price / (1 + $buyerPercent/100), 2);
+        $baseUnit = $offer->base_price ?: round($offer->price / (1 + $buyerPercent/100), 2);
 
         $payout = round($baseUnit * $deal->quantity, 2);
 
-        // переводим продавцу
         $seller->increment('balance', $payout);
 
-        // обновляем сделку
         $deal->update([
             'confirmed_at' => now(),
             'released_at'  => now(),
@@ -231,7 +236,7 @@ public function confirm(Deal $deal)
         ]);
     });
 
-    return back()->with('status', 'Получение подтверждено, средства выплачены продавцу.');
+    return response()->json(['ok' => true]);
 }
 
 }
