@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use App\Models\PaymentMethod;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\DB; 
 
 
 class TradeController extends Controller
