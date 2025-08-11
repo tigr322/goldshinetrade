@@ -11,8 +11,17 @@ class Deal extends Model
     use HasFactory;
 
     protected $fillable = [
-        'offer_id', 'buyer_id', 'payment_method_id',
-        'quantity', 'total_price', 'status', 'funds_frozen'
+        'offer_id', 'buyer_id',
+        'quantity', 'total_price',
+        'status', 'escrow_amount',   // <-- используем escrow_amount
+        'confirmed_at', 'released_at', 'canceled_at',
+    ];
+
+    protected $casts = [
+        'escrow_amount' => 'decimal:2',
+        'confirmed_at'  => 'datetime',
+        'released_at'   => 'datetime',
+        'canceled_at'   => 'datetime',
     ];
 
     public function offer(): BelongsTo

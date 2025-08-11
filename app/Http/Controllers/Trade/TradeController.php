@@ -108,27 +108,29 @@ class TradeController extends Controller
 
         return redirect()->route('offers.index')->with('success', 'Оффер создан.');
     }
-    public function pay(Request $request, Deal $deal)
+    public function pay(Request $request, \App\Models\Deal $deal)
     {
-        $data = $request->validate([
-            'quantity' => ['required','integer','min:1'],
-        ]);
+        $data = $request->validate(['quantity' => ['required','integer','min:1']]);
     
         $user = auth()->user();
-        abort_if($deal->buyer_id !== $user->id, 403);
-        abort_if($deal->status !== 'pending', 422, 'Сделка уже оплачена или завершена');
-    
-        $offer = $deal->offer()->lockForUpdate()->first();
-        $qty   = min($data['quantity'], $offer->quantity); // не больше остатка
-        if ($qty < 1) {
-            return response()->json(['message' => 'Недостаточно товара в наличии'], 422);
+        if ($deal->buyer_id !== $user->id) {
+            return response()->json(['message' => 'Оплатить может только покупатель.'], 422);
+        }
+        if ($deal->status !== 'pending') {
+            return response()->json(['message' => 'Сделка уже оплачена или завершена.'], 422);
         }
     
-        $unitPrice = (float) $offer->price; // уже с процентом
+        $offer = $deal->offer()->lockForUpdate()->first();
+        $qty   = min($data['quantity'], $offer->quantity);
+        if ($qty < 1) {
+            return response()->json(['message' => 'Недостаточно товара в наличии.'], 422);
+        }
+    
+        $unitPrice = (float) $offer->price; // уже с +% для покупателя
         $total = round($unitPrice * $qty, 2);
     
         if ($user->balance < $total) {
-            return response()->json(['message' => 'Недостаточно средств на балансе'], 422);
+            return response()->json(['message' => 'Недостаточно средств на балансе.'], 422);
         }
     
         DB::transaction(function () use ($user, $deal, $offer, $qty, $total) {
@@ -201,18 +203,19 @@ public function buy(Request $request)
     ]);
 }
 
-public function confirm(Deal $deal)
+public function confirm(\App\Models\Deal $deal)
 {
     $user = auth()->user();
 
+    // 1) только покупатель
     if ($deal->buyer_id !== $user->id) {
         return response()->json(['message' => 'Подтверждать может только покупатель.'], 422);
     }
 
+    // 2) сделка должна быть оплачена и с заморозкой
     if ($deal->status !== 'paid') {
         return response()->json(['message' => 'Сделка ещё не оплачена. Сначала оплатите.'], 422);
     }
-
     if ((float) $deal->escrow_amount <= 0) {
         return response()->json(['message' => 'Нет замороженных средств для выплаты.'], 422);
     }
@@ -221,18 +224,20 @@ public function confirm(Deal $deal)
         $offer  = $deal->offer()->lockForUpdate()->first();
         $seller = $offer->user()->lockForUpdate()->first();
 
-        $buyerPercent = (float) config('fees.buyer_percent');
+        // базовая цена продавца
+        $buyerPercent = (float) config('fees.buyer_percent', 3.5);
         $baseUnit = $offer->base_price ?: round($offer->price / (1 + $buyerPercent/100), 2);
 
         $payout = round($baseUnit * $deal->quantity, 2);
 
+        // Выплата продавцу
         $seller->increment('balance', $payout);
 
         $deal->update([
-            'confirmed_at' => now(),
-            'released_at'  => now(),
-            'status'       => 'released',
-            'escrow_amount'=> 0,
+            'confirmed_at'  => now(),
+            'released_at'   => now(),
+            'status'        => 'released',
+            'escrow_amount' => 0,
         ]);
     });
 
