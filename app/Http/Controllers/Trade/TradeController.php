@@ -69,12 +69,13 @@ class TradeController extends Controller
             'games' => Game::select('id', 'name', 'category_id', 'game_type_id')->get(),
            'servers' => Server::select('id', 'name', 'game_id')->get(),
            'paymentMethods' => PaymentMethod::select('id', 'name')->get(), 
+           'fees' => config('fees'),
         ]);
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $data = $request->validate([
             'title' => 'required',
             'description' => 'nullable',
             'full_description' => 'nullable',
@@ -84,18 +85,22 @@ class TradeController extends Controller
             'price' => 'required|numeric|min:0.01',
             'quantity' => 'required|integer|min:1',
         ]);
-
+        $buyerPercent = config('fees.buyer_percent');
+        $rawPrice   = (float) $data['price'];
+        $finalPrice = round($rawPrice * (1 + $buyerPercent / 100), 2);
         Offer::create([
-            'user_id' => Auth::id(),
+            'user_id' => auth()->id(),
             'category_id' => $request->category_id,
             'game_id' => $request->game_id,
             'server_id' => $request->server_id,
             'title' => $request->title,
             'description' => $request->description,
-            'full_description'=> $request->full_description,
-            'price' => $request->price,
+            'price' =>  $finalPrice,
             'quantity' => $request->quantity,
             'is_active' => true,
+            'fee_model' => config('fees.model'),       // по умолчанию покупатель платит
+            'fee_buyer_percent' => config('fees.buyer_percent'),       // процент комиссии для покупателя
+            'fee_seller_percent' => config('fees.seller_percent'),        // продавец не платит
         ]);
 
         return redirect()->route('offers.index')->with('success', 'Оффер создан.');

@@ -3,12 +3,16 @@ import { ref, computed, watch } from 'vue'
 import { useForm, router } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import { usePage } from '@inertiajs/vue3'
+
 const flash = computed(() => {
   const props = usePage().props
   return props && props.flash ? props.flash : {}
 })
+
 defineOptions({ layout: (h, page) => h(AppLayout, null, () => page) })
+
 const user = usePage().props.auth.user
+
 const props = defineProps({
   offers: Array,
   categories: Array,
@@ -17,8 +21,7 @@ const props = defineProps({
   servers: Array,
   filters: Object,
   paymentMethods: Array,
-  filters: Object,
-
+  fees: Object,
 })
 
 const showCreateModal = ref(false)
@@ -32,6 +35,7 @@ const filters = ref({
 })
 
 const selectedOffer = ref(null)
+
 const form = useForm({
   offer_id: '',
   quantity: 1000,
@@ -50,25 +54,27 @@ const createForm = useForm({
   quantity: '',
 })
 
-// При смене категории сбрасываем привязанные игровые поля
+// === добавлено: расчёт «продавец получит» ===
+
+// ===========================================
+
 watch(() => createForm.category_id, () => {
   createForm.game_id = ''
   createForm.server_id = ''
   createForm.game_type_id = ''
 })
+
 const uniqueGames = computed(() => {
   const set = new Set()
   props.offers.forEach(o => o.game_name && set.add(o.game_name))
   return [...set]
 })
 
-// Игры по выбранной категории
 const availableGames = computed(() => {
   if (!createForm.category_id) return []
   return props.games.filter(g => g.category_id == createForm.category_id)
 })
 
-// Автозаполнение типа игры + фильтрация серверов
 watch(() => createForm.game_id, (gameId) => {
   if (!gameId) {
     availableServers.value = []
@@ -76,10 +82,8 @@ watch(() => createForm.game_id, (gameId) => {
     createForm.game_type_id = ''
     return
   }
-
   const selectedGame = props.games.find(g => g.id === gameId)
   createForm.game_type_id = selectedGame?.game_type_id || ''
-
   availableServers.value = props.servers.filter(s => s.game_id === gameId)
 })
 
@@ -91,10 +95,6 @@ const filteredOffers = computed(() => {
     return matchCategory && matchGame && matchSearch
   })
 })
-
-
-
-
 
 const buy = (offer) => {
   selectedOffer.value = offer
@@ -108,8 +108,50 @@ const submitFilter = () => {
     preserveScroll: true,
   })
 }
+const feeModel = computed(() => props.fees?.model ?? 'buyer_pays')
+
+const buyerPercent = computed(() => {
+  if (feeModel.value === 'split') return props.fees?.split?.buyer_percent ?? 0
+  if (feeModel.value === 'buyer_pays') return props.fees?.buyer_percent ?? 0
+  return 0 // seller_pays — покупатель платит ровно price
+})
+
+const sellerPercent = computed(() => {
+  if (feeModel.value === 'split') return props.fees?.split?.seller_percent ?? 0
+  if (feeModel.value === 'seller_pays') return props.fees?.seller_percent ?? 0
+  return 0 // buyer_pays — продавцу без удержаний
+})
+
+// «продавец получит»
+const sellerReceive = computed(() => {
+  const price = Number(createForm.price) || 0
+  const pct = Number(sellerPercent.value) || 0
+  return (price * (1 - pct / 100)).toFixed(2)
+})
+
+// «покупатель заплатит»
+const buyerPriceCreate = computed(() => {
+  const price = Number(createForm.price) || 0
+  const pct = Number(buyerPercent.value) || 0
+  return (price * (1 + pct / 100)).toFixed(2)
+})
+
+const buyerPriceForOffer = (offer) => {
+  const model = offer.fee_model ?? props.fees?.model ?? 'buyer_pays'
+
+  // процент для покупателя
+  const pct = model === 'split'
+    ? (offer.fee_buyer_percent ?? props.fees?.split?.buyer_percent ?? 0)
+    : (model === 'buyer_pays'
+        ? (offer.fee_buyer_percent ?? props.fees?.buyer_percent ?? 0)
+        : 0) // seller_pays
+
+  const price = Number(offer.price_per_unit ?? offer.price ?? 0)
+  return (price * (1 + pct / 100)).toFixed(2)
+}
 
 </script>
+
 <template>
      <Head title="Офферы" />
         
@@ -179,17 +221,33 @@ const submitFilter = () => {
               </select>
             </div>
   
-            <!-- Цена и количество -->
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700">Цена</label>
-                <input v-model="createForm.price" type="number" step="0.01" class="w-full border rounded-md shadow-sm" />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700">Количество</label>
-                <input v-model="createForm.quantity" type="number" class="w-full border rounded-md shadow-sm" />
-              </div>
+          <!-- Цена и количество -->
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Цена</label>
+              <input v-model.number="createForm.price" type="number" step="0.01" class="w-full border rounded-md shadow-sm" />
+
+              <!-- Мини-текст под ценой -->
+              <p class="text-xs text-gray-500 mt-1">
+                Продавец получит: <span class="font-semibold text-gray-900">{{ sellerReceive }} ₽</span>
+              </p>
+              <p class="text-xs text-gray-500 mt-1">
+                Покупатель заплатит:
+                <span class="font-semibold text-gray-900">{{ buyerPriceCreate }} ₽</span>
+                <span v-if="buyerPercent"
+                      class="ml-1 inline-block rounded bg-cyan-50 px-1.5 py-0.5 text-[11px] text-cyan-700">
+                  +{{ buyerPercent }}%
+                </span>
+              </p>
+
+
             </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Количество</label>
+              <input v-model.number="createForm.quantity" type="number" class="w-full border rounded-md shadow-sm" />
+            </div>
+          </div>
+
   
             <!-- Кнопки -->
             <div class="flex justify-end pt-2">
@@ -262,7 +320,7 @@ const submitFilter = () => {
           <td class="px-4 py-3 text-sm text-gray-700">{{ offer.description }}</td>
           <td class="px-4 py-3 text-sm text-gray-900">{{ offer.game_name ?? '—' }}</td>
           <td class="px-4 py-3 text-sm text-gray-900">{{ offer.server_name ?? '—' }}</td>
-          <td class="px-4 py-3 text-sm text-gray-900">{{ offer.price_per_unit }} ₽</td>
+          <td class="px-4 py-3 text-sm text-gray-900">{{ (offer.price_per_unit ?? offer.price).toFixed ? (offer.price_per_unit ?? offer.price).toFixed(2) : (offer.price_per_unit ?? offer.price) }} ₽</td>
           <td class="px-4 py-3 text-sm text-gray-900">{{ offer.quantity }}</td>
           <td class="px-4 py-3 text-sm text-gray-900"> 
       <a
