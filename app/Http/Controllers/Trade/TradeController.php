@@ -242,7 +242,7 @@ public function confirm(\App\Models\Deal $deal)
             $deal->update([
                 'confirmed_at'  => now(),
                 'released_at'   => now(),
-                'status'        => 'released',
+                'status'        => 'completed',
                 'escrow_amount' => 0,
             ]);
         });
