@@ -53,7 +53,10 @@ class SocialController extends Controller
         event(new Registered($user));
       
         Auth::login($user);
-        $user->sendEmailVerificationNotification();
+        if (!$user->hasVerifiedEmail()) {
+            $user->sendEmailVerificationNotification();
+            event(new Registered($user));
+        }
 
         return redirect()->intended(route('dashboard'));
     }
