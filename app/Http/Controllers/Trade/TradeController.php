@@ -230,7 +230,8 @@ public function buy(Request $request)
 public function confirm(\App\Models\Deal $deal)
 {
     $user = auth()->user();
-
+    $buyerPercent = (float) config('fees.buyer_percent'); // из конфига
+    $finalPrice  = round((1 + $buyerPercent/100), 2); // что видит покупатель
     if ($deal->buyer_id !== $user->id) {
         return response()->json(['message' => 'Подтверждать может только покупатель.'], 422);
     }
@@ -243,11 +244,15 @@ public function confirm(\App\Models\Deal $deal)
 
     try {
         DB::transaction(function () use ($deal) {
+
             $offer  = $deal->offer()->lockForUpdate()->firstOrFail();
             $seller = $offer->user()->lockForUpdate()->firstOrFail();
 
             // Простой вариант: выплачиваем ВСЮ сумму из эскроу
-            $payout = (float) $deal->total_price;
+            $payout = (float) ($deal->total_price)/$finalPrice; // цена для продавца (без %)
+            if ($payout <= 0) {
+                abort(422, 'Неверная сумма для выплаты.');
+            }
 
             $seller->increment('balance', $payout);
 

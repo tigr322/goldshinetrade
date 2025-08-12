@@ -56,6 +56,7 @@ class SocialController extends Controller
         if (!$user->hasVerifiedEmail()) {
             $user->sendEmailVerificationNotification();
             event(new Registered($user));
+            
         }
 
         return redirect()->intended(route('dashboard'));
