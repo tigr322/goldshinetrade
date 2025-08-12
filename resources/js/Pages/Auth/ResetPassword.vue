@@ -28,7 +28,7 @@ const submit = () => {
 </script>
 
 <template>
-    <Head title="Reset Password" />
+    <Head title="Новый пароль" />
     <div class="relative isolate min-h-screen bg-white flex items-center justify-center">
     <!-- Градиентный фон -->
     <div

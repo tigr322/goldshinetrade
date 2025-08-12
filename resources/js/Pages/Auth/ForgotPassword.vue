@@ -20,7 +20,7 @@ const submit = () => {
 </script>
 
 <template>
-  <Head title="Forgot Password" />
+  <Head title="Забыли пароль" />
 
   <div class="relative isolate min-h-screen bg-white flex items-center justify-center">
     <!-- Градиентный фон -->

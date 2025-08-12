@@ -30,7 +30,7 @@ const submit = () => {
                 Регистрация нового аккаунта GoldShineTrade
             </h2>
         </div>
-        <Head title="Register" />
+        <Head title="Регистрация" />
 
         <form @submit.prevent="submit">
             <div>

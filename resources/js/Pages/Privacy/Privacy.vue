@@ -3,6 +3,8 @@ import { Head, Link } from '@inertiajs/vue3'
 </script>
 
 <template>
+      <Head title="Политика конфиденциальности" />
+
   <div class="max-w-5xl mx-auto py-12 space-y-8">
     <h1 class="text-2xl font-bold text-gray-900 mb-6">Политика конфиденциальности</h1>
 
