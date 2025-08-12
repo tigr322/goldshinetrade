@@ -204,7 +204,7 @@ public function buy(Request $request)
         'buyer_id'    => $user->id,
         'offer_id'    => $offer->id,
         'quantity'    => 1,
-        'total_price' => $offer->price,
+        'total_price' => $offer->base_price,
         'status'      => 'pending',
         'payment_method_id' => null, // <- важно
     ]);
@@ -247,7 +247,7 @@ public function confirm(\App\Models\Deal $deal)
             $seller = $offer->user()->lockForUpdate()->firstOrFail();
 
             // Простой вариант: выплачиваем ВСЮ сумму из эскроу
-            $payout = (float) $deal->escrow_amount;
+            $payout = (float) $deal->total_price;
 
             $seller->increment('balance', $payout);
 

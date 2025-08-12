@@ -19,6 +19,7 @@ class Offer extends Model
         'title',
         'description',
         'full_description',
+        'base_price',
         'price',
         'quantity',
         'is_active',
