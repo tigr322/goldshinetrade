@@ -176,49 +176,49 @@ class TradeController extends Controller
     
         return response()->json(['ok' => true]);
     }
-public function buy(Request $request)
-{
-    $data = $request->validate([
-        'offer_id' => ['required','exists:offers,id'],
-    ]);
-
-    $user  = Auth::user();
-    $offer = \App\Models\Offer::findOrFail($data['offer_id']);
-
-    // нельзя купить свой оффер
-    if ($offer->user_id === $user->id) {
-        return $request->wantsJson()
-            ? response()->json(['message' => 'Нельзя купить свой оффер'], 422)
-            : back()->withErrors(['offer' => 'Нельзя купить свой оффер']);
-    }
-
-    // оффер должен быть активен и иметь остаток
-    if (!$offer->is_active || (int) $offer->quantity <= 0) {
-        return $request->wantsJson()
-            ? response()->json(['message' => 'Оффер недоступен'], 422)
-            : back()->withErrors(['offer' => 'Оффер недоступен']);
-    }
-
-    // создаём заготовку сделки (дальше количество/оплата на странице сделки)
-    $deal = Deal::create([
-        'buyer_id'    => $user->id,
-        'offer_id'    => $offer->id,
-        'quantity'    => 1,
-        'total_price' => $offer->base_price,
-        'status'      => 'pending',
-        'payment_method_id' => null, // <- важно
-    ]);
-
-    // XHR → JSON с redirect; обычный запрос → обычный redirect
-    if ($request->wantsJson()) {
-        return response()->json([
-            'deal_id'  => $deal->id,
-            'redirect' => route('deals.show', $deal->id),
+    public function buy(Request $request)
+    {
+        $data = $request->validate([
+            'offer_id' => ['required','exists:offers,id'],
         ]);
+    
+        $user  = Auth::user();
+        $offer = Offer::findOrFail($data['offer_id']);
+    
+        if ($offer->user_id === $user->id) {
+            return $request->wantsJson()
+                ? response()->json(['message' => 'Нельзя купить свой оффер'], 422)
+                : back()->withErrors(['offer' => 'Нельзя купить свой оффер']);
+        }
+    
+        if (!$offer->is_active || (int)$offer->quantity <= 0) {
+            return $request->wantsJson()
+                ? response()->json(['message' => 'Оффер недоступен'], 422)
+                : back()->withErrors(['offer' => 'Оффер недоступен']);
+        }
+    
+        // цена для покупателя за 1 ед. (точно не null)
+        $unitPrice = (float)($offer->price ?? 0);
+    
+        $deal = Deal::create([
+            'buyer_id'    => $user->id,
+            'offer_id'    => $offer->id,
+            'quantity'    => 1,
+            'total_price' => round($unitPrice * 1, 2),  // <= заполняем не-null
+            'status'      => 'pending',
+            'payment_method_id' => null,
+        ]);
+    
+        if ($request->wantsJson()) {
+            return response()->json([
+                'deal_id'  => $deal->id,
+                'redirect' => route('deals.show', $deal->id),
+            ]);
+        }
+    
+        return redirect()->route('deals.show', $deal->id);
     }
-
-    return redirect()->route('deals.show', $deal->id);
-}
+    
         public function show(Deal $deal)
 {
     $this->authorize('view', $deal); // Покупатель или продавец
