@@ -2,7 +2,7 @@
 import { ref, computed, watch } from 'vue'
 import { useForm, router } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
-import { usePage } from '@inertiajs/vue3'
+import { usePage, Head } from '@inertiajs/vue3'
 import axios from 'axios'
 
 const flash = computed(() => {
