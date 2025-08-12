@@ -230,32 +230,48 @@ public function buy(Request $request)
 public function confirm(\App\Models\Deal $deal)
 {
     $user = auth()->user();
-    $buyerPercent = (float) config('fees.buyer_percent'); // из конфига
-    $finalPrice  = round((1 + $buyerPercent/100), 2); // что видит покупатель
+
+    // Разрешаем подтверждение только покупателю
     if ($deal->buyer_id !== $user->id) {
-        return response()->json(['message' => 'Подтверждать может только покупатель.'], 422);
+        return response()->json(['message' => 'Подтверждать может только покупатель.'], 403);
     }
+
     if ($deal->status !== 'paid') {
         return response()->json(['message' => 'Сделка ещё не оплачена.'], 422);
     }
+
     if ((float)$deal->escrow_amount <= 0) {
         return response()->json(['message' => 'Нет замороженных средств для выплаты.'], 422);
     }
 
     try {
         DB::transaction(function () use ($deal) {
-
+            // блокируем строки оффера и продавца
             $offer  = $deal->offer()->lockForUpdate()->firstOrFail();
             $seller = $offer->user()->lockForUpdate()->firstOrFail();
 
-            // Простой вариант: выплачиваем ВСЮ сумму из эскроу
-            $payout = (float) ($deal->total_price)/$finalPrice; // цена для продавца (без %)
-            if ($payout <= 0) {
-                abort(422, 'Неверная сумма для выплаты.');
+            // 1) Базовая цена за единицу (для продавца)
+            //    Если есть сохранённая base_price — используем её.
+            //    Иначе аккуратно восстановим из текущей цены и процента покупателя.
+            $buyerPercent = (float) config('fees.buyer_percent', 0);
+            $unitBase = null;
+
+            if (!is_null($offer->base_price)) {
+                $unitBase = (float) $offer->base_price;
+            } else {
+                // fallback для старых офферов: price = final (для покупателя)
+                $finalK = 1 + ($buyerPercent / 100);
+                $unitBase = $finalK > 0 ? round(((float) $offer->price) / $finalK, 2) : (float) $offer->price;
             }
 
+            // 2) Сколько выплатить продавцу: базовая * купленное количество
+            $qty    = (int) $deal->quantity;
+            $payout = round($unitBase * $qty, 2);
+
+            // 3) Переводим продавцу
             $seller->increment('balance', $payout);
 
+            // 4) Завершаем сделку, освобождаем эскроу
             $deal->update([
                 'confirmed_at'  => now(),
                 'released_at'   => now(),
@@ -266,7 +282,9 @@ public function confirm(\App\Models\Deal $deal)
 
         return response()->json(['ok' => true]);
     } catch (\Throwable $e) {
+        // можно залогировать $e
         return response()->json(['message' => 'Внутренняя ошибка при подтверждении'], 500);
     }
 }
+
 }
