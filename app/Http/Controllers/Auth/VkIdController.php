@@ -91,21 +91,14 @@ class VkIdController extends Controller
         }
 
         $tokenResp = Http::asForm()->post($this->tokenUrl, $form);
-        if (!$tokenResp->ok()) {
-            return redirect()->route('login')->withErrors(['vk' => 'Не удалось получить токен']);
-        }
+       
 
         $token       = $tokenResp->json();
         $accessToken = $token['access_token'] ?? null;
-        if (!$accessToken) {
-            return redirect()->route('login')->withErrors(['vk' => 'Пустой access_token']);
-        }
-
+       
         // OIDC userinfo
         $userResp = Http::withToken($accessToken)->get($this->userUrl);
-        if (!$userResp->ok()) {
-            return redirect()->route('login')->withErrors(['vk' => 'Не удалось получить профиль']);
-        }
+      
 
         $u    = $userResp->json();
         $sub  = $u['sub']   ?? null;
