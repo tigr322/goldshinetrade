@@ -48,18 +48,18 @@ Route::get('/users/{user}', [MainController::class, 'show'])->name('users.show')
 
 
 
-Route::get('/auth/redirect/{provider}', [SocialController::class, 'redirect'])
+Route::get('/auth/redirect/{google}', [SocialController::class, 'redirect'])
     ->whereIn('provider', ['google'])
     ->name('oauth.redirect');
 
-Route::get('/auth/callback/{provider}', [SocialController::class, 'callback'])
+Route::get('/auth/callback/{google}', [SocialController::class, 'callback'])
     ->whereIn('provider', ['google'])
     ->name('oauth.callback');
 // routes/web.php
 Route::get('/oauth/vk/redirect', [\App\Http\Controllers\Auth\VkIdController::class, 'redirect'])
     ->name('oauth.vk.redirect');
 
-Route::get('/oauth/vk/callback', [\App\Http\Controllers\Auth\VkIdController::class, 'callback'])
+Route::get('/oauth/vk/callback/{vkontakte}', [\App\Http\Controllers\Auth\VkIdController::class, 'callback'])
     ->name('oauth.vk.callback');
 
 // 🛡️ Защищённые страницы           'verified',
