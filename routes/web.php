@@ -27,7 +27,7 @@ use App\Http\Controllers\Auth\SocialController;
 use App\Http\Controllers\Auth\VkIdController;
 Broadcast::routes(['middleware' => ['web', 'auth:sanctum']]);
 
-// 🌐 Гостевая страница
+// Гостевая страница
 Route::get('/', function () {
    
     return Inertia::render('Welcome', [
@@ -38,7 +38,7 @@ Route::get('/', function () {
     ]);
 })->name('Welcome');
 
-// 📜 Статичные страницы
+//  Статичные страницы
 Route::get('/privacy', fn () => Inertia::render('Privacy/Privacy'))->name('privacy');
 Route::get('/policy/offer', fn () => Inertia::render('Privacy/Offert'))->name('policy.offer');
 Route::get('/policy/terms', fn () => Inertia::render('Privacy/Terms'))->name('policy.terms');
@@ -59,7 +59,7 @@ Route::get('/auth/redirect/vkontakte', [VkIdController::class, 'redirect'])
     ->name('oauth.vk.redirect');
 Route::get('/auth/callback/vkontakte', [VkIdController::class, 'callback'])
     ->name('oauth.vk.callback');
-// 🛡️ Защищённые страницы           'verified',
+//  Защищённые страницы           'verified',
 
     Route::middleware([
           'verified',
@@ -69,7 +69,7 @@ Route::get('/auth/callback/vkontakte', [VkIdController::class, 'callback'])
 Route::post('/deals/{deal}/confirm', [TradeController::class, 'confirm'])->name('deals.confirm')->middleware('auth');
 Route::post('/deals/{deal}/pay', [TradeController::class, 'pay'])->name('deals.pay');
 
-    // 🌍 Главная, торговля, маршруты SPA
+    //  Главная, торговля, маршруты SPA
     Route::get('/dashboard', [MainController::class, 'index'])->name('dashboard');
     Route::get('/offers', [TradeController::class, 'index'])->name('offers.index');
     Route::post('/offers', [TradeController::class, 'store'])->name('offers.store');
@@ -81,7 +81,7 @@ Route::post('/deals/{deal}/pay', [TradeController::class, 'pay'])->name('deals.p
     Route::get('/help', fn () => Inertia::render('Help'))->name('help');
     Route::get('/security', fn () => Inertia::render('Security'))->name('security');
 
-    // 📩 Сделки и сообщения
+    //  Сделки и сообщения
     Route::get('/deals/{deal}', [TradeController::class, 'show'])->name('deals.show');
    
     Route::get('/deals/{deal}/messages', [MessageController::class, 'index'])->name('messages.index');
@@ -89,24 +89,24 @@ Route::post('/deals/{deal}/pay', [TradeController::class, 'pay'])->name('deals.p
     Route::get('/mymessages', [MessageController::class, 'mymasseges'])->name('mymessages');
     Route::post('/messages/mark-read', [MessageController::class, 'markAsRead'])->name('messages.markRead');
 
-    // 💳 Карты
+    //  Карты
     Route::bind('card', fn ($value) => UserCard::findOrFail($value));
     Route::get('/cards', [CardController::class, 'index'])->name('cards.index');
     Route::get('/cards/add', [CardController::class, 'create'])->name('cards.create');
     Route::post('/cards', [CardController::class, 'store'])->name('cards.store');
     Route::delete('/cards/{card}', [CardController::class, 'destroy'])->name('cards.destroy');
 
-    // 💼 Профиль
+    //  Профиль
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])->name('profile.photo');
 
-    // 💰 Пополнение и оплата
+    // Пополнение и оплата
     Route::get('/wallet/topup', [WalletTopupController::class, 'create'])->name('wallet.topup');
     Route::post('/wallet/topup', [WalletTopupController::class, 'store'])->name('wallet.topup.store');
    
-    // ⚙️ Админ-панель
+    // Админ-панель
     Route::middleware(['admin_or_moder'])->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
         Route::get('/users', [AdminUsersController::class, 'index'])->name('users.index')->middleware('admin');
