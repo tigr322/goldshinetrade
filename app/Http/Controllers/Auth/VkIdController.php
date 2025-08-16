@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Cache;
 class VkIdController extends Controller
 {
     private string $issuer = 'https://id.vk.com'; // базовый Issuer
+    private string $authUrl = 'https://id.vk.com/authorize';
 
 
     /** BASE64URL без паддингов (=) */
