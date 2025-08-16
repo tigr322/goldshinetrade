@@ -67,7 +67,7 @@ const submit = () => {
           <p class="text-sm font-medium text-gray-700">Вход в систему</p>
           <div class="mt-3 grid grid-cols-2 gap-3">
             <a
-              :href="route('oauth.redirect', { provider: 'google' })"
+              :href="route('oauth.google.redirect')"
               class="inline-flex w-full justify-center items-center gap-2 rounded-xl border border-gray-300 bg-white py-2.5 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition"
             >
             <svg

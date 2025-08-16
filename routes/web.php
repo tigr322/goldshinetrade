@@ -24,6 +24,7 @@ use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Laravel\Fortify\Features;
 use App\Http\Controllers\Auth\SocialController;
+use App\Http\Controllers\Auth\VkIdController;
 Broadcast::routes(['middleware' => ['web', 'auth:sanctum']]);
 
 // 🌐 Гостевая страница
@@ -48,20 +49,16 @@ Route::get('/users/{user}', [MainController::class, 'show'])->name('users.show')
 
 
 
-Route::get('/auth/redirect/{google}', [SocialController::class, 'redirect'])
-    ->whereIn('provider', ['google'])
-    ->name('oauth.redirect');
+Route::get('/auth/redirect/google', [SocialController::class, 'redirectGoogle'])
+    ->name('oauth.google.redirect');
+Route::get('/auth/callback/google', [SocialController::class, 'callbackGoogle'])
+    ->name('oauth.google.callback');
 
-Route::get('/auth/callback/{google}', [SocialController::class, 'callback'])
-    ->whereIn('provider', ['google'])
-    ->name('oauth.callback');
-// routes/web.php
-Route::get('/oauth/vk/redirect', [\App\Http\Controllers\Auth\VkIdController::class, 'redirect'])
+// VK ID (наш кастомный OIDC)
+Route::get('/auth/redirect/vkontakte', [VkIdController::class, 'redirect'])
     ->name('oauth.vk.redirect');
-
-Route::get('/oauth/vk/callback/{vkontakte}', [\App\Http\Controllers\Auth\VkIdController::class, 'callback'])
+Route::get('/auth/callback/vkontakte', [VkIdController::class, 'callback'])
     ->name('oauth.vk.callback');
-
 // 🛡️ Защищённые страницы           'verified',
 
     Route::middleware([
