@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class VkIdController extends Controller
 {
@@ -34,7 +35,7 @@ class VkIdController extends Controller
     {
         $clientId    = config('services.vkontakte.client_id', env('VKONTAKTE_CLIENT_ID'));
         $redirectUri = config('services.vkontakte.redirect', env('VKONTAKTE_REDIRECT_URI'));
-        $scope       = env('VKONTAKTE_ID_SCOPE', 'openid email'); // В .env ОБЯЗАТЕЛЬНО в кавычках: "openid email"
+        $scope       = env('VKONTAKTE_ID_SCOPE', 'openid email'); 
 
         // CSRF и nonce
         $state = Str::random(32);
@@ -62,70 +63,89 @@ class VkIdController extends Controller
     }
 
     public function callback(Request $request)
-    {
-        // Проверяем state
-        $savedState = $request->session()->pull('vkid_state');
-        if (!$request->has('state') || $request->state !== $savedState) {
-            abort(403, 'Invalid state');
-        }
-        if (!$request->has('code')) {
-            return redirect()->route('login')->withErrors(['vk' => 'Не получили код авторизации']);
-        }
-
-        $clientId     = config('services.vkontakte.client_id', env('VKONTAKTE_CLIENT_ID'));
-        $clientSecret = config('services.vkontakte.client_secret', env('VKONTAKTE_CLIENT_SECRET')); // для confidential app
-        $redirectUri  = config('services.vkontakte.redirect', env('VKONTAKTE_REDIRECT_URI'));
-        $verifier     = (string) $request->session()->pull('vkid_pkce_verifier', '');
-
-        // Обмен кода на токен (обязателен code_verifier!)
-        $form = [
-            'grant_type'    => 'authorization_code',
-            'code'          => $request->code,
-            'redirect_uri'  => $redirectUri,
-            'client_id'     => $clientId,
-            'code_verifier' => $verifier,
-        ];
-        // Если у вас конфиденциальное веб-приложение с секретом — добавьте:
-        if (!empty($clientSecret)) {
-            $form['client_secret'] = $clientSecret;
-        }
-
-        $tokenResp = Http::asForm()->post($this->tokenUrl, $form);
-       
-
-        $token       = $tokenResp->json();
-        $accessToken = $token['access_token'] ?? null;
-       
-        // OIDC userinfo
-        $userResp = Http::withToken($accessToken)->get($this->userUrl);
-      
-
-        $u    = $userResp->json();
-        $sub  = $u['sub']   ?? null;
-        $email= $u['email'] ?? null;
-        $name = $u['name']  ?? ($u['given_name'] ?? 'User');
-
-        if (!$email) {
-            $email = "vkid_{$sub}@example.local";
-        }
-
-        $user = \App\Models\User::firstOrCreate(
-            ['email' => $email],
-            ['name' => $name, 'password' => bcrypt(Str::random(32))]
-        );
-
-        // Сохраним кусок oauth-меты (если есть json колонка)
-        $user->oauth = array_merge((array)$user->oauth, [
-            'vkid' => ['sub' => $sub, 'email' => $u['email'] ?? null],
+{
+    // Проверяем state
+    $savedState = $request->session()->pull('vkid_state');
+    if (!$request->has('state') || $request->state !== $savedState) {
+        Log::warning('VKID callback: неверный state', [
+            'expected' => $savedState,
+            'received' => $request->get('state'),
         ]);
-        $user->save();
-
-        // Сразу верифицируем email, чтобы не слать письмо каждый логин
-        if (method_exists($user, 'markEmailAsVerified') && is_null($user->email_verified_at)) {
-            $user->markEmailAsVerified();
-        }
-
-        Auth::login($user, true);
-        return redirect()->intended(route('dashboard'));
+        abort(403, 'Invalid state');
     }
+
+    if (!$request->has('code')) {
+        Log::error('VKID callback: отсутствует код авторизации', [
+            'full_request' => $request->all(),
+        ]);
+        return redirect()->route('login')->withErrors(['vk' => 'Не получили код авторизации']);
+    }
+
+    $clientId     = config('services.vkontakte.client_id', env('VKONTAKTE_CLIENT_ID'));
+    $clientSecret = config('services.vkontakte.client_secret', env('VKONTAKTE_CLIENT_SECRET'));
+    $redirectUri  = config('services.vkontakte.redirect', env('VKONTAKTE_REDIRECT_URI'));
+    $verifier     = (string) $request->session()->pull('vkid_pkce_verifier', '');
+
+    $form = [
+        'grant_type'    => 'authorization_code',
+        'code'          => $request->code,
+        'redirect_uri'  => $redirectUri,
+        'client_id'     => $clientId,
+        'code_verifier' => $verifier,
+    ];
+    if (!empty($clientSecret)) {
+        $form['client_secret'] = $clientSecret;
+    }
+
+    $tokenResp = Http::asForm()->post($this->tokenUrl, $form);
+
+    // Лог токена
+    Log::info('VKID callback: token response', [
+        'status' => $tokenResp->status(),
+        'body'   => $tokenResp->json(),
+    ]);
+
+    $token       = $tokenResp->json();
+    $accessToken = $token['access_token'] ?? null;
+
+    $userResp = Http::withToken($accessToken)->get($this->userUrl);
+
+    // Лог userinfo
+    Log::info('VKID callback: userinfo response', [
+        'status' => $userResp->status(),
+        'body'   => $userResp->json(),
+    ]);
+
+    $u    = $userResp->json();
+    $sub  = $u['sub']   ?? null;
+    $email= $u['email'] ?? null;
+    $name = $u['name']  ?? ($u['given_name'] ?? 'User');
+
+    if (!$email) {
+        $email = "vkid_{$sub}@example.local";
+    }
+
+    $user = \App\Models\User::firstOrCreate(
+        ['email' => $email],
+        ['name' => $name, 'password' => bcrypt(Str::random(32))]
+    );
+
+    $user->oauth = array_merge((array)$user->oauth, [
+        'vkid' => ['sub' => $sub, 'email' => $u['email'] ?? null],
+    ]);
+    $user->save();
+
+    if (method_exists($user, 'markEmailAsVerified') && is_null($user->email_verified_at)) {
+        $user->markEmailAsVerified();
+    }
+
+    Auth::login($user, true);
+
+    Log::info('VKID callback: user logged in', [
+        'user_id' => $user->id,
+        'email'   => $user->email,
+    ]);
+
+    return redirect()->intended(route('dashboard'));
+}
 }
