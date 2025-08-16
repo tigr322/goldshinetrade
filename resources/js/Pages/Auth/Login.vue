@@ -88,12 +88,13 @@ const submit = () => {
             </a>
 
             <a
-              :href="route('oauth.redirect', { provider: 'vkontakte' })"
-              class="inline-flex w-full justify-center items-center gap-2 rounded-xl border border-gray-300 bg-white py-2.5 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition"
-            >
-              <img src="/images/vk.svg" alt="" class="h-5 w-5" />
-              Войти через ВКонтакте
-            </a>
+  :href="route('oauth.vk.redirect')"
+  class="inline-flex w-full justify-center items-center gap-2 rounded-xl border border-gray-300 bg-white py-2.5 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition"
+>
+  <img src="/images/vk.svg" alt="" class="h-5 w-5" />
+  Войти через VK ID
+</a>
+
           </div>
 
           <div class="relative mt-8">

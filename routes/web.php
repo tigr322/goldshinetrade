@@ -55,6 +55,12 @@ Route::get('/auth/redirect/{provider}', [SocialController::class, 'redirect'])
 Route::get('/auth/callback/{provider}', [SocialController::class, 'callback'])
     ->whereIn('provider', ['vkontakte','google'])
     ->name('oauth.callback');
+// routes/web.php
+Route::get('/oauth/vk/redirect', [\App\Http\Controllers\Auth\VkIdController::class, 'redirect'])
+    ->name('oauth.vk.redirect');
+
+Route::get('/oauth/vk/callback', [\App\Http\Controllers\Auth\VkIdController::class, 'callback'])
+    ->name('oauth.vk.callback');
 
 // 🛡️ Защищённые страницы           'verified',
 
