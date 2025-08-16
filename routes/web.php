@@ -49,11 +49,11 @@ Route::get('/users/{user}', [MainController::class, 'show'])->name('users.show')
 
 
 Route::get('/auth/redirect/{provider}', [SocialController::class, 'redirect'])
-    ->whereIn('provider', ['vkontakte','google'])
+    ->whereIn('provider', ['google'])
     ->name('oauth.redirect');
 
 Route::get('/auth/callback/{provider}', [SocialController::class, 'callback'])
-    ->whereIn('provider', ['vkontakte','google'])
+    ->whereIn('provider', ['google'])
     ->name('oauth.callback');
 // routes/web.php
 Route::get('/oauth/vk/redirect', [\App\Http\Controllers\Auth\VkIdController::class, 'redirect'])
