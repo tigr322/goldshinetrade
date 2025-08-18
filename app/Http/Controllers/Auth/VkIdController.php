@@ -33,25 +33,35 @@ class VkIdController extends Controller
     }
 
     public function redirect(Request $request)
-{
-    $clientId    = config('services.vkontakte.client_id');
-    $redirectUri = config('services.vkontakte.redirect'); // ДОЛЖЕН точно совпадать с тем, что указано в VK
-    $state = Str::random(32);
-    $request->session()->put('vk_state', $state);
+    {
+        $clientId    = config('services.vkontakte.client_id', env('VKONTAKTE_CLIENT_ID'));
+        $redirectUri = config('services.vkontakte.redirect', env('VKONTAKTE_REDIRECT_URI'));
+        $scope       = env('VKONTAKTE_ID_SCOPE', 'openid email'); 
 
-    $url = 'https://oauth.vk.com/authorize?' . http_build_query([
-        'client_id'     => $clientId,
-        'redirect_uri'  => $redirectUri,
-        'response_type' => 'code',
-        'scope'         => 'email',   // добавь, если хочешь получать email
-        'state'         => $state,
-        'display'       => 'page',
-        'v'             => '5.131',
-    ]);
+        // CSRF и nonce
+        $state = Str::random(32);
+        $nonce = Str::random(32);
+        $request->session()->put('vkid_state', $state);
+        $request->session()->put('vkid_nonce', $nonce);
 
-    return redirect()->away($url);
-}
+        // PKCE
+        [$verifier, $challenge] = $this->makePkce();
+        $request->session()->put('vkid_pkce_verifier', $verifier);
 
+        // Авторизация
+        $query = http_build_query([
+            'client_id'              => $clientId,
+            'redirect_uri'           => $redirectUri,
+            'response_type'          => 'code',
+            'scope'                  => $scope,            // будет url-энкодед автоматически
+            'state'                  => $state,
+            'nonce'                  => $nonce,
+            'code_challenge'         => $challenge,
+            'code_challenge_method'  => 'S256',           // ВАЖНО: именно S256
+        ]);
+
+        return redirect($this->authUrl.'?'.$query);
+    }
 
     private function oidcConfig(): array
     {
@@ -66,7 +76,6 @@ class VkIdController extends Controller
             return $resp->json();
         });
     }
-    
     public function callback(Request $request)
 {
     // 1) Проверка state
