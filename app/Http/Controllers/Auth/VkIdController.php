@@ -79,7 +79,7 @@ class VkIdController extends Controller
     public function callback(Request $request)
 {
     // 1) Проверка state
-    $savedState = $request->session()->pull('vk_state');
+    $savedState = $request->session()->pull('vkid_state');
     if (!$request->has('state') || $request->state !== $savedState) {
         \Log::warning('VK callback: invalid state', ['expected' => $savedState, 'got' => $request->get('state')]);
         abort(403, 'Invalid state');
