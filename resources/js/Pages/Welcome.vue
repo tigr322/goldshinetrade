@@ -83,7 +83,9 @@ const navigation = [
         >
           <div class="flex items-center justify-between">
             <Link href="/" class="-m-1.5 p-1.5 inline-flex items-center gap-2">
+              <picture>
               <img class="h-10 w-10 rounded-md object-contain" src="/storage/iconca.png" alt="GoldShineTrade" />
+            </picture>
               <span class="sr-only">GoldShineTrade</span>
             </Link>
             <button type="button" class="-m-2.5 rounded-md p-2.5 text-gray-700" @click="mobileMenuOpen = false">
