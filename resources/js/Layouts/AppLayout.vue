@@ -87,7 +87,8 @@ if (user && Array.isArray(user.roles) && user.roles.some(role => ['admin', 'mode
               </div>
 
               <div class="flex items-center px-4">
-                <img class="h-20 w-auto" src="/storage/icon.png" alt="Logo" />
+                <picture>  <img src="/storage/icon.png" alt="Logo" /></picture>
+              
               </div>
 
               <nav class="mt-5 divide-y divide-cyan-800 overflow-y-auto px-2" aria-label="Sidebar">
