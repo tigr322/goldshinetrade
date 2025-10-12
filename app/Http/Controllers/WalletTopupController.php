@@ -103,9 +103,10 @@ public function withdrawCreate()
 public function withdrawStore(Request $request)
 {
     $request->validate([
-        'amount' => 'required|numeric|min:1',
-        'card_id' => 'required|exists:user_cards,id',
+        'amount'  => 'required|numeric|min:1',
+        'card_id' => 'required|integer|exists:user_cards,id',
     ]);
+    
 
     $user = \App\Models\User::find(Auth::id());
     $amount = $request->input('amount');
