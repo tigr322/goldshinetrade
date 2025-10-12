@@ -128,7 +128,8 @@ public function withdrawStore(Request $request)
             'user_id' => $user->id,
             'amount' => $amount,
             'card_id' => $card->id,
-            'status' => 'PENDING', // or 'COMPLETED' based on your logic
+            'details' => 'Withdrawal to card ' . $card->number,
+            'status' => 'pending',
         ]);
     });
 
