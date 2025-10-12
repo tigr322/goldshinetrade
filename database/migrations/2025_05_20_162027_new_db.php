@@ -80,7 +80,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->decimal('amount', 10, 2);
-            $table->string('method');
+            $table->string('method')->nullable();
             $table->text('details')->nullable();
             $table->enum('status', ['pending', 'paid', 'rejected'])->default('pending');
             $table->timestamps();
