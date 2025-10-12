@@ -337,7 +337,12 @@ onMounted(async () => {
   >
     Пополнить кошелек
   </Link>
-                  <button type="button" class="inline-flex items-center rounded-md border border-transparent bg-cyan-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2">Вывести деньги</button> 
+  <Link
+    :href="route('wallet.withdraw')"
+    class="inline-flex items-center rounded-md border border-transparent bg-cyan-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
+  >
+  Вывести деньги
+  </Link>
                 </div>
               </div>
             </div>

@@ -105,7 +105,9 @@ Route::post('/deals/{deal}/pay', [TradeController::class, 'pay'])->name('deals.p
     // Пополнение и оплата
     Route::get('/wallet/topup', [WalletTopupController::class, 'create'])->name('wallet.topup');
     Route::post('/wallet/topup', [WalletTopupController::class, 'store'])->name('wallet.topup.store');
-   
+    //Вывод средств
+    Route::get('/wallet/withdraw', [WalletTopupController::class, 'withdrawCreate'])->name('wallet.withdraw');
+    Route::post('/wallet/withdraw', [WalletTopupController::class, 'withdrawStore'])->name('wallet.withdraw.store');
     // Админ-панель
     Route::middleware(['admin_or_moder'])->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');

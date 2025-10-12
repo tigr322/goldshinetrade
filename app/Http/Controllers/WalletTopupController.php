@@ -92,5 +92,46 @@ public function handleCallback(Request $request)
 
     return response()->json(['status' => 'ok']);
 }
+public function withdrawCreate()
+{
+    $cards = Auth::user()->cards()->get(['id', 'name', 'type', 'number', 'expiry', 'primary']);
 
+    return inertia('Wallet/Withdraw', [
+        'cards' => $cards,
+    ]);
+}
+public function withdrawStore(Request $request)
+{
+    $request->validate([
+        'amount' => 'required|numeric|min:1',
+        'card_id' => 'required|exists:user_cards,id',
+    ]);
+
+    $user = \App\Models\User::find(Auth::id());
+    $amount = $request->input('amount');
+    $cardId = $request->input('card_id');
+
+    if ($user->balance < $amount) {
+        return response()->json(['error' => 'Insufficient balance'], 400);
+    }
+
+    $card = UserCard::where('id', $cardId)->where('user_id', $user->id)->first();
+    if (!$card) {
+        return response()->json(['error' => 'Card not found'], 404);
+    }
+
+    DB::transaction(function () use ($user, $amount, $card) {
+        $user->balance -= $amount;
+        $user->save();
+
+        \App\Models\Withdrawal::create([
+            'user_id' => $user->id,
+            'amount' => $amount,
+            'card_id' => $card->id,
+            'status' => 'PENDING', // or 'COMPLETED' based on your logic
+        ]);
+    });
+
+    return response()->json(['message' => 'Withdrawal request submitted']);
+}
 }
