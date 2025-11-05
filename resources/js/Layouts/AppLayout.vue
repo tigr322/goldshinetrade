@@ -41,6 +41,27 @@ const secondaryNavigation = [
 const page = usePage()
 const user = page.props.auth.user
 
+// Добавляем недостающие ссылки в навигации
+try {
+  navigation.push(
+    { name: 'Аккаунты', href: route('accounts'), icon: DocumentChartBarIcon },
+    { name: 'Пополнить баланс', href: route('wallet.topup'), icon: ClockIcon },
+    { name: 'Вывод средств', href: route('wallet.withdraw'), icon: ScaleIcon },
+    { name: 'Обмен', href: route('exchange'), icon: DocumentChartBarIcon },
+  )
+
+  // Заменяем вторичную навигацию на реальные маршруты
+  secondaryNavigation.length = 0
+  secondaryNavigation.push(
+    { name: 'Настройки', href: route('settings'), icon: CogIcon },
+    { name: 'Помощь', href: route('help'), icon: QuestionMarkCircleIcon },
+    { name: 'Безопасность', href: route('security'), icon: ShieldCheckIcon },
+    { name: 'Жалобы', href: route('complaints'), icon: ShieldCheckIcon },
+  )
+} catch (e) {
+  // no-op
+}
+
 if (user && Array.isArray(user.roles) && user.roles.some(role => ['admin', 'moderator'].includes(role.name))) {
   navigation.push({
     name: 'Администрирование',

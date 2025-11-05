@@ -105,6 +105,7 @@ public function withdrawStore(Request $request)
     $request->validate([
         'amount'  => 'required|numeric|min:1',
         'card_id' => 'required|integer|exists:user_cards,id',
+        
     ]);
     
 
@@ -128,8 +129,10 @@ public function withdrawStore(Request $request)
         \App\Models\Withdrawal::create([
             'user_id' => $user->id,
             'amount' => $amount,
-            'card_id' => $card->id,
-            'details' => 'Withdrawal to card ' . $card->number,
+            // сохраняем тип (карта/телефон/кошелёк)
+            'method' => $card->type,
+            // сохраняем реквизиты, чтобы админ мог вручную перевести
+            'details' => ($card->type ? ($card->type . ': ') : '') . $card->number,
             'status' => 'pending',
         ]);
     });

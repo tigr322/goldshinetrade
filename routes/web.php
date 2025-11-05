@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\AdminDataController;
 use App\Http\Controllers\Trade\TradeController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminUsersController;
+use App\Http\Controllers\Admin\AdminWithdrawalController;
 use App\Models\UserCard;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -139,6 +140,9 @@ Route::post('/deals/{deal}/pay', [TradeController::class, 'pay'])->name('deals.p
         Route::post('/payment-methods', [AdminDataController::class, 'storePaymentMethod'])->name('payment_methods.store');
         Route::put('/payment-methods/{paymentMethod}', [AdminDataController::class, 'updatePaymentMethod'])->name('payment_methods.update');
         Route::delete('/payment-methods/{paymentMethod}', [AdminDataController::class, 'destroyPaymentMethod'])->name('payment_methods.destroy');
+
+        // Withdrawals tracking
+        Route::get('/withdrawals', [AdminWithdrawalController::class, 'index'])->name('withdrawals.index');
     });
 });
 Route::post('/payment/callback', [WalletTopupController::class, 'handleCallback']);
