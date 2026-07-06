@@ -1,61 +1,156 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# goldshinetrade — Gaming Currency Exchange Marketplace
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="https://img.shields.io/badge/Laravel-12-FF2D20?style=flat-square&logo=laravel" />
+  <img src="https://img.shields.io/badge/PHP-8.3-777BB4?style=flat-square&logo=php" />
+  <img src="https://img.shields.io/badge/Vue-3-4FC08D?style=flat-square&logo=vuedotjs" />
+  <img src="https://img.shields.io/badge/Inertia.js-2-9553E9?style=flat-square" />
+  <img src="https://img.shields.io/badge/Docker-Ready-2496ED?style=flat-square&logo=docker" />
+  <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" />
 </p>
 
-## About Laravel
+> 📸 **Screenshots coming soon**
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Full-stack marketplace for exchanging in-game currencies for real money. Escrow system with frozen funds, real-time messaging (Pusher WebSockets), CKassa payment gateway integration, social auth (VK ID + Google OAuth), Spatie role-based access control, and admin panel — all Docker-deployed.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## ✨ Features
 
-## Learning Laravel
+- **Escrow System** — Buyer places order → funds frozen → seller delivers → buyer confirms → funds released. Dispute resolution workflow included.
+- **Real-Time Chat** — Pusher WebSockets for instant messaging between buyers and sellers within deals.
+- **CKassa Payment Integration** — Production payment gateway integration for deposits and withdrawals.
+- **Social Authentication** — Login via VK ID (custom OIDC) and Google OAuth2.
+- **Role-Based Access** — Spatie Laravel Permissions for admin, seller, and buyer roles.
+- **Responsive SPA** — Vue 3 + Inertia.js 2 + Tailwind CSS 3 with Headless UI components.
+- **Admin Panel** — Manage offers, users, withdrawals; dashboard with metrics.
+- **Docker Deployment** — PHP-FPM 8.3 + Nginx Alpine, Docker Compose production-ready.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## 🛠️ Tech Stack
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+| Layer | Technology |
+|-------|-----------|
+| **Backend** | Laravel 12, PHP 8.3 |
+| **Auth** | Fortify + Jetstream 5 + Sanctum 4 |
+| **RBAC** | Spatie Laravel Permission v6 |
+| **Database** | MySQL 8 |
+| **Payments** | CKassa API |
+| **Real-Time** | Pusher + Laravel Echo |
+| **Social Auth** | Laravel Socialite (VK ID, Google) |
+| **Frontend** | Vue 3 + Inertia.js 2 + Tailwind CSS 3 |
+| **UI** | Headless UI + Heroicons |
+| **Build** | Vite 6 |
+| **Containerization** | Docker Compose + PHP-FPM 8.3 + Nginx Alpine |
+| **Queue** | Laravel Horizon + Redis |
+| **Mail** | Mailgun |
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 🚀 Quick Start
 
-### Premium Partners
+### Prerequisites
+- Docker & Docker Compose
+- PHP 8.2+ with Composer (for local dev)
+- Node.js 20+ with npm
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development/)**
-- **[Active Logic](https://activelogic.com)**
+### Setup
 
-## Contributing
+```bash
+# 1. Clone
+git clone https://github.com/tigr322/goldshinetrade.git
+cd goldshinetrade
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# 2. Install PHP dependencies
+composer install
 
-## Code of Conduct
+# 3. Install JS dependencies
+npm install
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# 4. Configure environment
+cp .env.example .env
+php artisan key:generate
 
-## Security Vulnerabilities
+# 5. Edit .env with your:
+#    - DB credentials
+#    - Pusher keys (PUSHER_APP_ID, PUSHER_APP_KEY, PUSHER_APP_SECRET)
+#    - CKassa credentials (CKASSA_SHOP_TOKEN, CKASSA_SEC_KEY)
+#    - VK ID credentials (VKONTAKTE_CLIENT_ID, VKONTAKTE_CLIENT_SECRET)
+#    - Google OAuth credentials
+#    - Mailgun credentials
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# 6. Docker up
+docker compose up -d
 
-## License
+# 7. Migrate & seed
+php artisan migrate --seed
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# 8. Build frontend
+npm run build
+
+# Visit http://localhost
+```
+
+---
+
+## 🏗️ Architecture
+
+### Escrow Flow
+
+```
+1. Seller creates an Offer (game, server, currency, price)
+2. Buyer accepts → Deal created, funds frozen
+3. Seller delivers in-game currency
+4. Buyer confirms receipt → funds released to seller
+5. If disputed → admin mediates
+```
+
+### Key Models
+
+| Model | Purpose |
+|-------|---------|
+| `Game` / `Server` | Game catalog |
+| `Offer` | Seller's listing |
+| `Deal` | Active transaction with escrow state |
+| `Message` | Real-time deal chat |
+| `Payment` / `Withdrawal` | Financial operations |
+| `Review` | Buyer/seller feedback |
+
+### Directory Structure
+
+```
+goldshinetrade/
+├── app/
+│   ├── Actions/         Fortify + Jetstream actions
+│   ├── Events/          BalanceUpdated, MessageSent, etc.
+│   ├── Http/Controllers/
+│   │   ├── Admin/       Dashboard, Users, Offers, Withdrawals
+│   │   ├── Auth/        SocialController, VkIdController
+│   │   └── Trade/       TradeController
+│   ├── Models/          Game, Deal, Offer, Payment, etc. (14 models)
+│   ├── Policies/        Authorization rules
+│   └── Services/        CkassaService, EncryptionService
+├── database/migrations/ 17 migration files
+├── resources/js/        Vue 3 SPA (Inertia pages)
+├── routes/
+│   ├── web.php          Main application routes
+│   ├── api.php          REST API
+│   └── channels.php     Pusher broadcasting
+├── docker/              PHP-FPM + Nginx configs
+└── tests/               Feature + Unit tests
+```
+
+---
+
+## 🇷🇺 Русский
+
+**goldshinetrade** — полноценный маркетплейс для обмена внутриигровых валют на реальные деньги. Платформа включает escrow-систему с заморозкой средств, чат в реальном времени через Pusher, интеграцию платёжного шлюза CKassa, авторизацию через VK ID и Google, систему ролей Spatie и админ-панель. Развёртывается через Docker Compose.
+
+**Стек**: Laravel 12, Vue 3 + Inertia.js, MySQL, CKassa, Pusher, Docker.
+
+---
+
+## 📄 License
+
+MIT © [Tigran Adamyan](https://github.com/tigr322)
